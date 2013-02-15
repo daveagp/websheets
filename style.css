@@ -1,0 +1,63 @@
+input.oneliner, .CodeMirror {
+    background: #F7F7F7
+}
+
+input.oneliner {
+    border: none; 
+    border-bottom: 1px dashed #CCC
+}
+
+.CodeMirror {
+    border: 1px dashed #CCC
+}
+
+.CodeMirror {
+    margin-top: -1em; 
+    margin-bottom: -1em
+}
+
+input.oneliner {
+    font-family:monospace; 
+    margin-left: 0px; 
+    margin-right: 0px;
+    font-size: 16px;
+}
+
+div.code {
+    font-family:monospace;
+    white-space:pre;
+}
+
+div.exercise {
+    box-shadow: -1px 1px 8px #888888;
+    width: 720px;
+    margin: 5px;
+    font-size: 16px;
+    background: rgb(232, 238, 247);
+}
+
+.exercise .section {
+    padding: 5px;
+}
+
+.exercise .section.code {
+    padding-left: 10px;
+}
+
+.exercise .section:not(:first-child) { 
+    border-top: 1px dotted #888;
+}
+
+table.actions {
+    margin: 0px auto;
+}
+
+/* start of auto-size code */
+.CodeMirror {
+    height: auto
+}
+.CodeMirror-scroll {
+    overflow-y: hidden;
+    overflow-x: auto;
+}
+/* end of auto-size code */
