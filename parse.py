@@ -151,17 +151,17 @@ def make_page(wses):
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Testing Multiple Text Areas</title>
-        <link rel="stylesheet" href="codemirror-3.0/lib/codemirror.css">
-        <link rel="stylesheet" href="codemirror-3.0/theme/neat.css">
+        <link rel="stylesheet" href="codemirror/lib/codemirror.css">
+        <link rel="stylesheet" href="codemirror/theme/neat.css">
         <link rel="stylesheet" href="style.css">
         <script type="text/javascript" 
          src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <!-- next one for one-line text inputs -->
         <script type="text/javascript" src="autoGrowInput.js"></script>
         <script type="text/javascript" 
-         src="codemirror-3.0/lib/codemirror.js"></script>
+         src="codemirror/lib/codemirror.js"></script>
         <script type="text/javascript" 
-         src="codemirror-3.0/mode/clike/clike.js"></script>
+         src="codemirror/mode/clike/clike.js"></script>
         <script type="text/javascript" src="interface.js"></script>
    </head>
    <body>
