@@ -1,13 +1,16 @@
 #!/usr/bin/python3
 
 """
-Note: this is a cheap and dirty solution that assumes
+Note: this is a relatively cheap and dirty solution that assumes
 that the delimeters never occur in comments or quotes
-in the source code. While this approach should not be practical,
+in the source code. While this approach should be practical,
 a more full solution could be done by extending java_parse.
 """
 
 import re
+import sys
+sys.path.append('../../java-syntax')
+import java_syntax
 
 def record(**dict):
     """ e.g. foo = record(bar='baz', jim=5) creates an object foo
@@ -17,7 +20,7 @@ def record(**dict):
 open_delim = {r'\[', r'\hide[', r'\fake['}
 close_delim = {']\\'} # not rawstring to make emacs happy
     
-def parse(source):
+def parse_websheet_source(source):
     # allowing source to start with a newline makes the source files prettier
     if (source[:1]=="\n"):
         source = source[1:]
@@ -44,24 +47,39 @@ def parse(source):
         result.append(record(depth=depth, token=token, type=type))
         
         if depth < 0:
-            return 'Error: too many closing delimiters'
+            return [False, 'Error in websheet source code: too many closing delimiters']
         if depth > 1:
-            return 'Error: nesting not currently allowed'
+            return [False, 'Error in websheet source code: nesting not currently allowed']
     if depth != 0:
-        return 'Error: not enough closing delimiters'
+        return [False, 'Error in websheet source code: not enough closing delimiters']
 
-    return result
+    return [True, result]
 
-def make_html_exercise(ws):
+def prepare_websheet(ws):
+    parsed = parse_websheet_source(ws.code)
+    if not parsed[0]:
+        return parsed
+    input_count = 0
+    for token in parsed[1]:
+        if token.type == "open" and token.token == r"\[":
+            input_count += 1
+    return [True, record(source_code = ws.code,
+                         token_list = parsed[1],
+                         input_count = input_count,
+                         classname = ws.classname,
+                         description = ws.description,
+                         tests = ws.tests)]
+
+def make_html_exercise(pws):
     result = ""
-    result += '<h3>' + ws.classname + '</h3>\n'
+    result += '<h3>' + pws.classname + '</h3>\n'
     result += '<div class="exercise">\n'
-    result += '<div class="section preamble">\n' + ws.description + "\n</div>\n"
+    result += '<div class="section preamble">\n' + pws.description + "\n</div>\n"
     result += '<div class="section code">'
     stack = []
     r = []
     input_count = 0
-    for item in parse(ws.code):
+    for item in pws.token_list:
         if item.type=="open":
             stack.append(item.token)
         elif item.type=="close":
@@ -98,12 +116,35 @@ def make_html_exercise(ws):
     result += '</div> <!--exercise-->\n'
     return result
 
+def is_valid_substitute(reference_code, student_code):
+    is_inline = not ("\n" in reference_code)
 
-def make_student_solution(ws, student_code):
+    stuparse = java_syntax.java_parse(student_code)
+    if not stuparse.valid:
+        return [False, stuparse.errmsg]
+    if stuparse.ends_with_scomment and is_inline:
+        return [False, "// is not allowed"]
+    refparse = java_syntax.java_parse(reference_code)
+    if refparse.oneline or refparse.oneline_with_semicolon:
+        if "\n" in student_code:
+            return [False, "newlines are not allowed"]
+    if refparse.oneline and stuparse.semicolons > 0:
+        return [False, "; is not allowed"]
+    if refparse.oneline_with_semicolon and not stuparse.oneline_with_semicolon:
+            return [False, "must have exactly one semicolon, at the end"]
+    if stuparse.empty and not refparse.empty:
+        return [False, "must not be empty"]
+    if stuparse.terminated_badly and not refparse.terminated_badly:
+        return [False, "must end with a semicolon (;) or a {block}"]
+    return [True]
+
+def make_student_solution(pws, student_code):
     stack = []
     r = []
     input_count = 0
-    for item in parse(ws.code):
+    if pws.input_count != len(student_code):
+        return [False, "Wrong number of inputs"]
+    for item in pws.token_list:
         if item.type=="open":
             stack.append(item.token)
         elif item.type=="close":
@@ -115,19 +156,23 @@ def make_student_solution(ws, student_code):
             else:
                 assert len(stack)==1
                 if stack[0]=="\\[":
+                    valid = is_valid_substitute(item.token, student_code[input_count])
+                    if not valid[0]:
+                        return [False, 
+                                "Error in input area "+str(input_count)+": "+
+                                valid[1]]
                     r.append(student_code[input_count])
                     input_count += 1
                 elif stack[0]=="\\hide[":
                     r.append(item.token)
                 elif stack[0]=="\\fake[":
                     pass
+    return [True, ''.join(r)]
 
-    return ''.join(r)
-
-def make_reference_solution(ws):
+def make_reference_solution(pws, before_ref="", after_ref=""):
     stack = []
     r = []
-    for item in parse(ws.code):
+    for item in pws.token_list:
         if item.type=="open":
             stack.append(item.token)
         elif item.type=="close":
@@ -139,12 +184,12 @@ def make_reference_solution(ws):
             else:
                 assert len(stack)==1
                 if stack[0] in {"\\[", "\\hide["}:
-                    r.append(item.token)
+                    r.extend([before_ref, item.token, after_ref])
                 else:
                     assert stack[0]=="\\fake["
     return ''.join(r)
 
-def make_page(wses):
+def make_page(pwses):
     result = r"""
 <!DOCTYPE html>
 <html>
@@ -166,8 +211,8 @@ def make_page(wses):
    </head>
    <body>
 """
-    for ws in wses:
-       result += make_html_exercise(ws)
+    for pws in pwses:
+       result += make_html_exercise(pws)
     result += "</body></html>"
     return result
 
@@ -175,14 +220,42 @@ if __name__ == "__main__":
     # testing
     import ws_MaxThree, ws_FourSwap, ws_NextYear
     all_ws = (ws_MaxThree, ws_FourSwap, ws_NextYear)
-    import sys
-    if len(sys.argv)>1:
-        for ws in all_ws:
-            print("#reference for "+ws.classname+"#")
-            print(make_reference_solution(ws))
-            print("#student sample for "+ws.classname+"#")
-            print(make_student_solution(ws, ("000", "111", "222", "333")))
+    all_pws = []
+    for ws in all_ws:
+        pws = prepare_websheet(ws)
+        if not pws[0]:
+            print("Error in preparing websheet!")
+            print(pws[1])
+            print("Websheet input:")
+            print(ws)
+            sys.exit(0)
+        all_pws.append(pws[1])
+
+    if len(sys.argv) > 1:
+        for pws in all_pws:
+          while True:  
+            print("#reference for "+pws.classname+"#")
+            print(make_reference_solution(pws, "<r>", "</r>"))
+            stulist = []
+            for i in range(pws.input_count):
+                r = ""
+                while True:
+                    inp = input("Enter more for input #"+str(i)+" (blank to stop): ")
+                    if inp != "":
+                        if r != "": r += "\n"
+                        r += inp
+                    else:
+                        break
+                if i==0 and r =="": break
+                stulist.append(r)
+            if stulist==[]: break
+            print("#student sample for "+pws.classname+"#")
+            ss = make_student_solution(pws, stulist)
+            if ss[0]:
+                print("Accepted:\n"+ss[1])
+            else:
+                print("Error:", ss[1])
     else:
-        print(make_page(all_ws))
+        print(make_page(all_pws))
 
     

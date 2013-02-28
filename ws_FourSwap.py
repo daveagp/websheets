@@ -11,6 +11,7 @@ String right = ...;
 ]\
 // now, write code to re-arrange the values correctly,
 // when a clockwise 90-degree rotation is performed
+
 \[String tmp = top;
 top = left;
 left = bottom;
