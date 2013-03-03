@@ -70,15 +70,9 @@ def prepare_websheet(ws):
                          description = ws.description,
                          tests = ws.tests)]
 
-def make_html_exercise(pws):
-    result = ""
-    result += '<h3>' + pws.classname + '</h3>\n'
-    result += '<div class="exercise">\n'
-    result += '<div class="section preamble">\n' + pws.description + "\n</div>\n"
-    result += '<div class="section code">'
+def iterate_token_list(pws, with_delimiters = false):
     stack = []
-    r = []
-    input_count = 0
+    input_counter = 0
     for item in pws.token_list:
         if item.type=="open":
             stack.append(item.token)
@@ -86,25 +80,37 @@ def make_html_exercise(pws):
             stack.pop()
         else:
             assert item.type==""
-            if len(stack)==0:
+            if stack == ["\\["]:
+                input_counter += 1
+        if with_delimiters or item.type=="":
+            yield (item, stack, input_counter)      
+
+def make_html_exercise(pws):
+    result = ""
+    result += '<h3>' + pws.classname + '</h3>\n'
+    result += '<div class="exercise">\n'
+    result += '<div class="section preamble">\n' + pws.description + "\n</div>\n"
+    result += '<div class="section code">'
+    r = []
+
+    for (item, stack, input_counter) in iterate_token_list(pws):
+        if len(stack)==0:
+            r.append(item.token)
+        else:
+            assert len(stack)==1
+            if stack[0]=="\\[":
+                if "\n" in item.token:
+                    rows = 1 + item.token.count('\n')
+                    r.append("<textarea cols=60 rows={} name='wsi{}'></textarea>".
+                             format(rows, input_counter))
+                else:
+                    cols = 3 + len(item.token)
+                    r.append('<input class="oneliner" type="text" size="{}" name="wsi{}"/>'.
+                             format(cols, input_counter))
+            elif stack[0]=="\\fake[":
                 r.append(item.token)
-            else:
-                assert len(stack)==1
-                if stack[0]=="\\[":
-                    if "\n" in item.token:
-                        rows = 1 + item.token.count('\n')
-                        r.append("<textarea cols=60 rows={} name='wsi{}'></textarea>".
-                                 format(rows, input_count))
-                        input_count += 1
-                    else:
-                        cols = 3 + len(item.token)
-                        r.append('<input class="oneliner" type="text" size="{}" name="wsi{}"/>'.
-                                 format(cols, input_count))
-                        input_count += 1
-                elif stack[0]=="\\fake[":
-                    r.append(item.token)
-                elif stack[0]=="\\hide[":
-                    pass
+            elif stack[0]=="\\hide[":
+                pass
 
     result += ''.join(r)
 
@@ -139,54 +145,42 @@ def is_valid_substitute(reference_code, student_code):
     return [True]
 
 def make_student_solution(pws, student_code):
-    stack = []
-    r = []
-    input_count = 0
     if pws.input_count != len(student_code):
         return [False, "Wrong number of inputs"]
-    for item in pws.token_list:
-        if item.type=="open":
-            stack.append(item.token)
-        elif item.type=="close":
-            stack.pop()
+
+    r = []
+
+    for (item, stack, input_counter) in iterate_token_list(pws):
+        if len(stack)==0:
+            r.append(item.token)
         else:
-            assert item.type==""
-            if len(stack)==0:
+            assert len(stack)==1
+            if stack[0]=="\\[":
+                valid = is_valid_substitute(item.token, student_code[input_count])
+                if not valid[0]:
+                    return [False, 
+                            "Error in input area "+str(input_count)+": "+
+                            valid[1]]
+                r.append(student_code[input_count])
+            elif stack[0]=="\\hide[":
                 r.append(item.token)
-            else:
-                assert len(stack)==1
-                if stack[0]=="\\[":
-                    valid = is_valid_substitute(item.token, student_code[input_count])
-                    if not valid[0]:
-                        return [False, 
-                                "Error in input area "+str(input_count)+": "+
-                                valid[1]]
-                    r.append(student_code[input_count])
-                    input_count += 1
-                elif stack[0]=="\\hide[":
-                    r.append(item.token)
-                elif stack[0]=="\\fake[":
-                    pass
+            elif stack[0]=="\\fake[":
+                pass
+    
     return [True, ''.join(r)]
 
 def make_reference_solution(pws, before_ref="", after_ref=""):
-    stack = []
     r = []
-    for item in pws.token_list:
-        if item.type=="open":
-            stack.append(item.token)
-        elif item.type=="close":
-            stack.pop()
+
+    for (item, stack, input_counter) in iterate_token_list(pws):
+        if len(stack)==0:
+            r.append(item.token)
         else:
-            assert item.type==""
-            if len(stack)==0:
-                r.append(item.token)
+            assert len(stack)==1
+            if stack[0] in {"\\[", "\\hide["}:
+                r.extend([before_ref, item.token, after_ref])
             else:
-                assert len(stack)==1
-                if stack[0] in {"\\[", "\\hide["}:
-                    r.extend([before_ref, item.token, after_ref])
-                else:
-                    assert stack[0]=="\\fake["
+                assert stack[0]=="\\fake["
     return ''.join(r)
 
 def make_page(pwses):
