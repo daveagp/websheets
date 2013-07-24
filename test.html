@@ -1,0 +1,181 @@
+<html>
+
+<head>
+
+   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+   <script type="text/javascript" src="CodeMirror/lib/codemirror.js"></script>
+   <script type="text/javascript" src="CodeMirror/mode/clike/clike.js"></script>
+
+   <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
+   <link rel="stylesheet" href="CodeMirror/theme/neat.css">
+
+<style type='text/css'>
+.red {border-bottom: 1px solid red}
+.inline {background-color: #FDD !important;}
+.inline-left {background-color: #FEE !important;}
+.inline-right {background-color: #FEE !important;}
+pre.block {background-color: #EFE !important;}
+pre.block span {background-color: #DFD !important;}
+
+.CodeMirror {
+  border: 1px solid #eee;
+  height: auto;
+}
+.CodeMirror-scroll {
+  overflow-y: hidden;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+.CodeMirror {
+  font-family: Monaco, Menlo, 'Ubuntu Mono', 'Droid Sans Mono', Consolas, monospace;
+  font-size: 14px;
+  line-height: 16px;
+}
+</style>
+
+<script type='text/javascript'>
+
+var java_keywords = {
+    abstract:0, continue:0, for:0, new:0, switch:0,assert:0, default:0, 
+    goto:0, package:0, synchronized:0, boolean:0, do:0, if:0, private:0, 
+    this:0, break:0, double:0, implements:0, protected:0, throw:0, 
+    byte:0, else:0, import:0, public:0, throws:0, case:0, enum:0, 
+    instanceof:0, return:0, transient:0,catch:0, extends:0, int:0, 
+    short:0, try:0, char:0, final:0, interface:0, static:0, void:0,class:0, 
+    finally:0, long:0, strictfp:0, volatile:0, const:0, float:0, native:0, 
+    super:0, while:0};
+
+$( function() {
+
+var cm = CodeMirror.fromTextArea(document.getElementById("code"),
+  {
+  mode: "text/x-java", //{name: "clike", keywords: java_keywords},
+  theme: "neat", tabSize: 3, indentUnit: 3,
+  lineNumbers: true,
+  viewportMargin: Infinity});
+
+cm.setValue("public static  max3(  ) {\n\n}");
+
+function intersects(r1, r2) {
+   return !(r1.to.line < r2.from.line 
+   || r1.to.line == r2.from.line && r1.to.ch <= r2.from.ch
+   || r1.from.line > r2.to.line
+   || r1.from.line == r2.to.line && r1.from.ch >= r2.to.ch);
+}
+function contains(r1, r2) {
+   return (r1.from.line < r2.from.line 
+   || r1.from.line == r2.from.line && r1.from.ch <= r2.from.ch)
+   && (r1.to.line > r2.to.line
+   || r1.to.line == r2.to.line && r1.to.ch >= r2.to.ch);
+}
+
+var marks = [
+     cm.markText({line: 0, ch: 0}, {line: 0, ch: 13},
+            {readOnly: true, 
+            className: "red",
+                       inclusiveLeft: true, inclusiveRight: false}),
+     cm.markText({line: 0, ch: 15}, {line: 0, ch: 20},
+            {readOnly: true,
+             className: "red",
+                       inclusiveLeft: false, inclusiveRight: false}),
+     cm.markText({line: 0, ch: 22}, {line: 0, ch: 25},
+            {readOnly: true, 
+            className: "red",
+                       inclusiveLeft: false, inclusiveRight: false}),
+     cm.markText({line: 2, ch: 0}, {line: 2, ch: 1},
+            {readOnly: true, 
+            className: "red",
+                       inclusiveLeft: false, inclusiveRight: true})
+
+];
+
+var inline = [
+     cm.markText({line: 0, ch: 13}, {line: 0, ch: 15},
+            {readOnly: false, 
+            className: "inline",
+                       inclusiveLeft: true, inclusiveRight: true}),
+     cm.markText({line: 0, ch: 20}, {line: 0, ch: 22},
+            {readOnly: false, 
+            className: "inline",
+                       inclusiveLeft: true, inclusiveRight: true})
+                       ];
+
+     cm.markText({line: 0, ch: 13}, {line: 0, ch: 14},
+            {readOnly: true, 
+            className: "inline-left",
+                       inclusiveRight: false});
+     cm.markText({line: 0, ch: 20}, {line: 0, ch: 21},
+            {readOnly: true, 
+            className: "inline-left",
+                       inclusiveRight: false});
+     cm.markText({line: 0, ch: 14}, {line: 0, ch: 15},
+            {readOnly: true, 
+            className: "inline-right",
+                       inclusiveLeft: false});
+     cm.markText({line: 0, ch: 21}, {line: 0, ch: 22},
+            {readOnly: true, 
+            className: "inline-right",
+                       inclusiveRight: false});
+
+
+var block = [
+     cm.markText({line: 0, ch: 25}, {line: 2, ch: 0},
+            {readOnly: false, 
+            className: "block",
+                       inclusiveLeft: true, inclusiveRight: true})
+                       ];
+
+var user = [inline[0], inline[1], block[0]];
+
+// this is better than readOnly since it works when you surround read-only text
+// and try to change the whole selection
+cm.on("beforeChange", function(cm, change) {
+   for (var i=0; i<marks.length; i++) {
+      var mrange = marks[i].find();
+      if (intersects(change, mrange)) { 
+        change.cancel();
+        return; 
+    }
+   }
+   for (var i=0; i<inline.length; i++) {
+      var mrange = inline[i].find();
+    if (change.text.length > 1 && intersects(change, mrange)) {
+        change.cancel();
+        return; 
+   }}
+
+   for (var i=0; i<user.length; i++) {
+     // you can't edit the first or last character in a user range
+      var mrange = user[i].find();
+      //console.log([mrange, change]);
+      if (intersects({from: {line: mrange.from.line, ch: mrange.from.ch-1}
+                      , to: {line: mrange.from.line, ch: mrange.from.ch+1}}, change) ||
+       intersects({from: {line: mrange.to.line, ch: mrange.to.ch-1}
+                      , to: {line: mrange.to.line, ch: mrange.to.ch+1}}, change)) 
+{
+        change.cancel();
+        return; 
+ }   }   
+});
+
+cm.on("renderLine", function(cm, line, elt) {
+     var ln = cm.getLineNumber(line);
+     for (var i=0; i<block.length; i++) {
+      var mrange = block[i].find();
+                                  // <= looked too goofy
+      if (mrange && mrange.from.line < ln && mrange.to.line > ln)
+      {       //console.log(elt);// cm.addLineClass(line, "background", "green");
+      $(elt).addClass("block");}
+    }
+});
+
+cm.refresh();
+
+});
+
+</script>
+</head>
+<body>
+<textarea id="code" name="code"></textarea>
+</body>
+</html>
