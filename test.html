@@ -1,5 +1,4 @@
 <html>
-
 <head>
 
    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
@@ -12,6 +11,11 @@
    <link rel="stylesheet" href="CodeMirror/theme/neat.css">
    <link rel="stylesheet" href="websheet.css">
 
+   <script type="text/javascript">
+   $(function() {
+      window.testWS = websheet("code", ["public static", "  ","max3(", "  ", ") {", "\n\n", "}"]);
+   });
+   </script>
 </head>
 <body>
 <textarea id="code" name="code"></textarea>
