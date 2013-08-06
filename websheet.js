@@ -13,13 +13,33 @@ function websheet(textarea_id, fragments) {
     return (compare(int1.from, int2.from) < 0)
       && (compare(int2.to, int1.to) < 0);
   }
-  
+
+  // tab jumps you to the start of the next input field
+  function do_tab() {
+    var pos = cm.getCursor();
+    var first = null;
+    for (var i=0; i<editable.length; i++) {
+      var ustart = editable[i].find().from;
+      if (cm.getLine(ustart.line).length == ustart.ch) 
+        ustart = {line: ustart.line+1, ch: 0};
+      else
+        ustart.ch++;
+      if (compare(ustart, pos) == 1) {
+        cm.setCursor(ustart);
+        return;
+      }
+      if (first == null) first = ustart;
+    }
+    cm.setCursor(first);
+  }
+
   var cm = CodeMirror.fromTextArea(document.getElementById(textarea_id), {
     mode: "text/x-java",
     theme: "neat", tabSize: 3, indentUnit: 3,
     lineNumbers: true,
     styleSelectedText: true,
-    viewportMargin: Infinity
+    viewportMargin: Infinity,
+    extraKeys: { Tab: do_tab }
   });
 
   cm.setValue(fragments.join(""));
@@ -34,6 +54,7 @@ function websheet(textarea_id, fragments) {
     var oldline = line;
     var oldch = ch;
     var lastNL = fragments[i].lastIndexOf("\n");
+
     if (lastNL == -1) {
       ch += fragments[i].length;
     }
@@ -42,7 +63,35 @@ function websheet(textarea_id, fragments) {
         if (fragments[i].charAt(j)=='\n') line++;
       ch = fragments[i].length - lastNL - 1;
     }
+
     if (i%2 == 1) { // alternate chunks are for user input
+      if (fragments[i].length < 2) {
+        cm.toTextArea();
+        var errmsg = "Error: fragment " + i + " is too short";
+        console.log(errmsg, fragments);
+        return;
+      }
+      
+      // check for errors
+      if (lastNL != -1) {
+        if (fragments[i].charAt(0)!='\n'
+            || fragments[i].charAt(fragments[i].length-1)!='\n') {
+          cm.toTextArea();
+          var errmsg = "Error: fragment " + i + " contains a newline, must start end end with a newline";
+          console.log(errmsg, fragments);
+          return;
+        }
+      }
+      else {
+        if (fragments[i].charAt(0)!=' '
+            || fragments[i].charAt(fragments[i].length-1)!=' ') {
+          cm.toTextArea();
+          var errmsg = "Error: fragment " + i + " contains no newline, must start end end with a space";
+          console.log(errmsg, fragments);
+          return;
+        }
+      }
+      
       var marker = cm.markText(
         {line: oldline, ch: oldch},
         {line: line, ch: ch},
@@ -50,6 +99,7 @@ function websheet(textarea_id, fragments) {
       editable.push(marker);
       if (lastNL==-1) { // inline
         inline.push(marker);
+        // mark half-char widths
         cm.markText({line: oldline, ch: oldch},
                     {line: oldline, ch: oldch+1},
                     {className: "inlineL"});
@@ -66,6 +116,18 @@ function websheet(textarea_id, fragments) {
   // this is better than readOnly since it works when you surround read-only text
   // and try to change the whole selection
   cm.on("beforeChange", function(cm, change) {
+
+    // cancel newlines in inline regions
+    if (change.text.length > 1) // array of lines; is there a newline?
+      for (var i=0; i<inline.length; i++) {
+        var inlinerange = inline[i].find();
+        if (contains_strictly(inlinerange, change)) {
+          change.cancel();
+          return;
+        }
+      }
+
+    // only allow changes within editable regions
     for (var i=0; i<editable.length; i++) {
       var fixedrange = editable[i].find();
       if (contains_strictly(fixedrange, change)) return;
