@@ -167,7 +167,8 @@ function websheet(textarea_id, fragments) {
         });
       }
       return result;      
-    }
+    },
+    cm: cm
   };
   
 }

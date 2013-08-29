@@ -93,7 +93,7 @@ class Websheet:
                 stack.pop()
             else:
                 assert item.type==""
-                if stack == ["\\["]:
+                if stack == [r"\["]:
                     info["blank_index"] = input_counter
                     input_counter += 1
 
@@ -102,7 +102,7 @@ class Websheet:
 
     def make_student_solution(self, student_code):
         if self.input_count != len(student_code):
-            return [False, "Wrong number of inputs"]
+            return [False, "Internal error! Wrong number of inputs"]
 
         r = []
 
@@ -111,18 +111,45 @@ class Websheet:
                 r.append(item.token)
             else:
                 assert len(stack)==1
-                if stack[0]=="\\[":
+                if stack[0]==r"\[":
                     i = info["blank_index"]
+
+                    if type(student_code[i]) == str:
+                        chunk = student_code[i]
+                        pos = None
+                    else:
+                        chunk = student_code[i]['code']
+                        pos = student_code[i]
+                        
                     valid = java_syntax.is_valid_substitute(
-                        item.token, student_code[i])
+                        item.token, chunk)
                     if not valid[0]:
-                        return [False, 
-                                "Error in input area "+str(i)+": "+
-                                valid[1]]
-                    r.append(student_code[i])
-                elif stack[0]=="\\hide[":
+                        import re
+                        match = re.search(re.compile(r"^Error at line (\d+), column (\d+):\n(.*)$"), valid[1])
+                        if match is None:
+                            user_pos = "end of region"
+                            if pos is not None:
+                                user_pos = "line "+str(pos['to']['line']+(1 if "\n" not in chunk else 0))
+                            return [False, 
+                                    "Error in input area "+str(i)+" ("+user_pos+"): "+valid[1]]
+                        else:
+                            user_pos = "chunk-line "+match.group(1)+", chunk-col "+match.group(2)
+                            if pos is not None:
+                                if match.group(1)=="0":
+                                    user_pos = {"line": pos['from']['line'],
+                                                "col": pos['from']['ch']+int(match.group(2))}
+                                else:
+                                    user_pos = {"line": pos['from']['line']+int(match.group(1)),
+                                                "col": int(match.group(2))}
+                                if "\n" in chunk: user_pos["line"] -= 1
+                                user_pos = "line " + str(user_pos["line"]+1) + ", col " + str(user_pos["col"])
+                            return [False, 
+                                    "Error in input area "+str(i)+" ("+user_pos+"): "+match.group(3)]
+
+                    r.append(chunk)
+                elif stack[0]==r"\hide[":
                     r.append(item.token)
-                elif stack[0]=="\\fake[":
+                elif stack[0]==r"\fake[":
                     pass
     
         return [True, ''.join(r)]
@@ -135,11 +162,28 @@ class Websheet:
                 r.append(item.token)
             else:
                 assert len(stack)==1
-                if stack[0] in {"\\[", "\\hide["}:
+                if stack[0] in {r"\[", r"\hide["}:
                     r.extend([before_ref, item.token, after_ref])
                 else:
-                    assert stack[0]=="\\fake["
+                    assert stack[0]== r"\fake["
         return ''.join(r)
+
+    def get_json_chunks(self):
+        r = [""]
+        
+        for (item, stack, info) in self.iterate_token_list():
+            token = item.token
+            if stack == [] or stack == [r"\fake["]:
+                if token.startswith("\n"): token = token[1:]
+                if token.endswith("\n"): token = token[:-1]
+                if token != "": 
+                    if len(r) % 2 == 0: r += [""]
+                    r[-1] += token
+            elif stack == [r"\["]:
+                if len(r) % 2 == 1: r += [""]
+                r[-1] += "\n\n" if "\n" in token else "  "
+                
+        return r
 
     @staticmethod
     def from_module(module):
@@ -147,14 +191,24 @@ class Websheet:
                         module.tests, module.description)
 
 if __name__ == "__main__":
-    # testing
-    import ws_MaxThree, ws_FourSwap, ws_NextYear
 
-    websheets = [Websheet.from_module(m) 
-                 for m in (ws_MaxThree, ws_FourSwap, ws_NextYear)]
+    if sys.argv[1:] == ["json"]:
+        import ws_MaxThree, ws_FourSwap, ws_NextYear
 
-    for w in websheets:
-          while True:  
+        websheets = [Websheet.from_module(m) 
+                     for m in (ws_MaxThree, ws_FourSwap, ws_NextYear)]
+
+        # test of json chunking
+        for w in websheets:
+            print(w.get_json_chunks())
+        sys.exit(0)
+
+    if sys.argv[1:] == ["interactive"]:
+        import ws_MaxThree, ws_FourSwap, ws_NextYear
+
+        websheets = [Websheet.from_module(m) 
+                     for m in (ws_MaxThree, ws_FourSwap, ws_NextYear)]
+        while True:  
             print("#reference for "+w.classname+"#")
             print(w.make_reference_solution("<r>", "</r>"))
             stulist = []
@@ -178,4 +232,27 @@ if __name__ == "__main__":
             else:
                 print("Error:", ss[1])
 
-    
+    # call Websheet.py chunks ws_MaxThree and input [" int ", "  int a, int b, int c ", "..."] 
+    if sys.argv[1] == "chunks":
+        module = __import__(sys.argv[2])
+        websheet = Websheet.from_module(module)
+        user_input = input() # assume json all on one line
+        import json
+        user_chunks = json.loads(user_input)
+        print(websheet.make_student_solution(user_chunks))
+
+    if sys.argv[1] == "get_json_template":
+        module = __import__(sys.argv[2])
+        websheet = Websheet.from_module(module)
+        import json
+        print(json.dumps(websheet.get_json_chunks()))
+
+    # call Websheet.py poschunks ws_MaxThree and input [{code: " int ", from: ..., to: ...}, ...]
+    if sys.argv[1] == "poschunks":
+        module = __import__(sys.argv[2])
+        websheet = Websheet.from_module(module)
+        user_input = input() # assume json all on one line
+        import json
+        user_poschunks = json.loads(user_input)
+        print(json.dumps(websheet.make_student_solution(user_poschunks)))
+        

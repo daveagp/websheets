@@ -2,9 +2,11 @@ classname = "MaxThree"
 
 code = r"""
 public static \[int]\ max3(\[int a, int b, int c]\) {
-   \[int result = Math.max(a, b);
+\[
+   int result = Math.max(a, b);
    result = Math.max(result, c);
-   return result;]\
+   return result;
+]\
 }
 """
 
