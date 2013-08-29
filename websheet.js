@@ -155,6 +155,19 @@ function websheet(textarea_id, fragments) {
         result.push(cm.getRange(range.from, range.to));
       }
       return result;
-    }};
+    },
+    getUserCodeAndLocations: function() {
+      var result = new Array();
+      for (var i=0; i<editable.length; i++) {
+        var range = editable[i].find();
+        result.push({
+          code: cm.getRange(range.from, range.to),
+          from: {line: range.from.line, ch: range.from.ch},
+          to: {line: range.to.line, ch: range.to.ch}
+        });
+      }
+      return result;      
+    }
+  };
   
 }

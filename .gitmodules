@@ -1,3 +1,6 @@
 [submodule "CodeMirror"]
 	path = CodeMirror
-	url = https://github.com/marijnh/CodeMirror
+	url = https://github.com/marijnh/CodeMirror.git
+[submodule "java_syntax"]
+	path = java_syntax
+	url = git@github.com:daveagp/java_syntax.git

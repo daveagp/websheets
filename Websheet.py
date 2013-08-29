@@ -9,8 +9,7 @@ a more full solution could be done by extending java_parse.
 
 import re
 import sys
-sys.path.append('../../java-syntax')
-import java_syntax
+from java_syntax import java_syntax
 
 def record(**dict):
     """ e.g. foo = record(bar='baz', jim=5) creates an object foo
@@ -101,47 +100,6 @@ class Websheet:
             if with_delimiters or item.type=="":
                 yield (item, stack, info)      
 
-    def make_html_exercise(self):
-        r = []
-        r.append('<h3>' + self.classname + '</h3>\n')
-        r.append('<div class="exercise">\n')
-        r.append('<div class="section preamble">\n' 
-                 + self.description 
-                 + "\n</div>\n")
-        r.append('<div class="section code">')
-        
-        for (item, stack, info) in self.iterate_token_list():
-            if len(stack)==0:
-                r.append(item.token)
-            else:
-                assert len(stack)==1
-                if stack[0]=="\\[":
-                    if "\n" in item.token:
-                        rows = 1 + item.token.count('\n')
-                        r.append(("<textarea cols=60 rows={} name='wsi{}'>"+
-                                 "</textarea>").
-                                 format(rows, info["blank_index"]))
-                    else:
-                        cols = 3 + len(item.token)
-                        r.append(('<input class="oneliner" type="text"'+
-                                  ' size="{}" name="wsi{}"/>').
-                                 format(cols, info["blank_index"]))
-                elif stack[0]=="\\fake[":
-                    r.append(item.token)
-                elif stack[0]=="\\hide[":
-                    pass
-
-        r.append("""</div> <!--code-->
-<div class="section">
-<table class="actions"><tr><td>
-<input type="button" value="Submit" class="exercise-submit">
-</td></tr></table>
-<div class="results"></div>
-</div> <!--tail section-->
-</div> <!--exercise-->""")
-
-        return ''.join(r)
-
     def make_student_solution(self, student_code):
         if self.input_count != len(student_code):
             return [False, "Wrong number of inputs"]
@@ -184,36 +142,6 @@ class Websheet:
         return ''.join(r)
 
     @staticmethod
-    def make_page(websheets):
-        r = []
-        r.append(r"""
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Testing Multiple Text Areas</title>
-        <link rel="stylesheet" href="codemirror/lib/codemirror.css">
-        <link rel="stylesheet" href="codemirror/theme/neat.css">
-        <link rel="stylesheet" href="style.css">
-        <script type="text/javascript" 
-         src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js">
-        </script>
-        <!-- next one for one-line text inputs -->
-        <script type="text/javascript" src="autoGrowInput.js"></script>
-        <script type="text/javascript" 
-         src="codemirror/lib/codemirror.js"></script>
-        <script type="text/javascript" 
-         src="codemirror/mode/clike/clike.js"></script>
-        <script type="text/javascript" src="interface.js"></script>
-   </head>
-   <body>
-""")
-        for websheet in websheets:
-            r.append(websheet.make_html_exercise())
-        r.append("</body></html>")
-        return ''.join(r)
-
-    @staticmethod
     def from_module(module):
         return Websheet(module.classname, module.code, 
                         module.tests, module.description)
@@ -225,10 +153,7 @@ if __name__ == "__main__":
     websheets = [Websheet.from_module(m) 
                  for m in (ws_MaxThree, ws_FourSwap, ws_NextYear)]
 
-    if len(sys.argv) == 1:
-        print(Websheet.make_page(websheets))
-    else:
-        for w in websheets:
+    for w in websheets:
           while True:  
             print("#reference for "+w.classname+"#")
             print(w.make_reference_solution("<r>", "</r>"))
