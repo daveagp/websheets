@@ -77,7 +77,7 @@ function websheet(textarea_id, fragments) {
         if (fragments[i].charAt(0)!='\n'
             || fragments[i].charAt(fragments[i].length-1)!='\n') {
           cm.toTextArea();
-          var errmsg = "Error: fragment " + i + " contains a newline, must start end end with a newline";
+          var errmsg = "Error: fragment " + i + " contains a newline, must start and end with a newline";
           console.log(errmsg, fragments);
           return;
         }
@@ -86,7 +86,7 @@ function websheet(textarea_id, fragments) {
         if (fragments[i].charAt(0)!=' '
             || fragments[i].charAt(fragments[i].length-1)!=' ') {
           cm.toTextArea();
-          var errmsg = "Error: fragment " + i + " contains no newline, must start end end with a space";
+          var errmsg = "Error: fragment " + i + " contains no newline, must start and end with a space";
           console.log(errmsg, fragments);
           return;
         }
@@ -109,6 +109,8 @@ function websheet(textarea_id, fragments) {
       }
       else { // block
         block.push(marker);
+        for (var ell=oldline+1; ell<line; ell++)
+          cm.indentLine(ell, "smart");
       }
     }
   }

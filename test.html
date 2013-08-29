@@ -1,6 +1,5 @@
 <html>
 <head>
-
    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
    <script type="text/javascript" src="CodeMirror/lib/codemirror.js"></script>
    <script type="text/javascript" src="CodeMirror/mode/clike/clike.js"></script>
@@ -19,6 +18,8 @@
    </script>
 </head>
 <body>
+Use the Tab key as a shortcut to jump from one blank to the next.
 <textarea id="code" name="code"></textarea>
+<button onClick="alert('Your fragments are: [[['+testWS.getUserCode().join('|||').replace(/\n/g, '\\n')+']]]');">Submit code</button>
 </body>
 </html>
