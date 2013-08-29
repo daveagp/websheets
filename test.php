@@ -75,15 +75,16 @@ var hhandle = null;
    </script>
 </head>
 <body>
-<select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val());">
-<option value="ws_MaxThree">MaxThree</option>
-<option value="ws_FourSwap">FourSwap</option>
-<option value="ws_NextYear">NextYear</option>
-</select>
-<p>Use the Tab key as a shortcut to jump from one blank to the next.</p>
-<textarea id="code" name="code"></textarea>
-<button onClick="checkSolution()">Submit code</button>
-<p>Results of the basic syntax check will appear below.</p>
-<pre id="results"></pre>
+   <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val());">
+     <option value="ws_MaxThree">MaxThree</option>
+   <option value="ws_FourSwap">FourSwap</option>
+   <option value="ws_NextYear">NextYear</option>
+   </select>
+   <p>Use the Tab key as a shortcut to jump from one blank to the next.</p>
+   <textarea id="code" name="code"></textarea>
+   <button onClick="checkSolution()">Submit code</button>
+   <p>Results of the basic syntax check will appear below.</p>
+   <pre id="results"></pre>
+   <p>(Grading is not yet implemented.)</p>
 </body>
 </html>
