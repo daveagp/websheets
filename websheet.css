@@ -21,7 +21,7 @@
     line-height: 20px;
 }
 
-#results > div {
+#results div {
     padding: 3px;
     margin: 1px;
     background-color: #F6F6F6;

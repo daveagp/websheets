@@ -44,11 +44,15 @@ if __name__ == "__main__":
     classname = websheet.classname
 
     ss_to_ui_linemap = student_solution[2]
-    
+
+    with open("GenericTester.java") as file:
+        GTjava = "\n".join(file)
+              
     dump = {
         "/home/cscircles/dev_java_jail/scratch/reference/" + classname + ".java" : reference_solution,
         "/home/cscircles/dev_java_jail/scratch/student/" + student + "/" + classname + ".java" : student_solution[1],
-        "/home/cscircles/dev_java_jail/scratch/tester/" + classname + ".java" : make_tester(websheet)
+        "/home/cscircles/dev_java_jail/scratch/tester/" + classname + ".java" : make_tester(websheet),
+        "/home/cscircles/dev_java_jail/scratch/framework/GenericTester.java" : GTjava,
         }
 
     for filename in dump:
