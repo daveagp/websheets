@@ -65,12 +65,13 @@ class Websheet:
 
         return [True, result]
 
-    def __init__(self, classname, source_code, tests, description, tester_preamble):
+    def __init__(self, classname, source_code, tests, description, tester_preamble, show_class_decl):
         self.classname = classname
         self.source_code = source_code
         self.tests = tests
         self.description = description
         self.tester_preamble = tester_preamble
+        self.show_class_decl = show_class_decl
 
         parsed = Websheet.parse_websheet_source(source_code)
 
@@ -118,6 +119,8 @@ class Websheet:
         linemap = {}
         ui_lines = 1 # user interface lines
         ss_lines = 1 # student solution lines
+
+        if self.show_class_decl: ui_lines += 1
 
         last_line_with_blank = -1
         blank_count_on_line = -1
@@ -234,6 +237,9 @@ class Websheet:
 
     def get_json_template(self):
         r = [""]
+
+        if self.show_class_decl:
+            r[0] = "public class "+self.classname+" {\n";
         
         for (item, stack, info) in self.iterate_token_list():
             token = item.token
@@ -244,14 +250,22 @@ class Websheet:
             elif stack == [r"\["]:
                 if len(r) % 2 == 1: r += [""]
                 r[-1] += "\n\n" if "\n" in token else "  "
-                
+
+        if self.show_class_decl:
+            for i in range(len(r)):
+                if i % 2 == 0: r[i] = r[i].replace("\n", "\n   ")
+                if i % 2 == 1 and r[i][-1] == "\n": r[i+1] = "   "+r[i+1]
+            if len(r) % 2 == 0: r.extend("")
+            r[-1] += "\n}"
+
         return r
 
     @staticmethod
     def from_module(module):
         return Websheet(module.classname, module.code, 
                         module.tests, module.description,
-                        module.tester_preamble if "tester_preamble" in dir(module) else None)
+                        module.tester_preamble if "tester_preamble" in dir(module) else None,
+                        module.show_class_decl if "show_class_decl" in dir(module) else False)
 
 if __name__ == "__main__":
 

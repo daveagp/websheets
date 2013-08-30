@@ -24,6 +24,8 @@ public static void main(String[] args) {
 }
 """
 
+show_class_decl = True
+
 tests = r"""
    testMain();
    test("max3", 3, 5, 7);

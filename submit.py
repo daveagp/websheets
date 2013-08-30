@@ -101,7 +101,7 @@ if __name__ == "__main__":
             return "???("+str(ss_lineno)+")"
         
     if proc.returncode != 0:
-        print("Compiler error:")
+        print("Syntax error (could not compile):")
         print("<pre>")
         #remove the safeexec bits
         compilerOutput = cgi.escape(result[1].decode("UTF-8")).split("\n")[:-5]
