@@ -1,16 +1,17 @@
 <?php
 
-if (!array_key_exists('user_state', $_REQUEST)
-    || !array_key_exists('module', $_REQUEST))
+if (!array_key_exists('stdin', $_REQUEST)
+    || !array_key_exists('args', $_REQUEST))
   {
-    echo "Internal error, malformed request to check.php";
+    echo "Internal error, malformed request to Websheet.php";
     die;
   }
-$user_state = $_REQUEST['user_state'];
-$module = $_REQUEST['module'];
+$stdin = $_REQUEST["stdin"];
+$args = $_REQUEST["args"];
 
-if (!preg_match("@^[a-zA-Z_]+$@", $module)) {
-  echo "Internal error, malformed module name \"$module\"";
+// only accept characters that cannot cause problems
+if (!preg_match("@^[0-9a-zA-Z_. ]*$@", $args)) {
+  echo "Internal error, malformed arguments \"$args\"";
   die;
  }
 
@@ -20,13 +21,13 @@ $descriptorspec = array(
                         2 => array("pipe", "w"),  // stderr
                         );
 
-$process = proc_open("./Websheet.py poschunks $module", $descriptorspec, $pipes);
+$process = proc_open("./submit.py " . $args, $descriptorspec, $pipes);
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";
   die;
  }
 
-fwrite($pipes[0], $user_state);
+fwrite($pipes[0], $stdin);
 fclose($pipes[0]);
 $stdout = stream_get_contents($pipes[1]);
 fclose($pipes[1]);
@@ -35,8 +36,8 @@ fclose($pipes[2]);
 $return_value = proc_close($process);
 
 if ($stderr != "" || $return_value != 0) {
-  echo "Internal error: ";
-  echo $stdout . $stderr . "\nReturned $return_value";
+  echo "Internal error: <pre>";
+  echo $stdout . $stderr . "\nReturned $return_value</pre>";
   die;
  }
 

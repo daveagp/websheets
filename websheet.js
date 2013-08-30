@@ -145,6 +145,12 @@ function websheet(textarea_id, fragments) {
     }
   });
   
+  var hhandle = null;
+  cm.on("change", function() {
+    if (hhandle != null) testWS.cm.removeLineClass(hhandle, "wrapper", "tempAlert");
+    hhandle = null;
+  });
+
   cm.refresh();
 
   return {
@@ -162,11 +168,17 @@ function websheet(textarea_id, fragments) {
         var range = editable[i].find();
         result.push({
           code: cm.getRange(range.from, range.to),
-          from: {line: range.from.line, ch: range.from.ch},
-          to: {line: range.to.line, ch: range.to.ch}
+          // add one since what the gutter displays is one more than the line index
+          from: {line: range.from.line+1, ch: range.from.ch},
+          to: {line: range.to.line+1, ch: range.to.ch}
         });
       }
       return result;      
+    },
+    tempAlert: function(line) {
+      // subtract one since what the gutter displays is one less than the line index
+      if (hhandle != null) testWS.cm.removeLineClass(hhandle, "wrapper", "tempAlert");
+      hhandle = cm.addLineClass(line-1, "wrapper", "tempAlert");
     },
     cm: cm
   };

@@ -13,9 +13,10 @@ public static void main(String[] args) {
 """
 
 tests = r"""
-   test("main", "Jim", "29");
-   test("main", "Jane", "9");
-   test("main", "Whiskers", "0");
+   //test("main", (Object) new String[] {"Jim", "29"});
+   testMain("Jim", "29");
+   testMain("Jane", "9");
+   testMain("Whiskers", "0");
 """
 
 description = r"""

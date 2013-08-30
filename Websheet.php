@@ -9,8 +9,8 @@ if (!array_key_exists('stdin', $_REQUEST)
 $stdin = $_REQUEST["stdin"];
 $args = $_REQUEST["args"];
 
-
-if (!preg_match("@^[a-zA-Z_. ]*$@", $args)) {
+// only accept characters that cannot cause problems
+if (!preg_match("@^[0-9a-zA-Z_. ]*$@", $args)) {
   echo "Internal error, malformed arguments \"$args\"";
   die;
  }
