@@ -19,14 +19,14 @@
 
 </head>
 <body>
-   <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val());">
+   Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val());">
    <option value="ws_MaxThree">MaxThree</option>
    <option value="ws_FourSwap">FourSwap</option>
    <option value="ws_NextYear">NextYear</option>
    </select>
-   <h3>Problem statement</h3>
+   <h3>Exercise Description</h3>
    <div id="description"></div>
-   <p><i>User interface hint:</i> use the Tab key as a shortcut to jump from one blank to the next.</p>
+   <p><i>Enter code in the yellow areas. You may use the Tab key as a shortcut to jump from one blank to the next.</i></p>
    <textarea id="code" name="code"></textarea>
    <button id="submitButton" onClick="checkSolution()">Submit code</button>
    <p>Results will appear below.</p>

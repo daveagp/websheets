@@ -32,6 +32,10 @@
     background-color: #EEE;
 }
 
+h3 {
+    margin: 15px 0px 5px 0px;
+}
+
 p, pre {
     margin: 5px 0px;
 }
