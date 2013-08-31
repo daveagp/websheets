@@ -20,6 +20,6 @@ tests = r"""
 """
 
 description = r"""
-Complete the code so that <code>java nextYear Trey 3</code> prints out 
-<br><code>Next year, Trey will be 4 years old.</code>
+Complete the code so that <code>java NextYear Trey 3</code> prints out 
+<pre>Next year, Trey will be 4 years old.</pre>
 """
