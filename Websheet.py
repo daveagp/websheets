@@ -181,10 +181,10 @@ class Websheet:
                         match = re.search(re.compile(r"^Error at line (\d+), column (\d+):\n(.*)$"), valid[1])
                         if match is None: # error at end of chunk
                             if "\n" in chunk:
-                                user_pos = "Line "+str(pos['to']['line']-(1 if "\n" in chunk else 0))+" (at end of editable region)"
+                                user_pos = "Line "+str(pos['to']['line']-(1 if "\n" in chunk else 0))+", in editable region"
                             else:
-                                user_pos = "Line "+str(pos['to']['line']-(1 if "\n" in chunk else 0))+", end of editable region " + str(blank_count_on_line)
-                            return [False, user_pos + ": " + valid[1]]
+                                user_pos = "Line "+str(pos['to']['line']-(1 if "\n" in chunk else 0))+", editable region " + str(blank_count_on_line)
+                            return [False, user_pos + ":\n" + valid[1]]
                         else:
                             if match.group(1)=="0":
                                 user_pos = {"line": pos['from']['line'],
@@ -193,7 +193,7 @@ class Websheet:
                                 user_pos = {"line": pos['from']['line']+int(match.group(1)),
                                             "col": int(match.group(2))}
                                 if "\n" not in chunk: user_pos["line"] += 1
-                            user_pos = "Line " + str(user_pos["line"]+1) + ", col " + str(user_pos["col"])+" (blank " + str(blank_count_on_line) + ")"
+                            user_pos = "Line " + str(user_pos["line"]+1) + ", col " + str(user_pos["col"])+" (blank " + str(blank_count_on_line) + ")\n"
                             return [False, 
                                     user_pos + ": " + match.group(3)]
 
