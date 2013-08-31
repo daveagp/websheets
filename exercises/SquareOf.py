@@ -1,6 +1,6 @@
 source_code = r"""
 public static void main(String[] args) {
-   int inputNum = \[Integer.parseInt(args[0])]\; // save the input
+   int inputNum = \[Integer.parseInt(args[0])]\; // convert the input
    System.out.println(\[inputNum * inputNum]\); // print its square
 }
 """
