@@ -14,6 +14,10 @@ function websheet(textarea_id, fragments) {
       && (compare(int2.to, int1.to) < 0);
   }
 
+  var hooks = {
+    run: function() { "User can replace hooks.run"; }
+  };
+
   // tab jumps you to the start of the next input field
   function do_tab() {
     var pos = cm.getCursor();
@@ -33,13 +37,17 @@ function websheet(textarea_id, fragments) {
     cm.setCursor(first);
   }
 
+  var keyMap = {Tab: do_tab};
+  // no hyphens in object literal keys, so do it this way:
+  keyMap["Shift-Enter"] = function() {hooks.run()};
+
   var cm = CodeMirror.fromTextArea(document.getElementById(textarea_id), {
     mode: "text/x-java",
     theme: "neat", tabSize: 3, indentUnit: 3,
     lineNumbers: true,
     styleSelectedText: true,
     viewportMargin: Infinity,
-    extraKeys: { Tab: do_tab }
+    extraKeys: keyMap
   });
 
   cm.setValue(fragments.join(""));
@@ -180,7 +188,8 @@ function websheet(textarea_id, fragments) {
       if (hhandle != null) testWS.cm.removeLineClass(hhandle, "wrapper", "tempAlert");
       hhandle = cm.addLineClass(line-1, "wrapper", "tempAlert");
     },
-    cm: cm
+    cm: cm,
+    hooks: hooks
   };
   
 }

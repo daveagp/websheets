@@ -32,6 +32,14 @@
     background-color: #EEE;
 }
 
+#submitButton {
+    font-size: 110%;
+    font-family: 'Source Code Pro';
+    font-weight: bold;
+    width: 500px;
+    max-width: 100%;
+}
+
 h3 {
     margin: 15px 0px 5px 0px;
 }

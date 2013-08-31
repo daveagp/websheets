@@ -14,7 +14,10 @@
 
    <script type="text/javascript" src="test.js"></script>
 <script type="text/javascript">
-   $(function() { resetup( <?php echo passthru("./Websheet.py get_html_template MaxThree"); ?> ); });
+   $(function() { 
+       resetup( <?php echo passthru("./Websheet.py get_html_template MaxThree"); ?> ); 
+       testWS.hooks.run = checkSolution;
+     });
 </script>
 
 </head>
@@ -26,7 +29,7 @@
    </select>
    <h3>Exercise Description</h3>
    <div id="description"></div>
-   <p><i>Enter code in the yellow areas. You may use the Tab key as a shortcut to jump from one blank to the next.</i></p>
+   <p><i>Enter code in the yellow areas. Shift-Enter: submit code. Tab: next blank.</i></p>
    <textarea id="code" name="code"></textarea>
    <button id="submitButton" onClick="checkSolution()">Submit code</button>
    <p>Results will appear below.</p>
