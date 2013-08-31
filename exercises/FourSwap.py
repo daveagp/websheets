@@ -53,4 +53,5 @@ tests = r"""
 description = r"""
 Complete the code so that the variables are correct after the
 square is rotated clockwise by 90 degrees.
+<div><img style='height:150px;margin-top:5px' src='exercises/FourSwap.ipe.png'></div>
 """
