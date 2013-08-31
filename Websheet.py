@@ -9,6 +9,7 @@ a more full solution could be done by extending java_parse.
 
 import re
 import sys
+import os
 import exercises
 import json
 from java_syntax import java_syntax
@@ -72,7 +73,7 @@ class Websheet:
         mandatory_fields = ["classname", "source_code", "tests", "description"]
 
         # optional fields AND default values
-        optional_fields = {"tester_preamble": None, "show_class_decl": False}
+        optional_fields = {"tester_preamble": None, "show_class_decl": True}
 
         for field in mandatory_fields:
             setattr(self, field, field_dict[field])
@@ -342,6 +343,14 @@ if __name__ == "__main__":
         user_input = input() # assume json all on one line
         user_poschunks = json.loads(user_input)
         print(json.dumps(websheet.make_student_solution(user_poschunks, "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
+        sys.exit(0)
+
+    # call Websheet.py list
+    if sys.argv[1:] == ["list"]:
+        r = []
+        for file in os.listdir("exercises"):
+            if file.endswith(".py") and not file.startswith("_"): r.append(file[:-3])
+        print(json.dumps(r))
         sys.exit(0)
 
     print("Invalid command for Websheet")

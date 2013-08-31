@@ -14,22 +14,31 @@
 
    <script type="text/javascript" src="test.js"></script>
    <script type="text/javascript">
+   var defaultEx = "SquareOf";
+   if (window.location.hash) 
+     defaultEx = window.location.hash.substring(1);
    $(function() { 
-       resetup( <?php echo passthru("./Websheet.py get_html_template MaxThree"); ?> ); 
+       if (!window.location.hash)
+         resetup( <?php echo passthru("./Websheet.py get_html_template SquareOf"); ?> ); 
      });
    </script>
 
 </head>
 <body>
-   Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val());">
-   <option value="MaxThree">MaxThree</option>
-   <option value="FourSwap">FourSwap</option>
-   <option value="NextYear">NextYear</option>
+   Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
    </select>
+   <script type='text/javascript'>
+   populateSheets(<?php echo passthru("./Websheet.py list") ?> );
+   $('#selectSheet').val(defaultEx);
+   </script>
    <h3>Exercise Description</h3>
    <div id="description"></div>
    <p><i>Enter code in the yellow areas. F8: submit code. Tab/Shift-Tab: next/prev blank.</i></p>
    <textarea id="code" name="code"></textarea>
+   <script type='text/javascript'>
+     if (window.location.hash)
+       loadProblem(defaultEx);
+   </script>
    <button id="submitButton" onClick="checkSolution()">Submit code</button>
    <p>Results will appear below.</p>
    <div id="results"></div>

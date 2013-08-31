@@ -8,6 +8,7 @@
    }
 
 loadProblem = function(slug) {
+  window.location.hash = slug;
   $.ajax("Websheet.php",
          {data: {args: "get_html_template "+$("#selectSheet").val(), 
                  stdin: ""},
@@ -37,6 +38,15 @@ checkSolution = function() {
                var lineno = parseInt(line[0].substr(5));
                testWS.tempAlert(lineno);
              }
+             $("html, body").animate({ scrollTop: $(document).height() }, "slow");
            }
          });
 };
+
+var populateSheets = function(sheets) {
+  for (var i=0; i<sheets.length; i++) {
+    $('#selectSheet').append('<option value="' + sheets[i]+'">'
+                             +sheets[i]
+                             +"</option>");
+  }
+}

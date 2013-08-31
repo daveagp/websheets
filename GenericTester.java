@@ -150,8 +150,8 @@ public abstract class GenericTester {
                                         (studentO.equals("") ? "" : "<br>Partial printed output:" + pre(studentO)));
         }
         if (referenceO.length() > 0 && !referenceO.equals(studentO)) {
-            throw new FailTestException("Expected this printed output:" + pre(referenceO)
-                                        + " and got this instead:" + pre(studentO));
+            throw new FailTestException("Your program printed this output:" + pre(studentO)
+                                        + " but it was supposed to print this output:" + pre(referenceO));
         }
         if (referenceO.equals("") && !studentO.equals("")) {
             System.out.println("Found this printed output (not required):" + pre(studentO));
