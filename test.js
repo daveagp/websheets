@@ -4,6 +4,7 @@
        window.testWS.cm.toTextArea();
      window.testWS = websheet("code", data.code );
      $("#description").html(data.description);
+     testWS.cm.addKeyMap({F8: checkSolution});
    }
 
 loadProblem = function(slug) {

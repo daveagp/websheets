@@ -13,12 +13,11 @@
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
 
    <script type="text/javascript" src="test.js"></script>
-<script type="text/javascript">
+   <script type="text/javascript">
    $(function() { 
        resetup( <?php echo passthru("./Websheet.py get_html_template MaxThree"); ?> ); 
-       testWS.hooks.run = checkSolution;
      });
-</script>
+   </script>
 
 </head>
 <body>
@@ -29,7 +28,7 @@
    </select>
    <h3>Exercise Description</h3>
    <div id="description"></div>
-   <p><i>Enter code in the yellow areas. Shift-Enter: submit code. Tab: next blank.</i></p>
+   <p><i>Enter code in the yellow areas. F8: submit code. Tab/Shift-Tab: next/prev blank.</i></p>
    <textarea id="code" name="code"></textarea>
    <button id="submitButton" onClick="checkSolution()">Submit code</button>
    <p>Results will appear below.</p>

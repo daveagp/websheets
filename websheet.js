@@ -14,32 +14,43 @@ function websheet(textarea_id, fragments) {
       && (compare(int2.to, int1.to) < 0);
   }
 
-  var hooks = {
-    run: function() { "User can replace hooks.run"; }
-  };
+  function skip_space(range) {
+    var pos = range.from;
+    // skip past the first, ineditable, character
+    if (cm.getLine(pos.line).length == pos.ch) 
+      pos = {line: pos.line+1, ch: 0};
+    else
+      pos.ch++;
+    // skip past any spaces that immediately follow
+    // but not out of the editable range
+    var theline = cm.getLine(pos.line);
+    while (theline.charAt(pos.ch)==' ') {
+      var newpos = {line: pos.line, ch: pos.ch+1};
+      if (compare(newpos, range.to) == 0) return pos;
+      pos = newpos;
+    }
+    return pos;
+  }
 
   // tab jumps you to the start of the next input field
-  function do_tab() {
+  function do_tab(reverse) {
+    if (typeof reverse === 'undefined') reverse = false;
     var pos = cm.getCursor();
     var first = null;
-    for (var i=0; i<editable.length; i++) {
-      var ustart = editable[i].find().from;
-      if (cm.getLine(ustart.line).length == ustart.ch) 
-        ustart = {line: ustart.line+1, ch: 0};
-      else
-        ustart.ch++;
-      if (compare(ustart, pos) == 1) {
+    var tgt = null;
+    for (var i=(reverse ? editable.length-1 : 0); i>=0 && i<editable.length; i += (reverse ? -1 : 1)) {
+      var ustart = skip_space(editable[i].find());
+      if (compare(ustart, pos) == (reverse ? -1 : 1)) {
         cm.setCursor(ustart);
         return;
       }
-      if (first == null) first = ustart;
     }
-    cm.setCursor(first);
+    cm.setCursor(skip_space(editable[reverse ? editable.length-1 : 0].find()));
   }
 
-  var keyMap = {Tab: do_tab};
+  var keyMap = {Tab: function() {do_tab(false); return true;}};
   // no hyphens in object literal keys, so do it this way:
-  keyMap["Shift-Enter"] = function() {hooks.run()};
+  keyMap["Shift-Tab"] = function() {do_tab(true); return true;};
 
   var cm = CodeMirror.fromTextArea(document.getElementById(textarea_id), {
     mode: "text/x-java",
@@ -188,8 +199,7 @@ function websheet(textarea_id, fragments) {
       if (hhandle != null) testWS.cm.removeLineClass(hhandle, "wrapper", "tempAlert");
       hhandle = cm.addLineClass(line-1, "wrapper", "tempAlert");
     },
-    cm: cm,
-    hooks: hooks
+    cm: cm
   };
   
 }

@@ -40,6 +40,10 @@
     max-width: 100%;
 }
 
+code, pre {
+    font-family: 'Source Code Pro';
+}
+
 h3 {
     margin: 15px 0px 5px 0px;
 }
