@@ -20,7 +20,7 @@ ws.classname + " to = new " + ws.classname + "();\n" +
 
 if __name__ == "__main__":
 
-    import sys, Websheet, json, re
+    import sys, Websheet, json, re, cgi
     
     student = sys.argv[2]
     websheet = Websheet.Websheet.from_filesystem(sys.argv[1])
@@ -32,10 +32,11 @@ if __name__ == "__main__":
     stdin = input() # assume json all on one line
     user_poschunks = json.loads(stdin)
 
+    # this is the pre-syntax check
     student_solution = websheet.make_student_solution(user_poschunks, "student."+student)
     if student_solution[0] == False:
-        print("<p>Syntax error:</p>")
-        print(student_solution[1]) # Error
+        print("<div class='pre-syntax-error'>Syntax error:")
+        print("<pre>"+cgi.escape(student_solution[1])+"</pre></div>") # error text
         exit(0)
 
     reference_solution = websheet.get_reference_solution("reference")
@@ -80,8 +81,6 @@ if __name__ == "__main__":
     proc = Popen(call0.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
     result = proc.communicate(input = "")
 
-    import cgi
-    
     if proc.returncode != 0:
         print("<pre>")
         print(cgi.escape(result[0].decode("UTF-8")))

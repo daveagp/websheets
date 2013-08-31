@@ -172,7 +172,7 @@ class Websheet:
                     else:
                         last_line_with_blank = ui_lines
                         blank_count_on_line = 1
-                        
+
                     valid = java_syntax.is_valid_substitute(
                         item.token, chunk)
 
@@ -193,7 +193,7 @@ class Websheet:
                                 user_pos = {"line": pos['from']['line']+int(match.group(1)),
                                             "col": int(match.group(2))}
                                 if "\n" not in chunk: user_pos["line"] += 1
-                                user_pos = "Line " + str(user_pos["line"]+1) + ", col " + str(user_pos["col"])+" (blank " + str(blank_count_on_line) + ")"
+                            user_pos = "Line " + str(user_pos["line"]+1) + ", col " + str(user_pos["col"])+" (blank " + str(blank_count_on_line) + ")"
                             return [False, 
                                     user_pos + ": " + match.group(3)]
 
