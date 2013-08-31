@@ -1,7 +1,7 @@
 source_code = r"""
 public static void main(String[] args) {
-   int inputNum = \[Integer.parseInt(args[0])]\;
-   System.out.println(\[inputNum * inputNum]\);
+   int inputNum = \[Integer.parseInt(args[0])]\; // save the input
+   System.out.println(\[inputNum * inputNum]\); // print its square
 }
 """
 
