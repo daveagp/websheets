@@ -1,6 +1,4 @@
-classname = "NextYear"
-
-code = r"""
+source_code = r"""
 public static void main(String[] args) {
 \[
    System.out.print("Next year, ");

@@ -1,6 +1,4 @@
-classname = "FourSwap"
-
-code = r"""
+source_code = r"""
 \hide[
 public static void fourSwap(String top, String bottom,
   String left, String right) {

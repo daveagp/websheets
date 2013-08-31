@@ -1,6 +1,4 @@
-classname = "MaxThree"
-
-code = r"""
+source_code = r"""
 public static \[int]\ max3(\[int a, int b, int c]\) {
 \[
    int result = Math.max(a, b);

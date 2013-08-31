@@ -20,12 +20,11 @@ ws.classname + " to = new " + ws.classname + "();\n" +
 
 if __name__ == "__main__":
 
-    import sys, Websheet, json
+    import sys, Websheet, json, re
     
-    module = __import__(sys.argv[1])
     student = sys.argv[2]
-    websheet = Websheet.Websheet.from_module(module)
-    import re
+    websheet = Websheet.Websheet.from_filesystem(sys.argv[1])
+
     if not re.match(re.compile("^[a-z0-9]+$"), student):
         print("Error: invalid student name")
         exit(1)

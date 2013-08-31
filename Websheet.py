@@ -9,6 +9,8 @@ a more full solution could be done by extending java_parse.
 
 import re
 import sys
+import exercises
+import json
 from java_syntax import java_syntax
 
 def record(**dict):
@@ -65,15 +67,20 @@ class Websheet:
 
         return [True, result]
 
-    def __init__(self, classname, source_code, tests, description, tester_preamble, show_class_decl):
-        self.classname = classname
-        self.source_code = source_code
-        self.tests = tests
-        self.description = description
-        self.tester_preamble = tester_preamble
-        self.show_class_decl = show_class_decl
+    def __init__(self, field_dict):
 
-        parsed = Websheet.parse_websheet_source(source_code)
+        mandatory_fields = ["classname", "source_code", "tests", "description"]
+
+        # optional fields AND default values
+        optional_fields = {"tester_preamble": None, "show_class_decl": False}
+
+        for field in mandatory_fields:
+            setattr(self, field, field_dict[field])
+
+        for field in optional_fields:
+            setattr(self, field, field_dict[field] if field in field_dict else optional_fields[field])
+        
+        parsed = Websheet.parse_websheet_source(self.source_code)
 
         if not parsed[0]:
             raise Exception("Could not parse websheet source code: " 
@@ -139,11 +146,11 @@ class Websheet:
 
                 if chunk != "" and chunk != "\n":
                     if chunk[:1] != "\n":
-                        linemap[ss_lines] = ui_lines #+"D" + chunk +"D"
+                        linemap[ss_lines] = ui_lines 
                     for i in range(0, item.token.count("\n")):
                         ui_lines += 1
                         ss_lines += 1
-                        linemap[ss_lines] = ui_lines #+"D" + chunk +"D"
+                        linemap[ss_lines] = ui_lines 
 
             else:
                 assert len(stack)==1
@@ -262,29 +269,30 @@ class Websheet:
 
     @staticmethod
     def from_module(module):
-        return Websheet(module.classname, module.code, 
-                        module.tests, module.description,
-                        module.tester_preamble if "tester_preamble" in dir(module) else None,
-                        module.show_class_decl if "show_class_decl" in dir(module) else False)
+        # convert module to a dict
+        dicted = {attname: getattr(module, attname) for attname in dir(module)}
+        dicted["classname"] = module.__name__.split(".")[-1]
+        return Websheet(dicted)
+
+    @staticmethod
+    def from_filesystem(slug):
+        return Websheet.from_module(getattr(__import__("exercises." + slug), slug))
 
 if __name__ == "__main__":
 
+    # call Websheet.py json
     if sys.argv[1:] == ["json"]:
-        import ws_MaxThree, ws_FourSwap, ws_NextYear
-
-        websheets = [Websheet.from_module(m) 
-                     for m in (ws_MaxThree, ws_FourSwap, ws_NextYear)]
+        websheets = [Websheet.from_filesystem(slug) for slug in ("MaxThree", "FourSwap", "NextYear")]
 
         # test of json chunking
         for w in websheets:
             print(w.get_json_template())
         sys.exit(0)
 
+    # call Websheet.py interactive
     if sys.argv[1:] == ["interactive"]:
-        import ws_MaxThree, ws_FourSwap, ws_NextYear
+        websheets = [Websheet.from_filesystem(slug) for slug in ("MaxThree", "FourSwap", "NextYear")]
 
-        websheets = [Websheet.from_module(m) 
-                     for m in (ws_MaxThree, ws_FourSwap, ws_NextYear)]
         while True:  
             print("#reference for "+w.classname+"#")
             print(w.get_reference_solution(before_ref = "<r>", after_ref = "</r>"))
@@ -309,39 +317,32 @@ if __name__ == "__main__":
             else:
                 print("Error:", ss[1])
 
-    # call Websheet.py get_reference_solution ws_MaxThree
+
+    # call Websheet.py get_reference_solution MaxThree
     if sys.argv[1] == "get_reference_solution":
-        module = __import__(sys.argv[2])
-        websheet = Websheet.from_module(module)
-        import json
+        websheet = Websheet.from_filesystem(sys.argv[2])
         print(json.dumps(websheet.get_reference_solution("Ref_Sols")))
         sys.exit(0)
 
-    # call Websheet.py get_json_template ws_MaxThree
+    # call Websheet.py get_json_template MaxThree
     if sys.argv[1] == "get_json_template":
-        module = __import__(sys.argv[2])
-        websheet = Websheet.from_module(module)
-        import json
+        websheet = Websheet.from_filesystem(sys.argv[2])
         print(json.dumps(websheet.get_json_template()))
         sys.exit(0)
 
-    # call Websheet.py get_html_template ws_MaxThree
+    # call Websheet.py get_html_template MaxThree
     if sys.argv[1] == "get_html_template":
-        module = __import__(sys.argv[2])
-        websheet = Websheet.from_module(module)
-        import json
+        websheet = Websheet.from_filesystem(sys.argv[2])
         print(json.dumps({"code":websheet.get_json_template(),"description":websheet.description}))
         sys.exit(0)
 
-    # call Websheet.py make_student_solution ws_MaxThree stu and input [{code: " int ", from: ..., to: ...}, ...]
+    # call Websheet.py make_student_solution MaxThree stu and input [{code: " int ", from: ..., to: ...}, ...]
     if sys.argv[1] == "make_student_solution":
-        module = __import__(sys.argv[2])
-        websheet = Websheet.from_module(module)
+        websheet = Websheet.from_filesystem(sys.argv[2])
         user_input = input() # assume json all on one line
-        import json
         user_poschunks = json.loads(user_input)
         print(json.dumps(websheet.make_student_solution(user_poschunks, "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
         sys.exit(0)
 
-    print("Invalid command for Websheet module")
+    print("Invalid command for Websheet")
     sys.exit(1)

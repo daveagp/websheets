@@ -14,15 +14,15 @@
 
    <script type="text/javascript" src="test.js"></script>
 <script type="text/javascript">
-   $(function() { resetup( <?php echo passthru("./Websheet.py get_html_template ws_MaxThree"); ?> ); });
+   $(function() { resetup( <?php echo passthru("./Websheet.py get_html_template MaxThree"); ?> ); });
 </script>
 
 </head>
 <body>
    Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val());">
-   <option value="ws_MaxThree">MaxThree</option>
-   <option value="ws_FourSwap">FourSwap</option>
-   <option value="ws_NextYear">NextYear</option>
+   <option value="MaxThree">MaxThree</option>
+   <option value="FourSwap">FourSwap</option>
+   <option value="NextYear">NextYear</option>
    </select>
    <h3>Exercise Description</h3>
    <div id="description"></div>
