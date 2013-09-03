@@ -22,4 +22,5 @@ tests = r"""
 description = r"""
 Complete the code so that <code>java NextYear Trey 3</code> prints out 
 <pre>Next year, Trey will be 4 years old.</pre>
+Your code should similarly compute the age next year for any arguments <code>«name» «age»</code>.
 """

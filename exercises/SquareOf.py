@@ -1,6 +1,6 @@
 source_code = r"""
 public static void main(String[] args) {
-   int inputNum = \[Integer.parseInt(args[0])]\; // convert the input
+   int inputNum =\[Integer.parseInt(args[0])]\; // convert the input
    System.out.println(\[inputNum * inputNum]\); // print its square
 }
 """
@@ -12,7 +12,7 @@ tests = r"""
 """
 
 description = r"""
-Write a program that takes one command-line argument,
-which is an integer, and prints its square.
-<br>For best style, don't call <code>Integer.parseInt()</code> more than once.
+Write a program that takes a whole number as a command-line argument,
+and prints its square. For example, <pre>java SquareOf 10</pre> should print:
+<pre>100</pre>
 """
