@@ -152,7 +152,14 @@ function websheet(textarea_id, fragments) {
     for (var i=0; i<editable.length; i++) {
       var fixedrange = editable[i].find();
       if (contains_strictly(fixedrange, change)) return;
+      // the editor often replaces '\n...' by '\n...', allow it
+      if (compare(fixedrange.from, change.from)==0
+          && compare(fixedrange.to, change.to)<0
+          && cm.getLine(fixedrange.from.line).charAt(fixedrange.ch.from.ch)=='\n'
+          && change.test.length > 1 && change[0] == '') // first char is '\n'
+        return;
     }
+
     change.cancel();
   });
   

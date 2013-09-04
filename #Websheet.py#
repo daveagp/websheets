@@ -34,6 +34,8 @@ class Websheet:
         result = []
         pos = 0
         n = len(source)
+
+        # treat a delim 
         
         regex = '|'.join(re.escape(delim) for delim in 
                          (Websheet.open_delim | 
@@ -110,12 +112,12 @@ class Websheet:
                     info["blank_index"] = input_counter
                     input_counter += 1
                 # avoid extraneous space around user-facing read-only tokens
-                if stack == [] or stack == [r"\fake["]:
-                    if item.token=='\n\n':
-                        item.token='\n'
-                    else:
-                        if item.token.startswith("\n"): item.token = item.token[1:]
-                        if item.token.endswith("\n"): item.token = item.token[:-1]
+#                if stack == [] or stack == [r"\fake["]:
+#                    if item.token=='\n\n':
+#                        item.token='\n'
+#                    else:
+#                        if item.token.startswith("\n"): item.token = item.token[1:]
+#                        if item.token.endswith("\n"): item.token = item.token[:-1]
 
             if with_delimiters or item.type=="":
                 yield (item, stack, info)      

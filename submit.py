@@ -130,4 +130,8 @@ if __name__ == "__main__":
         re.compile("at line (\d+) "),
         lambda match: "at line " + translate_line(match.group(1)) + " ",
         runtimeOutput)
+
+    if "<div class='all-passed'>" in runtimeOutput and websheet.epilogue is not None:
+        runtimeOutput += "<div class='epilogue'>" + websheet.epilogue + "</div>"
+        
     print(runtimeOutput)

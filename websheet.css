@@ -9,7 +9,6 @@
 .CodeMirror-scroll {
   height: auto;
   min-height: 100px;
-  max-height: 70%;
   overflow-y: hidden;
   overflow-x: auto;
   box-sizing: border-box;
