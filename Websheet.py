@@ -269,6 +269,24 @@ class Websheet:
 
         return r
 
+    def make_tester(self):        
+        return (
+"package tester;\n" +
+"import java.util.Random;\n" +
+"import static framework.GenericTester.*;\n" +
+"public class " + self.classname + " extends framework.GenericTester {\n" +
+"{className=\"" + self.classname + "\";}" +
+"protected void runTests() {" +
+self.tests +
+"\n}" +
+("" if self.tester_preamble is None else self.tester_preamble) +
+" public static void main(String[] args) {" +
+self.classname + " to = new " + self.classname + "();\n" + 
+"to.genericMain(args);\n" + 
+"}\n}"
+)
+
+
     @staticmethod
     def from_module(module):
         # convert module to a dict

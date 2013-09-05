@@ -1,23 +1,5 @@
 #!/usr/bin/python3
 
-def make_tester(ws):
-    
-    return (
-"package tester;\n" +
-"import java.util.Random;\n" +
-"import static framework.GenericTester.*;\n" +
-"public class " + ws.classname + " extends framework.GenericTester {\n" +
-"{className=\"" + ws.classname + "\";}" +
-"protected void runTests() {" +
-ws.tests +
-"\n}" +
-("" if ws.tester_preamble is None else ws.tester_preamble) +
-" public static void main(String[] args) {" +
-ws.classname + " to = new " + ws.classname + "();\n" + 
-"to.genericMain(args);\n" + 
-"}\n}"
-)
-
 if __name__ == "__main__":
 
     import sys, Websheet, json, re, cgi
@@ -38,59 +20,7 @@ if __name__ == "__main__":
         print("<div class='pre-syntax-error'>Syntax error:")
         print("<pre>"+cgi.escape(student_solution[1])+"</pre></div>") # error text
         exit(0)
-
-    reference_solution = websheet.get_reference_solution("reference")
-
-    classname = websheet.classname
-
     ss_to_ui_linemap = student_solution[2]
-
-    with open("GenericTester.java") as file:
-        GTjava = "\n".join(file)
-              
-    dump = {
-        "/home/cscircles/dev_java_jail/scratch/reference/" + classname + ".java" : reference_solution,
-        "/home/cscircles/dev_java_jail/scratch/student/" + student + "/" + classname + ".java" : student_solution[1],
-        "/home/cscircles/dev_java_jail/scratch/tester/" + classname + ".java" : make_tester(websheet),
-        "/home/cscircles/dev_java_jail/scratch/framework/GenericTester.java" : GTjava,
-        }
-
-    for filename in dump:
-        file = open(filename, "w")
-        file.write(dump[filename])
-        file.close()
-
-    javac = "/java/bin/javac -J-Xmx128M "
-
-    java = "/java/bin/java -Xmx128M "
-
-    safeexec = "/home/cscircles/dev/safeexec/safeexec"
-
-    jail = "/home/cscircles/dev_java_jail/"
-
-    safeexec_args = " --chroot_dir "+ jail +" --exec_dir /scratch --env_vars '' --nproc 50 --mem 500000 --nfile 30 --clock 2 --exec "
-
-    call0 = (safeexec + " --fsize 1000" + safeexec_args + javac + "-cp . framework/GenericTester.java"
-    + " reference/" + classname + ".java"
-    + " tester/" + classname + ".java")
-    call3 = safeexec + " --fsize 1000" + safeexec_args + javac + "student/" + student + "/" + classname + ".java"
-    call4 = safeexec + safeexec_args + java + "tester." + classname + " " + student
-
-    from subprocess import Popen, PIPE
-
-    proc = Popen(call0.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    result = proc.communicate(input = "")
-
-    if proc.returncode != 0:
-        print("<pre>")
-        print(cgi.escape(result[0].decode("UTF-8")))
-        print(cgi.escape(result[1].decode("UTF-8")))
-        print("</pre>")
-        exit(1)
-    
-    proc = Popen(call3.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    result = proc.communicate(input = "")
-
     def translate_line(ss_lineno):
         ss_lineno = int(ss_lineno)
         if ss_lineno in ss_to_ui_linemap:
@@ -98,11 +28,45 @@ if __name__ == "__main__":
         else:
             return "???("+str(ss_lineno)+")"
         
-    if proc.returncode != 0:
+    reference_solution = websheet.get_reference_solution("reference")
+
+    classname = websheet.classname
+
+    with open("GenericTester.java") as file:
+        GTjava = "\n".join(file)
+
+    from submit_config import run_java, run_javac, scratch_dir
+              
+    dump = {
+        "reference/" + classname + ".java" : reference_solution,
+        "student/" + student + "/" + classname + ".java" : student_solution[1],
+        "tester/" + classname + ".java" : websheet.make_tester(),
+        "framework/GenericTester.java" : GTjava,
+        }
+
+    for filename in dump:
+        file = open(scratch_dir + filename, "w")
+        file.write(dump[filename])
+        file.close()
+
+    compileTester = run_javac("framework/GenericTester.java "
+                              + "reference/" + classname + ".java "
+                              + "tester/" + classname + ".java")
+    
+    if compileTester.returncode != 0:
+        print("<pre>")
+        print(cgi.escape(compileTester.stdout))
+        print(cgi.escape(compileTester.stderr))
+        print("</pre>")
+        exit(1)
+
+    compileUser = run_javac("student/" + student + "/" + classname + ".java")
+        
+    if compileUser.returncode != 0:
         print("Syntax error (could not compile):")
         print("<pre>")
         #remove the safeexec bits
-        compilerOutput = cgi.escape(result[1].decode("UTF-8")).split("\n")[:-5]
+        compilerOutput = cgi.escape(compileUser.stderr).split("\n")[:-5]
         for i in range(0, len(compilerOutput)):
             # transform error messages
             if compilerOutput[i].startswith("student/"+student+"/"+classname+".java:"):
@@ -113,23 +77,21 @@ if __name__ == "__main__":
         print("</pre>")
         exit(0)
 
-    proc = Popen(call4.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    result = proc.communicate(input = "")
+    runUser = run_java("tester." + classname + " " + student)
 
-    if proc.returncode != 0:
-        print(result[0].decode("UTF-8"))
+    if runUser.returncode != 0:
+        print(runUser.stdout)
         print("<div class='safeexec'>Crashed! The grader reported ")
         print("<code>")
-        print(cgi.escape(result[1].decode("UTF-8").split('\n')[0]))
+        print(cgi.escape(runUser.stderr.split('\n')[0]))
         print("</code>")
         print("</div>")
         exit(0)
 
-    runtimeOutput = result[0].decode("UTF-8")
     runtimeOutput = re.sub(
         re.compile("at line (\d+) "),
         lambda match: "at line " + translate_line(match.group(1)) + " ",
-        runtimeOutput)
+        runUser.stdout)
 
     if "<div class='all-passed'>" in runtimeOutput and websheet.epilogue is not None:
         runtimeOutput += "<div class='epilogue'>" + websheet.epilogue + "</div>"
