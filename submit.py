@@ -19,7 +19,7 @@ if __name__ == "__main__":
     student_solution = websheet.make_student_solution(user_poschunks, "student."+student)
     if student_solution[0] == False:
         return("<div class='pre-syntax-error'>Syntax error:" + 
-               "<pre>"+cgi.escape(student_solution[1])+"</pre></div>", # error text
+               "<pre>\n"+cgi.escape(student_solution[1])+"</pre></div>", # error text
                0)
     ss_to_ui_linemap = student_solution[2]
     def translate_line(ss_lineno):
@@ -55,7 +55,7 @@ if __name__ == "__main__":
                               + "tester/" + classname + ".java")
     
     if compileTester.returncode != 0:
-        return ("<pre>" + 
+        return ("<pre>\n" + 
                 cgi.escape(compileTester.stdout) + "\n" +
                 cgi.escape(compileTester.stderr) +
                 "</pre>", 1)
@@ -64,16 +64,16 @@ if __name__ == "__main__":
         
     if compileUser.returncode != 0:
         result = "Syntax error (could not compile):"
-        result += "<pre>"
+        result += "<pre>\n"
         #remove the safeexec bits
-        compilerOutput = cgi.escape(compileUser.stderr).split("\n")[:-5]
+        compilerOutput = cgi.escape(compileUser.stderr).split("\n")
         for i in range(0, len(compilerOutput)):
             # transform error messages
             if compilerOutput[i].startswith("student/"+student+"/"+classname+".java:"):
                 linesep = compilerOutput[i].split(':')
                 linesep[1] = "Line " + translate_line(linesep[1])
                 compilerOutput[i] = ":".join(linesep[1:])
-            result += compilerOutput[i]
+            result += compilerOutput[i] + "\n"
         result += "</pre>"
         return (result, 0)
 
