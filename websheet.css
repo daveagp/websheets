@@ -22,10 +22,23 @@
 
 #results div {
     padding: 3px;
-    margin: 1px;
     background-color: #F6F6F6;
-    border: 1px solid #EEE;
+    border-bottom: 1px solid #EEE;
+    border-left: 1px solid #EEE;
+    border-right: 1px solid #EEE;
     }
+#results div:first-child {
+    border-top: 1px solid #EEE;
+    }
+
+.passed {
+    background-color: #EFE;
+}
+
+.passed #results div {
+    background-color: #EFE;
+    border-color: #2B2;
+}
 
 #results pre {
     background-color: #EEE;

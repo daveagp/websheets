@@ -11,7 +11,7 @@ if __name__ == "__main__":
 
   def main():
     if not re.match(re.compile("^[a-z0-9]+$"), student):
-        return("Error: invalid student name", 1)
+        return("Error: invalid student name", 1, False)
 
     user_poschunks = json.loads(stdin)
 
@@ -20,7 +20,7 @@ if __name__ == "__main__":
     if student_solution[0] == False:
         return("<div class='pre-syntax-error'>Syntax error:" + 
                "<pre>\n"+cgi.escape(student_solution[1])+"</pre></div>", # error text
-               0)
+               0, False)
     ss_to_ui_linemap = student_solution[2]
     def translate_line(ss_lineno):
         ss_lineno = int(ss_lineno)
@@ -58,7 +58,7 @@ if __name__ == "__main__":
         return ("<pre>\n" + 
                 cgi.escape(compileTester.stdout) + "\n" +
                 cgi.escape(compileTester.stderr) +
-                "</pre>", 1)
+                "</pre>", 1, False)
 
     compileUser = run_javac("student/" + student + "/" + classname + ".java")
         
@@ -75,7 +75,7 @@ if __name__ == "__main__":
                 compilerOutput[i] = ":".join(linesep[1:])
             result += compilerOutput[i] + "\n"
         result += "</pre>"
-        return (result, 0)
+        return (result, 0, False)
 
     runUser = run_java("tester." + classname + " " + student)
 
@@ -86,20 +86,21 @@ if __name__ == "__main__":
         result += cgi.escape(runUser.stderr.split('\n')[0])
         result += "</code>"
         result += "</div>"
-        return (result, 0)
+        return (result, 0, False)
 
     runtimeOutput = re.sub(
         re.compile("at line (\d+) "),
         lambda match: "at line " + translate_line(match.group(1)) + " ",
         runUser.stdout)
 
-    if "<div class='all-passed'>" in runtimeOutput and websheet.epilogue is not None:
+    passed = "<div class='all-passed'>" in runtimeOutput 
+    if passed and websheet.epilogue is not None:
         runtimeOutput += "<div class='epilogue'>" + websheet.epilogue + "</div>"
         
-    return (runtimeOutput, 0)
+    return (runtimeOutput, 0, passed)
 
-  output, returncode = main()
+  output, returncode, passed = main()
   import config
   config.save_submission(student, classname, stdin, output)
-  print(output)
+  print(json.dumps({'results': output, 'passed': passed, 'internal_err': returncode != 0}))
   sys.exit(returncode)

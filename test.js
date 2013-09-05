@@ -9,6 +9,7 @@
 
 loadProblem = function(slug) {
   window.location.hash = slug;
+  $("#container").removeClass("passed");
   $("#results").html("");
   $('#container').hide();
   $('#selectSheet')[0].disabled = true;
@@ -35,16 +36,19 @@ loadProblem = function(slug) {
 
 checkSolution = function() {
   $("#results").html("Waiting for a reply...");
+  $("#container").removeClass("passed");
   $("#submitButton").attr("disabled", "disabled");
   var user_state = JSON.stringify(testWS.getUserCodeAndLocations());
   $.ajax("submit.php",
          {
            data: {stdin: user_state, problem: $('#selectSheet').val()},
-           dataType: "text",
+           dataType: "json",
            success: function(data) {
-             $("#submitButton").removeAttr("disabled");
-             $("#results").html(data);
-             var line = data.match(/[Ll]ine (\d)+(?!\d)/);
+	     $("#submitButton").removeAttr("disabled");
+	     if (data.passed) $("#container").addClass("passed");
+	     var results = data.results;
+             $("#results").html(results);
+             var line = results.match(/[Ll]ine (\d)+(?!\d)/);
              if (line != null && line.length > 0) {
                var lineno = parseInt(line[0].substr(5));
                testWS.tempAlert(lineno);
