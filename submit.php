@@ -26,7 +26,7 @@ $descriptorspec = array(
                         2 => array("pipe", "w"),  // stderr
                         );
 
-$process = proc_open("../python3 ./submit.py " . $problem . " " . phpCAS::getUser(), $descriptorspec, $pipes);
+$process = proc_open("./submit.py " . $problem . " " . phpCAS::getUser(), $descriptorspec, $pipes);
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";
   die;

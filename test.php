@@ -30,7 +30,7 @@ if (isset($_REQUEST['logout'])) {
    Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
    </select>
    <script type='text/javascript'>
-   populateSheets(<?php echo passthru("../python3 ./Websheet.py list") ?> );
+   populateSheets(<?php echo passthru("./Websheet.py list") ?> );
    </script>
    <div id="container" style="display:none">
    <h3>Exercise Description</h3>
