@@ -9,6 +9,9 @@
 
 loadProblem = function(slug) {
   window.location.hash = slug;
+  $("#results").html("");
+  $('#container').hide();
+  $('#selectSheet')[0].disabled = true;
   $.ajax("Websheet.php",
          {data: {args: "get_html_template "+$("#selectSheet").val(), 
                  stdin: ""},
@@ -16,8 +19,16 @@ loadProblem = function(slug) {
             if (data.substring(0, 1) != '{') // not json array -- so an error
               alert(data);
             else {
-              resetup(JSON.parse(data));
-              $("#results").html("");
+	      $.ajax("load.php",
+		     {data: {problem: $("#selectSheet").val()},
+			     success: function(user_data) {
+			     $('#container').show();
+			     $('#selectSheet')[0].disabled = false;
+			     resetup(JSON.parse(data));
+			     if (user_data != false)
+				 testWS.setUserAreas(JSON.parse(user_data));
+			 }
+		     });
             }
           }});
 };
@@ -28,7 +39,7 @@ checkSolution = function() {
   var user_state = JSON.stringify(testWS.getUserCodeAndLocations());
   $.ajax("submit.php",
          {
-           data: {stdin: user_state, args: $('#selectSheet').val() + " joestu"},
+           data: {stdin: user_state, problem: $('#selectSheet').val()},
            dataType: "text",
            success: function(data) {
              $("#submitButton").removeAttr("disabled");

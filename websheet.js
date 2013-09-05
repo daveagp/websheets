@@ -133,10 +133,14 @@ function websheet(textarea_id, fragments) {
       }
     }
   }
+
+  var override = false;
   
   // this is better than readOnly since it works when you surround read-only text
   // and try to change the whole selection
   cm.on("beforeChange", function(cm, change) {
+
+    if (override) return;
 
     // cancel newlines in inline regions
     if (change.text.length > 1) // array of lines; is there a newline?
@@ -179,6 +183,22 @@ function websheet(textarea_id, fragments) {
 
   cm.refresh();
 
+  var setUserAreas = function(data) {
+      for (var i=0; i<data.length; i++) {
+	  var f = editable[i].find().from;
+	  var t = editable[i].find().to;
+	  if (data[i].indexOf("\n") != -1) {
+	      f = {line: f.line+1, ch: 0};
+	      t = {line: t.line-1, ch: cm.getLine(t.line-1).length};
+	  }
+	  else {
+	      f = {line: f.line, ch: f.ch+1};
+	      t = {line: t.line, ch: t.ch-1};
+	  }
+	  cm.replaceRange(data[i].substring(1, data[i].length-1), f, t);
+      }
+  }
+
   return {
     getUserCode: function() {
       var result = new Array();
@@ -206,7 +226,8 @@ function websheet(textarea_id, fragments) {
       if (hhandle != null) testWS.cm.removeLineClass(hhandle, "wrapper", "tempAlert");
       hhandle = cm.addLineClass(line-1, "wrapper", "tempAlert");
     },
-    cm: cm
+    cm: cm,
+    setUserAreas: setUserAreas
   };
   
 }

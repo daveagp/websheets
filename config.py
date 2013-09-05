@@ -53,3 +53,37 @@ sys.exit(proc.returncode)
 """.format(command=command, scratch=scratch_dir, java=java).encode('ASCII')
             
         return execute(cmd, input)
+
+    def connect():
+        import mysql.connector
+        return mysql.connector.connect(host='publicdb.cs.princeton.edu', user='cos126',
+                                       password=open('/n/fs/htdocs/dp6/websheets/.dbpwd').read(), db='cos126')
+
+    def save_submission(student, problem, submission, result):
+        import json
+        db = connect()
+        cursor = db.cursor()
+        cursor.execute(
+            "insert into ws_history (user, problem, submission, result)" + 
+            " VALUES (%s, %s, %s, %s)", 
+            (student, 
+             problem, 
+             json.dumps([blank["code"] for blank in json.loads(submission)]), 
+             json.dumps({"output": result, "pass": "<div class='all-passed'>" in result})))
+        db.commit()
+        cursor.close()
+        db.close()
+
+    def load_submission(student, problem):
+        db = connect()
+        cursor = db.cursor()
+        cursor.execute(
+            "select submission from ws_history WHERE user = %s AND problem = %s ORDER BY ID DESC LIMIT 1;",
+            (student, 
+             problem))
+        result = "false"
+        for row in cursor:
+            result = row[0]
+        cursor.close()
+        db.close()
+        return result

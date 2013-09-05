@@ -21,7 +21,7 @@ $descriptorspec = array(
                         2 => array("pipe", "w"),  // stderr
                         );
 
-$process = proc_open("./Websheet.py " . $args, $descriptorspec, $pipes);
+$process = proc_open("../python3 ./Websheet.py " . $args, $descriptorspec, $pipes);
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";
   die;

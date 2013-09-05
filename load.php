@@ -5,13 +5,13 @@ phpCAS::client(CAS_VERSION_2_0,'fed.princeton.edu',443,'cas');
 phpCAS::setNoCasServerValidation();
 phpCAS::forceAuthentication();
 
-if (!array_key_exists('stdin', $_REQUEST)
-    || !array_key_exists('problem', $_REQUEST))
+if (//!array_key_exists('stdin', $_REQUEST) ||
+     !array_key_exists('problem', $_REQUEST))
   {
-    echo "Internal error, malformed request to submit.php";
+    echo "Internal error, malformed request to load.php";
     die;
   }
-$stdin = $_REQUEST["stdin"];
+//$stdin = $_REQUEST["stdin"];
 $problem = $_REQUEST["problem"];
 
 // only accept characters that cannot cause problems
@@ -26,13 +26,13 @@ $descriptorspec = array(
                         2 => array("pipe", "w"),  // stderr
                         );
 
-$process = proc_open("../python3 ./submit.py " . $problem . " " . phpCAS::getUser(), $descriptorspec, $pipes);
+$process = proc_open("../python3 ./load.py " . $problem . " " . phpCAS::getUser(), $descriptorspec, $pipes);
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";
   die;
  }
 
-fwrite($pipes[0], $stdin);
+fwrite($pipes[0], "");//$stdin);
 fclose($pipes[0]);
 $stdout = stream_get_contents($pipes[1]);
 fclose($pipes[1]);
