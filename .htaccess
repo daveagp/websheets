@@ -1,0 +1,20 @@
+<Files *>
+Order Deny,Allow
+Deny from All
+</Files>
+
+# allow images, icons, pdfs
+<FilesMatch "\.(jpe?g|gif|png|ico|pdf)$">
+Allow from All
+</FilesMatch>
+
+# allow web pages
+<FilesMatch "\.(js|css|html?)$">
+Allow from All
+</FilesMatch>
+
+# allow php
+<FilesMatch "\.php$">
+Allow from All
+</FilesMatch>
+
