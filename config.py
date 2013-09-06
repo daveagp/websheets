@@ -29,14 +29,16 @@ elif socket.gethostname().endswith("princeton.edu"):
     javac = "javac -J-Xmx128M "
     java = "/usr/bin/java -Xmx128M "
 
-    scratch_dir = "/n/fs/htdocs/dp6/scratch/"
+    import getpass
+    server_username = getpass.getuser()
+    scratch_dir = "/n/fs/htdocs/"+server_username+"/scratch/"
 
     def run_javac(command, the_stdin = ""):
         os.chdir(scratch_dir)
         return execute(javac + command, the_stdin)
 
     def run_java(command, the_stdin = ""):
-        os.chdir( "/n/fs/htdocs/dp6/")
+        os.chdir( "/n/fs/htdocs/"+server_username+"/")
         if the_stdin != "":
             raise Exception('Cannot handle stdin in run_java yet')
         cmd = "sandbox -M -i safeexec/safeexec -i scratch /usr/bin/python -u -S"
@@ -57,7 +59,7 @@ sys.exit(proc.returncode)
     def connect():
         import mysql.connector
         return mysql.connector.connect(host='publicdb.cs.princeton.edu', user='cos126',
-                                       password=open('/n/fs/htdocs/dp6/websheets/.dbpwd').read(), db='cos126')
+                                       password=open('/n/fs/htdocs/'+server_username+'/websheets/.dbpwd').read(), db='cos126')
 
     def save_submission(student, problem, submission, result):
         import json
