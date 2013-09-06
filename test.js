@@ -44,8 +44,9 @@ checkSolution = function() {
            data: {stdin: user_state, problem: $('#selectSheet').val()},
            dataType: "json",
            success: function(data) {
+	     //console.log(data);
 	     $("#submitButton").removeAttr("disabled");
-	     if (data.passed) $("#container").addClass("passed");
+	     if (data.category == 'Passed') $("#container").addClass("passed");
 	     var results = data.results;
              $("#results").html(results);
              var line = results.match(/[Ll]ine (\d)+(?!\d)/);
