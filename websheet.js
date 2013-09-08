@@ -33,7 +33,7 @@ function websheet(textarea_id, fragments) {
   }
 
   // tab jumps you to the start of the next input field
-  function do_tab(reverse) {
+  function next_blank(reverse) {
     if (typeof reverse === 'undefined') reverse = false;
     var pos = cm.getCursor();
     var first = null;
@@ -48,9 +48,16 @@ function websheet(textarea_id, fragments) {
     cm.setCursor(skip_space(editable[reverse ? editable.length-1 : 0].find()));
   }
 
-  var keyMap = {Tab: function() {do_tab(false); return true;}};
-  // no hyphens in object literal keys, so do it this way:
-  keyMap["Shift-Tab"] = function() {do_tab(true); return true;};
+  var keyMap = {PageDown: function() {next_blank(false); return true;},
+                PageUp: function() {next_blank(true); return true;},
+                Tab: function() {
+                  var lo = cm.getCursor("start").line;
+                  var hi = cm.getCursor("end").line;
+                  for (var i = lo; i <= hi; i++)
+                    cm.indentLine(i, "smart");
+                  cm.setCursor(cm.getCursor("end"));
+                }
+               };
 
   var cm = CodeMirror.fromTextArea(document.getElementById(textarea_id), {
     mode: "text/x-java",
@@ -58,7 +65,8 @@ function websheet(textarea_id, fragments) {
     lineNumbers: true,
     styleSelectedText: true,
     viewportMargin: Infinity,
-    extraKeys: keyMap
+    extraKeys: keyMap,
+    matchBrackets: true
   });
 
   cm.setValue(fragments.join(""));

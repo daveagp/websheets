@@ -4,6 +4,7 @@
    <script type="text/javascript" src="CodeMirror/lib/codemirror.js"></script>
    <script type="text/javascript" src="CodeMirror/mode/clike/clike.js"></script>
    <script type="text/javascript" src="CodeMirror/addon/selection/mark-selection.js"></script>
+   <script type="text/javascript" src="CodeMirror/addon/edit/matchbrackets.js"></script>
    <script type="text/javascript" src="websheet.js"></script>
 
    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
@@ -33,7 +34,7 @@
    </script>
    <h3>Exercise Description</h3>
    <div id="description"></div>
-   <p><i>Enter code in the yellow areas. F8: submit code. Tab/Shift-Tab: next/prev blank.</i></p>
+   <p><i>Enter code in the yellow areas. F8: submit code. PgDn/PgUp: next/prev blank. Tab: reindent.</i></p>
    <textarea id="code" name="code"></textarea>
    <script type='text/javascript'>
      if (window.location.hash)
