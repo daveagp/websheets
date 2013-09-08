@@ -35,14 +35,16 @@ elif socket.gethostname().endswith("princeton.edu"):
     javac = "javac -J-Xmx128M "
     java = "/usr/bin/java -Xmx128M "
 
-    scratch_dir = "/n/fs/htdocs/dp6/scratch/"
+    import getpass
+    server_username = getpass.getuser()
+    scratch_dir = "/n/fs/htdocs/"+server_username+"/scratch/"
 
     def run_javac(command, the_stdin = ""):
         os.chdir(scratch_dir)
         return execute(javac + command, the_stdin)
 
     def run_java(command, the_stdin = ""):
-        os.chdir( "/n/fs/htdocs/dp6/")
+        os.chdir( "/n/fs/htdocs/"+server_username+"/")
         if the_stdin != "":
             raise Exception('Cannot handle stdin in run_java yet')
         cmd = "sandbox -M -i safeexec/safeexec -i scratch /usr/bin/python -u -S"
@@ -59,3 +61,37 @@ sys.exit(proc.returncode)
 """.format(command=command, scratch=scratch_dir, java=java).encode('ASCII')
             
         return execute(cmd, input)
+
+    def connect():
+        import mysql.connector
+        return mysql.connector.connect(host='publicdb.cs.princeton.edu', user='cos126',
+                                       password=open('/n/fs/htdocs/'+server_username+'/websheets/.dbpwd').read(), db='cos126')
+
+    def save_submission(student, problem, submission, result):
+        import json
+        db = connect()
+        cursor = db.cursor()
+        cursor.execute(
+            "insert into ws_history (user, problem, submission, result)" + 
+            " VALUES (%s, %s, %s, %s)", 
+            (student, 
+             problem, 
+             json.dumps([blank["code"] for blank in json.loads(submission)]), 
+             json.dumps({"output": result, "pass": "<div class='all-passed'>" in result})))
+        db.commit()
+        cursor.close()
+        db.close()
+
+    def load_submission(student, problem):
+        db = connect()
+        cursor = db.cursor()
+        cursor.execute(
+            "select submission from ws_history WHERE user = %s AND problem = %s ORDER BY ID DESC LIMIT 1;",
+            (student, 
+             problem))
+        result = "false"
+        for row in cursor:
+            result = row[0]
+        cursor.close()
+        db.close()
+        return result

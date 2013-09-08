@@ -1,12 +1,18 @@
 <?php
-include_once('include.php');
+include_once('../CAS-1.3.2/CAS.php');
+phpCAS::setDebug();
+phpCAS::client(CAS_VERSION_2_0,'fed.princeton.edu',443,'cas');
+phpCAS::setNoCasServerValidation();
+phpCAS::forceAuthentication();
+if (isset($_REQUEST['logout'])) {
+  phpCAS::logout();
+}
 ?><html>
 <head>
    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
    <script type="text/javascript" src="CodeMirror/lib/codemirror.js"></script>
    <script type="text/javascript" src="CodeMirror/mode/clike/clike.js"></script>
    <script type="text/javascript" src="CodeMirror/addon/selection/mark-selection.js"></script>
-   <script type="text/javascript" src="CodeMirror/addon/edit/matchbrackets.js"></script>
    <script type="text/javascript" src="websheet.js"></script>
 
    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
@@ -19,27 +25,17 @@ include_once('include.php');
 
 </head>
 <body>
-<?php
-if (WS_LOGGED_IN) {
-   echo " <p>Logged in as <b>" . WS_USERNAME . "</b>." .
-   "Click to <a href='" . WS_LOGOUT_LINK . "'>log out</a>.</p>";
-}?>
-   <p>This is an experimental system. Contact <a href="mailto:dp6@cs.princeton.edu">the developer</a>
-   if you find bugs, user interface problems, inaccurate grading or anything else.</p>
+   <p>Logged in as <b><?php echo phpCAS::getUser(); ?></b>.
+   Click to <a href="?logout=">log out</a>.</p>
    Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
    </select>
    <script type='text/javascript'>
-   populateSheets(<?php
-       if (array_key_exists("group", $_REQUEST))
-	 echo json_encode(explode(" ", $_REQUEST["group"]));
-       else
-	 echo passthru("./Websheet.py list") 
-	   ?> );
+   populateSheets(<?php echo passthru("./Websheet.py list") ?> );
    </script>
    <div id="container" style="display:none">
    <h3>Exercise Description</h3>
    <div id="description"></div>
-   <p><i>Enter code in the yellow areas. F8: submit code. PgDn/PgUp: next/prev blank. Tab: reindent.</i></p>
+   <p><i>Enter code in the yellow areas. F8: submit code. Tab/Shift-Tab: next/prev blank.</i></p>
    <textarea id="code" name="code"></textarea>
    <script type='text/javascript'>
     if (window.location.hash) {

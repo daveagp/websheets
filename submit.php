@@ -2,17 +2,17 @@
 include_once('include.php');
 
 if (!array_key_exists('stdin', $_REQUEST)
-    || !array_key_exists('args', $_REQUEST))
+    || !array_key_exists('problem', $_REQUEST))
   {
-    echo "Internal error, malformed request to Websheet.php";
+    echo "Internal error, malformed request to submit.php";
     die;
   }
 $stdin = $_REQUEST["stdin"];
-$args = $_REQUEST["args"];
+$problem = $_REQUEST["problem"];
 
 // only accept characters that cannot cause problems
-if (!preg_match("@^[0-9a-zA-Z_. ]*$@", $args)) {
-  echo "Internal error, malformed arguments \"$args\"";
+if (!preg_match("@^[0-9a-zA-Z]+$@", $problem)) {
+  echo "Internal error, malformed problem \"$problem\"";
   die;
  }
 
@@ -23,6 +23,7 @@ $descriptorspec = array(
                         );
 
 $process = proc_open("./submit.py " . $problem . " " . WS_USERNAME, $descriptorspec, $pipes);
+
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";
   die;

@@ -1,9 +1,17 @@
 <?php
 include_once('include.php');
+
 if (!PRINCETON) {
   echo "false";
   die;
  }
+
+include_once('../CAS-1.3.2/CAS.php');
+phpCAS::setDebug();
+phpCAS::client(CAS_VERSION_2_0,'fed.princeton.edu',443,'cas');
+phpCAS::setNoCasServerValidation();
+phpCAS::forceAuthentication();
+>>>>>>> 9cdaa59a8027ddca378fbecb295848560a02b329
 
 if (//!array_key_exists('stdin', $_REQUEST) ||
      !array_key_exists('problem', $_REQUEST))
@@ -27,6 +35,7 @@ $descriptorspec = array(
                         );
 
 $process = proc_open("./load.py " . $problem . " " . WS_USERNAME, $descriptorspec, $pipes);
+
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";
   die;

@@ -13,7 +13,7 @@ public abstract class GenericTester {
     }
             
     public static String pre(String S, String attr) {
-        return "<pre "+attr+">\n" + esc(S) + "</pre>";
+	return "<pre "+attr+">\n" + esc(S) + "</pre>";
     }
     public static String pre(String S) {return pre(S, "");}
 
@@ -112,6 +112,20 @@ public abstract class GenericTester {
         }
     }
 
+    protected String describeOutputDifference(String studentO, String referenceO) {
+	if (referenceO.equals(studentO+"\n"))
+	    return "Your program printed this output:" + pre(studentO)
+		+ " which is almost correct but <i>a newline character is missing at the end</i>.";
+	
+	if (studentO.equals(referenceO+"\n"))
+	    return "Your program printed this output:" + pre(studentO)
+		+ " which is almost correct but <i>an extra newline character was printed at the end</i>.";
+
+	return "Your program printed this output:" + pre(studentO)
+	    + " but it was supposed to print this output:" + pre(referenceO);
+    }	    
+
+
     @SuppressWarnings("unchecked")
     protected void compare(Method referenceM, Method studentM, Object[] args) {
         String referenceO = null, studentO = null;
@@ -150,8 +164,7 @@ public abstract class GenericTester {
                                         (studentO.equals("") ? "" : "<br>Partial printed output:" + pre(studentO)));
         }
         if (referenceO.length() > 0 && !referenceO.equals(studentO)) {
-            throw new FailTestException("Your program printed this output:" + pre(studentO)
-                                        + " but it was supposed to print this output:" + pre(referenceO));
+            throw new FailTestException(describeOutputDifference(studentO, referenceO));
         }
         if (referenceO.equals("") && !studentO.equals("")) {
             System.out.println("Found this printed output (not required):" + pre(studentO));

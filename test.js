@@ -9,6 +9,10 @@
 
 loadProblem = function(slug) {
   window.location.hash = slug;
+  $("#container").removeClass("passed");
+  $("#results").html("");
+  $('#container').hide();
+  $('#selectSheet')[0].disabled = true;
   $.ajax("Websheet.php",
          {data: {args: "get_html_template "+$("#selectSheet").val(), 
                  stdin: ""},
@@ -16,24 +20,36 @@ loadProblem = function(slug) {
             if (data.substring(0, 1) != '{') // not json array -- so an error
               alert(data);
             else {
-              resetup(JSON.parse(data));
-              $("#results").html("");
+	      $.ajax("load.php",
+		     {data: {problem: $("#selectSheet").val()},
+			     success: function(user_data) {
+			     $('#container').show();
+			     $('#selectSheet')[0].disabled = false;
+			     resetup(JSON.parse(data));
+			     if (user_data != false)
+				 testWS.setUserAreas(JSON.parse(user_data));
+			 }
+		     });
             }
           }});
 };
 
 checkSolution = function() {
   $("#results").html("Waiting for a reply...");
+  $("#container").removeClass("passed");
   $("#submitButton").attr("disabled", "disabled");
   var user_state = JSON.stringify(testWS.getUserCodeAndLocations());
   $.ajax("submit.php",
          {
-           data: {stdin: user_state, args: $('#selectSheet').val() + " joestu"},
-           dataType: "text",
+           data: {stdin: user_state, problem: $('#selectSheet').val()},
+           dataType: "json",
            success: function(data) {
-             $("#submitButton").removeAttr("disabled");
-             $("#results").html(data);
-             var line = data.match(/[Ll]ine (\d)+(?!\d)/);
+	     //console.log(data);
+	     $("#submitButton").removeAttr("disabled");
+	     if (data.category == 'Passed') $("#container").addClass("passed");
+	     var results = data.results;
+             $("#results").html(results);
+             var line = results.match(/[Ll]ine (\d)+(?!\d)/);
              if (line != null && line.length > 0) {
                var lineno = parseInt(line[0].substr(5));
                testWS.tempAlert(lineno);
