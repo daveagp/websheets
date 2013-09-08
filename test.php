@@ -1,4 +1,6 @@
-<html>
+<?php
+include_once('include.php');
+?><html>
 <head>
    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
    <script type="text/javascript" src="CodeMirror/lib/codemirror.js"></script>
@@ -26,6 +28,13 @@
 
 </head>
 <body>
+<?php
+if (WS_LOGGED_IN) {
+   echo " <p>Logged in as <b>" . WS_USERNAME . "</b>." .
+   "Click to <a href='" . WS_LOGOUT_LINK . "'>log out</a>.</p>";
+}?>
+   <p>This is an experimental system. Contact <a href="mailto:dp6@cs.princeton.edu">the developer</a>
+   if you find bugs, user interface problems, inaccurate grading or anything else.</p>
    Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
    </select>
    <script type='text/javascript'>

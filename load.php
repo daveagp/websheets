@@ -1,18 +1,22 @@
 <?php
 include_once('include.php');
+if (!PRINCETON) {
+  echo "false";
+  die;
+ }
 
-if (!array_key_exists('stdin', $_REQUEST)
-    || !array_key_exists('args', $_REQUEST))
+if (//!array_key_exists('stdin', $_REQUEST) ||
+     !array_key_exists('problem', $_REQUEST))
   {
-    echo "Internal error, malformed request to Websheet.php";
+    echo "Internal error, malformed request to load.php";
     die;
   }
-$stdin = $_REQUEST["stdin"];
-$args = $_REQUEST["args"];
+//$stdin = $_REQUEST["stdin"];
+$problem = $_REQUEST["problem"];
 
 // only accept characters that cannot cause problems
-if (!preg_match("@^[0-9a-zA-Z_. ]*$@", $args)) {
-  echo "Internal error, malformed arguments \"$args\"";
+if (!preg_match("@^[0-9a-zA-Z]+$@", $problem)) {
+  echo "Internal error, malformed problem \"$problem\"";
   die;
  }
 
@@ -22,13 +26,13 @@ $descriptorspec = array(
                         2 => array("pipe", "w"),  // stderr
                         );
 
-$process = proc_open("./submit.py " . $problem . " " . WS_USERNAME, $descriptorspec, $pipes);
+$process = proc_open("./load.py " . $problem . " " . WS_USERNAME, $descriptorspec, $pipes);
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";
   die;
  }
 
-fwrite($pipes[0], $stdin);
+fwrite($pipes[0], "");//$stdin);
 fclose($pipes[0]);
 $stdout = stream_get_contents($pipes[1]);
 fclose($pipes[1]);

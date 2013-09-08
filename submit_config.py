@@ -25,6 +25,12 @@ if socket.gethostname().endswith("uwaterloo.ca"):
     def run_java(command, the_stdin = ""):
         return execute(safeexec + safeexec_args + java + command, the_stdin)  
 
+    def save_submission(student, problem, submission, result):
+        pass
+
+    def load_submission(student, problem):
+        return "false"
+
 elif socket.gethostname().endswith("princeton.edu"):
     javac = "javac -J-Xmx128M "
     java = "/usr/bin/java -Xmx128M "
