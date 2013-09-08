@@ -1,5 +1,5 @@
 <?php
-define ('WS_PRINCETON', substr($_SERVER['SERVER_NAME'], -12)=='princeton.edu');
+define ('WS_PRINCETON', substr($_SERVER['SERVER_NAME'], -13)=='princeton.edu');
 if (WS_PRINCETON) {
   include_once('../CAS-1.3.2/CAS.php');
   phpCAS::setDebug();
