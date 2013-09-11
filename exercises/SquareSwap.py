@@ -12,6 +12,7 @@ public static void main(String[] args) {
    String left = ...;
    String right = ...;
 ]\
+
    System.out.println("Before rotation, top = " + top + ", bottom = " + bottom
                + ", left = " + left + ", right = " + right + ".");
    // Now, write code to swap the variable values correctly,
