@@ -37,13 +37,12 @@
     border-top: 1px solid #DDD;
     }
 
-.passed {
+#page.passed {
     background-color: #EFE;
 }
-
-.passed #results div {
-    background-color: #EFE;
+#page.passed #results div {
     border-color: #9E9;
+    background-color: #EFE;
 }
 
 #results pre {
@@ -60,6 +59,7 @@ html {
 body {
   margin: 0px;
   padding: 0px;
+  box-shadow: gray 0px 0px 5px 0px;
 }
 
 #page {

@@ -1,5 +1,4 @@
-/*
- 
+description = r""" 
 Write a program SquareCensus that takes a single command-line argument <code>n</code>,
 which is an integer. First, print out all of the positive square numbers less
 than or equal to <code>n</code> (in increasing order). Then, print out their 
@@ -12,11 +11,13 @@ The sum is 14
 </pre>
 <i>Try solving it once with a <code>for</code> loop, and once with a
 <code>while</code> loop.</i>
- */
+"""
 
+source_code=r"""
 public class SquareCensus {
-    public static void main(String[] args) {
-        int n = Integer.parseInt(args[0]);
+   public static void main(String[] args) {
+      int n = Integer.parseInt(args[0]);
+\[
         int i = 1;
         int sum = 0;
         while (i*i <= n) {
@@ -25,7 +26,20 @@ public class SquareCensus {
             i += 1;
         }
         System.out.println("The sum is " + sum);
-        // alternate solution:
-        // for (int i = 1; i*i <= n; i++) {sum += i*i; System.out.println(i*i);}
-    }
+        /* alternate loop:
+        for (int i = 1; i*i <= n; i++) 
+           {sum += i*i; System.out.println(i*i);} */
+]\
+   }
 }
+"""
+
+tests = """
+testMain("11");
+testMain("16");
+testMain(randgen.nextInt(100)+"");
+testMain("1");
+testMain("0");
+testMain("-1");
+"""
+

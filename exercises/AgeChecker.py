@@ -1,7 +1,9 @@
 description = r"""
-Write a program AgeChecker that reads an integer from input, representing
+Write a program <code>AgeChecker</code>
+ that reads an integer from input, representing
 someone's age. If the age is 18 or larger, print out <pre>You can vote</pre>
-If the age is between 0 and 17 inclusive, print out <pre>Too young to vote</pre>
+If the age is 
+between 0 and 17 inclusive, print out <pre>Too young to vote</pre>
 If the age is less than 0, print out <pre>You are a time traveller</pre>
 """
 
