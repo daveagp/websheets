@@ -81,6 +81,18 @@ class Websheet:
 
         for field in optional_fields:
             setattr(self, field, field_dict[field] if field in field_dict else optional_fields[field])
+
+        # remove "public class" if there
+        lines = self.source_code.split("\n")
+        while lines[:1] == [""]: lines = lines[1:]
+        while lines[-1:] == [""]: lines = lines[:-1]
+        if "public class" in lines[0]:
+            lines = lines[1:-1]
+            spc = 0
+            while (lines[0].startswith(" "*(spc+1))): spc += 1
+            for i in range(len(lines)):
+                if (lines[i].startswith(" "*spc)): lines[i] = lines[i][spc:]
+            self.source_code = "\n".join(lines) + "\n"
         
         parsed = Websheet.parse_websheet_source(self.source_code)
 

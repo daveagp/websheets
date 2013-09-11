@@ -14,6 +14,12 @@
   box-sizing: border-box;
 }
 
+#description {
+}
+
+#container {
+}
+
 .tempAlert {
     border-top: 1px solid red;
     border-bottom: 1px solid red;
@@ -23,12 +29,12 @@
 #results div {
     padding: 3px;
     background-color: #F6F6F6;
-    border-bottom: 1px solid #EEE;
-    border-left: 1px solid #EEE;
-    border-right: 1px solid #EEE;
+    border-bottom: 1px solid #DDD;
+    border-left: 1px solid #DDD;
+    border-right: 1px solid #DDD;
     }
 #results div:first-child {
-    border-top: 1px solid #EEE;
+    border-top: 1px solid #DDD;
     }
 
 .passed {
@@ -37,11 +43,37 @@
 
 .passed #results div {
     background-color: #EFE;
-    border-color: #2B2;
+    border-color: #9E9;
 }
 
 #results pre {
-    background-color: #EEE;
+    background-color: rgba(240, 240, 240, 0.5);
+}
+
+html {
+  max-width: 105ch;
+  margin: 0px auto;
+  background-color: #DDD;
+  padding: 0px;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+#page {
+  background-color: white;
+  max-width: 105ch;
+  margin: 0px auto;
+  min-height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+#page > p:first-child {
+  margin-top: 0px;
 }
 
 #submitButton {
@@ -57,11 +89,19 @@ code, pre {
 }
 
 h3 {
-    margin: 15px 0px 5px 0px;
+    margin: 10px 0px 5px 0px;
 }
 
 p, pre {
     margin: 5px 0px;
+}
+
+#results div.testcase-desc {
+    border-bottom: none;
+}
+
+#results div.pass-test {
+    border-top: none;
 }
 
 .inline {background-color: #FF9}
