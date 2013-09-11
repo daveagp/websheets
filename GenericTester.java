@@ -112,6 +112,8 @@ public abstract class GenericTester {
         }
     }
 
+    // if true, any reference line comprised of a real number
+    // allows 1E-4 relative/absolute error in student output
     public boolean oneRealPerLine = false;
 
     protected String describeOutputDifference(String studentO, String referenceO) {
@@ -123,17 +125,25 @@ public abstract class GenericTester {
  		return "Printed too few lines of output. " + desc;
 	    if (reflines.length < stulines.length) 
  		return "Printed too many lines of output. " + desc;
-	    for (int i=0; i<reflines.length; i++) {
-		double s;
+	    for (int i=0; i<reflines.length; i++) {		
+		double r, s;
 		try {
-		    s = Double.parseDouble(stulines[i]);
+		    r = Double.parseDouble(reflines[i]);
+		    try {
+			s = Double.parseDouble(stulines[i]);
+		    }
+		    catch (Exception e) {
+			return "Line "+(i+1)+" of your output is not a number. " + desc;
+		    }
+		    if (Math.abs(s-r) > 1E-4 * Math.max(1, Math.abs(r)))
+			return "Line "+(i+1)+" of your output doesn't match ours. " + desc;
 		}
 		catch (Exception e) {
-		    return "Line "+(i+1)+" of your output is not a number. " + desc;
+		    // reference line not a double
+		    if (!stulines[i].equals(reflines[i]))
+			return "Line "+(i+1)+" of your output doesn't match ours. " + desc;
+
 		}
-		double r = Double.parseDouble(reflines[i]);
-		if (Math.abs(s-r) > 1E-4 * Math.max(1, Math.abs(r)))
-		    return "Line "+(i+1)+" of your output doesn't match ours. " + desc;
 	    }
 	    return null;
 	}
@@ -220,12 +230,15 @@ public abstract class GenericTester {
     }
 
     // mainArgs is final just so we can inherit in-line
-    protected void testMain(final String... mainArgs) {
-        new BasicTestCase("main", new Object[] {mainArgs}) {
+    protected void testMain(final Object... argObjs) {
+	final String[] argStrings = new String[argObjs.length];
+	for (int i=0; i<argStrings.length; i++)
+	    argStrings[i] = argObjs[i].toString();
+        new BasicTestCase("main", new Object[] {argStrings}) {
             protected void describe() {
                 System.out.print("Testing ");
                 String tmp = "java " + className;
-                for (String a : mainArgs) tmp += " " + a;        
+                for (String a : argStrings) tmp += " " + a;        
                 System.out.println(code(tmp));
             }}
             .execute();

@@ -40,7 +40,7 @@ include_once('include.php');
    <div id="container" style="display:none">
    <h3>Exercise Description</h3>
    <div id="description"></div>
-   <p><i>Enter code in the yellow areas. F8: submit code. PgDn/PgUp: next/prev blank. Tab: reindent.</i></p>
+   <p><i>Enter code in the yellow areas. F2: submit code. PgDn/PgUp: next/prev blank. Tab: reindent.</i></p>
    <textarea id="code" name="code"></textarea>
    <script type='text/javascript'>
     if (window.location.hash) {
