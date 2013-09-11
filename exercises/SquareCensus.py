@@ -9,35 +9,36 @@ sum. Use the format shown in this example: <code>java SquareCensus 11</code> sho
 9
 The sum is 14
 </pre>
-<i>Try solving it once with a <code>for</code> loop, and once with a
-<code>while</code> loop.</i>
 """
 
 source_code=r"""
 public class SquareCensus {
    public static void main(String[] args) {
       int n = Integer.parseInt(args[0]);
-\[
         int i = 1;
-        int sum = 0;
-        while (i*i <= n) {
+        int sum = \[0]\;
+        while (\[i*i <= n]\) {
+\[
             System.out.println(i*i);
             sum += i*i;
             i += 1;
+]\
         }
         System.out.println("The sum is " + sum);
+   }
+}
+"""
+
+"""
         /* alternate loop:
         for (int i = 1; i*i <= n; i++) 
            {sum += i*i; System.out.println(i*i);} */
-]\
-   }
-}
 """
 
 tests = """
 testMain("11");
 testMain("16");
-testMain(randgen.nextInt(100)+"");
+testMain(50+randgen.nextInt(50)+"");
 testMain("1");
 testMain("0");
 testMain("-1");

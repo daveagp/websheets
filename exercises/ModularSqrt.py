@@ -1,5 +1,4 @@
-/*
-
+description="""
 Write a program <code>ModularSqrt</code> that takes two command-line
 arguments, <code>remainder</code> and <code>modulus</code>. 
 It should print 
@@ -14,17 +13,14 @@ Use the format shown in this example:
 7
 2 square roots were found
 </pre>
-since 3<sup>2</sup>=9 and 7<sup>2</sup>=49 are the only squares between 
-0<sup>2</sup> and 
-9<sup>2</sup>
-whose square is 9 mod 10.
+"""
 
-*/
-
+source_code = r"""
 public class ModularSqrt {
-    public static void main(String[] args) {
-        int remainder = Integer.parseInt(args[0]);
-        int modulus = Integer.parseInt(args[1]);
+   public static void main(String[] args) {
+      int remainder = Integer.parseInt(args[0]);
+      int modulus = Integer.parseInt(args[1]);
+\[
         int count = 0;
         for (int i=0; i<modulus; i++) {
             if ((i*i) % modulus == remainder) {
@@ -33,5 +29,16 @@ public class ModularSqrt {
             }
         }
         System.out.println(count + " square roots were found");
-    }
+]\
+   }
 }
+"""
+
+tests = """
+testMain("9", "10");
+testMain("3", "8");
+testMain("5", "10");
+testMain("1", "8");
+testMain(randgen.nextInt(100)+"", "100");
+testMain(randgen.nextInt(100)+"", "100");
+"""
