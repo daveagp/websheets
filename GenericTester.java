@@ -112,19 +112,47 @@ public abstract class GenericTester {
         }
     }
 
+    public boolean oneRealPerLine = false;
+
     protected String describeOutputDifference(String studentO, String referenceO) {
-	if (referenceO.equals(studentO+"\n"))
-	    return "Your program printed this output:" + pre(studentO)
-		+ " which is almost correct but <i>a newline character is missing at the end</i>.";
-	
-	if (studentO.equals(referenceO+"\n"))
-	    return "Your program printed this output:" + pre(studentO)
-		+ " which is almost correct but <i>an extra newline character was printed at the end</i>.";
+	if (oneRealPerLine) {
+	    String[] stulines = studentO.split("\n");
+	    String[] reflines = referenceO.split("\n");
+	    String desc = "Your output:" + pre(studentO) + "Correct output:" + pre(referenceO);
+	    if (reflines.length > stulines.length)
+ 		return "Printed too few lines of output. " + desc;
+	    if (reflines.length < stulines.length) 
+ 		return "Printed too many lines of output. " + desc;
+	    for (int i=0; i<reflines.length; i++) {
+		double s;
+		try {
+		    s = Double.parseDouble(stulines[i]);
+		}
+		catch (Exception e) {
+		    return "Line "+(i+1)+" of your output is not a number. " + desc;
+		}
+		double r = Double.parseDouble(reflines[i]);
+		if (Math.abs(s-r) > 1E-4 * Math.max(1, Math.abs(r)))
+		    return "Line "+(i+1)+" of your output doesn't match ours. " + desc;
+	    }
+	    return null;
+	}
+	else {
+	    if (referenceO.equals(studentO))
+		return null;
 
-	return "Your program printed this output:" + pre(studentO)
-	    + " but it was supposed to print this output:" + pre(referenceO);
+	    if (referenceO.equals(studentO+"\n"))
+		return "Your program printed this output:" + pre(studentO)
+		    + " which is almost correct but <i>a newline character is missing at the end</i>.";
+	    
+	    if (studentO.equals(referenceO+"\n"))
+		return "Your program printed this output:" + pre(studentO)
+		    + " which is almost correct but <i>an extra newline character was printed at the end</i>.";
+	    
+	    return "Your program printed this output:" + pre(studentO)
+		+ " but it was supposed to print this output:" + pre(referenceO);
+	}
     }	    
-
 
     @SuppressWarnings("unchecked")
     protected void compare(Method referenceM, Method studentM, Object[] args) {
@@ -163,8 +191,10 @@ public abstract class GenericTester {
             throw new FailTestException("Runtime error: " + pre(stackTrace) + 
                                         (studentO.equals("") ? "" : "<br>Partial printed output:" + pre(studentO)));
         }
-        if (referenceO.length() > 0 && !referenceO.equals(studentO)) {
-            throw new FailTestException(describeOutputDifference(studentO, referenceO));
+        if (referenceO.length() > 0) {
+	    String reason = describeOutputDifference(studentO, referenceO);
+	    if (reason != null)
+		throw new FailTestException(reason);
         }
         if (referenceO.equals("") && !studentO.equals("")) {
             System.out.println("Found this printed output (not required):" + pre(studentO));

@@ -20,13 +20,13 @@ include_once('include.php');
 
 </head>
 <body>
-<?php
-if (WS_LOGGED_IN) {
-   echo " <p>Logged in as <b>" . WS_USERNAME . "</b>." .
+<div id="page">
+<?php if (WS_LOGGED_IN) {
+   echo "<p>Logged in as <b>" . WS_USERNAME . "</b>. " .
    "Click to <a href='" . WS_LOGOUT_LINK . "'>log out</a>.</p>";
-}?>
-   <p>This is an experimental system. Contact <a href="mailto:dp6@cs.princeton.edu">the developer</a>
-   if you find bugs, user interface problems, inaccurate grading or anything else.</p>
+} ?>
+   <p>This is an experimental system. <a href="mailto:dp6@cs.princeton.edu">Contact us</a>
+    if you find bugs, typos, user interface issues, inaccurate grading or anything else.</p>
    Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
    </select>
    <script type='text/javascript'>
@@ -56,5 +56,6 @@ if (WS_LOGGED_IN) {
    <p>Results will appear below.</p>
    <div id="results"></div>
    </div>
+</div>
 </body>
 </html>
