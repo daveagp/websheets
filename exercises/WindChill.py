@@ -17,7 +17,7 @@ tester_preamble = r"""
 tests = r"""
 testMain("32.0", "15.0");
 testMain("-40", "6.2");
-testMain("80.0", "30.0");
+testMain("79.5", "27.62");
 """
 
 source_code = r"""
