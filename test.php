@@ -38,7 +38,7 @@ include_once('include.php');
 	   ?> );
    </script>
    <div id="container" style="display:none">
-   <h3>Exercise Description</h3>
+   <div class='exercise-header'>Exercise Description</div>
    <div id="description"></div>
    <p><i>Enter code in the yellow areas. F2: submit code. PgDn/PgUp: next/prev blank. Tab: reindent.</i></p>
    <textarea id="code" name="code"></textarea>

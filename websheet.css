@@ -44,6 +44,9 @@
     border-color: #9E9;
     background-color: #EFE;
 }
+#page.passed .exercise-header {
+    background-color: #AFA;
+}
 
 #results pre {
     background-color: rgba(240, 240, 240, 0.5);
@@ -88,8 +91,12 @@ code, pre {
     font-family: 'Source Code Pro';
 }
 
-h3 {
+.exercise-header {
+    font-size: 125%;
+    font-weight: bold;
     margin: 10px 0px 5px 0px;
+    text-align: center;
+    background: #DDF;
 }
 
 p, pre {

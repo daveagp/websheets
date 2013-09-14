@@ -136,15 +136,19 @@ if __name__ == "__main__":
   if category.startswith("Internal Error"):
     results = "<b><p>Internal Error; please report to course staff!</p></b>" + results
 
-  output = {'category': category, 'results' : results}
+  import copy
+    
+  print_output = {'category': category, 'results' : results}
+  save_this = {'category': category}
   if errmsg is not None:
-    output['errmsg'] = errmsg
-
-  import config
-  config.save_submission(student, classname, stdin, output)
-
+    print_output['errmsg'] = errmsg
+    save_this['errmsg'] = errmsg
   if epilogue is not None: # no need to log this
-    output['epilogue'] = epilogue
+    print_output['epilogue'] = epilogue
 
-  print(json.dumps(output))
+  passed = (category == "Passed")
+  import config
+  config.save_submission(student, classname, stdin, save_this, passed)
+
+  print(json.dumps(print_output))
   sys.exit(0)

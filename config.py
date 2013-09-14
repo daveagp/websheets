@@ -67,22 +67,26 @@ sys.exit(proc.returncode)
         return mysql.connector.connect(host='publicdb.cs.princeton.edu', user='cos126',
                                        password=open('/n/fs/htdocs/'+server_username+'/websheets/.dbpwd').read(), db='cos126')
 
-    def save_submission(student, problem, submission, result):
+    def save_submission(student, problem, submission, result_column, passed):
         import json
         db = connect()
         cursor = db.cursor()
         cursor.execute(
-            "insert into ws_history (user, problem, submission, result)" + 
-            " VALUES (%s, %s, %s, %s)", 
+            "insert into ws_history (user, problem, submission, result, passed)" + 
+            " VALUES (%s, %s, %s, %s, %s)", 
             (student, 
              problem, 
+             # remove positional (line/ch) data from saved submission code
              json.dumps([blank["code"] for blank in json.loads(submission)]), 
-             json.dumps({"output": result, "pass": "<div class='all-passed'>" in result})))
+             json.dumps(result_column),
+             passed))
         db.commit()
         cursor.close()
         db.close()
 
+    # returns a list of code fragments
     def load_submission(student, problem):
+        import json
         db = connect()
         cursor = db.cursor()
         cursor.execute(
@@ -94,4 +98,4 @@ sys.exit(proc.returncode)
             result = row[0]
         cursor.close()
         db.close()
-        return result
+        return json.loads(result)

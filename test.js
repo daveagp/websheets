@@ -2,7 +2,7 @@
    resetup = function(data) {
      if (typeof window.testWS != 'undefined')
        window.testWS.cm.toTextArea();
-     window.testWS = websheet("code", data.code );
+     window.testWS = websheet("code", data.template_code );
      $("#description").html(data.description);
      testWS.cm.addKeyMap({F2: checkSolution});
    }
@@ -13,25 +13,18 @@ loadProblem = function(slug) {
   $("#results").html("");
   $('#container').hide();
   $('#selectSheet')[0].disabled = true;
-  $.ajax("Websheet.php",
-         {data: {args: "get_html_template "+$("#selectSheet").val(), 
-                 stdin: ""},
-          success: function(data) {
-            if (data.substring(0, 1) != '{') // not json array -- so an error
-              alert(data);
-            else {
-	      $.ajax("load.php",
-		     {data: {problem: $("#selectSheet").val()},
-			     success: function(user_data) {
-			     $('#container').show();
-			     $('#selectSheet')[0].disabled = false;
-			     resetup(JSON.parse(data));
-			     if (user_data != false)
-				 testWS.setUserAreas(JSON.parse(user_data));
-			 }
-		     });
-            }
-          }});
+  $.ajax("load.php",
+   {data: {problem: slug},
+	   dataType: "json",
+	   success: function(data) 
+	   {
+	       $('.exercise-header').html("Exercise Description: <code>" + slug + "</code>");
+	       $('#container').show();
+	       $('#selectSheet')[0].disabled = false;
+	       resetup(data);
+	       if (data.user_code != false)
+		   testWS.setUserAreas(data.user_code);
+	   }});
 };
 
 checkSolution = function() {
