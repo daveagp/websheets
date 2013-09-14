@@ -10,5 +10,6 @@ if __name__ == "__main__":
   websheet = Websheet.from_filesystem(classname)
   print(json.dumps({"template_code":websheet.get_json_template(),
                     "description":websheet.description,
-                    "user_code": config.load_submission(student, classname)
+                    "user_code": config.load_submission(student, classname),
+                    "ever_passed": config.ever_passed(student, classname)
                     }))

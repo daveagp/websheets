@@ -10,6 +10,7 @@
 loadProblem = function(slug) {
   window.location.hash = slug;
   $("#page").removeClass("passed");
+  $("#page").removeClass("ever-passed");
   $("#results").html("");
   $('#container').hide();
   $('#selectSheet')[0].disabled = true;
@@ -24,6 +25,8 @@ loadProblem = function(slug) {
 	       resetup(data);
 	       if (data.user_code != false)
 		   testWS.setUserAreas(data.user_code);
+	       if (data.ever_passed != false)
+		   $('#page').addClass("ever-passed");
 	   }});
 };
 
@@ -39,7 +42,10 @@ checkSolution = function() {
            success: function(data) {
 	     //console.log(data);
 	     $("#submitButton").removeAttr("disabled");
-	     if (data.category == 'Passed') $("#page").addClass("passed");
+	     if (data.category == 'Passed') {
+		 $("#page").addClass("passed");
+		 $('#page').addClass("ever-passed");
+	     }
 	     var results = data.results;
              $("#results").html(results);
              var line = results.match(/[Ll]ine (\d)+(?!\d)/);

@@ -44,10 +44,13 @@
     border-color: #9E9;
     background-color: #EFE;
 }
-#page.passed .exercise-header {
+#page.ever-passed .exercise-header {
     background-color: #AFA;
 }
-
+/* goes after the problem name */
+#page.ever-passed .exercise-header code:after {
+    content: " [\002713]"
+}
 #results pre {
     background-color: rgba(240, 240, 240, 0.5);
 }

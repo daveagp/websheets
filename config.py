@@ -84,7 +84,7 @@ sys.exit(proc.returncode)
         cursor.close()
         db.close()
 
-    # returns a list of code fragments
+    # returns a json list of code fragments
     def load_submission(student, problem):
         import json
         db = connect()
@@ -99,3 +99,19 @@ sys.exit(proc.returncode)
         cursor.close()
         db.close()
         return json.loads(result)
+
+    # returns a boolean
+    def ever_passed(student, problem):
+        import json
+        db = connect()
+        cursor = db.cursor()
+        cursor.execute(
+            "select passed from ws_history WHERE user = %s AND problem = %s AND passed = 1 LIMIT 1;",
+            (student, 
+             problem))
+        result = False
+        for row in cursor: # if any results, they've passed it
+            result = True
+        cursor.close()
+        db.close()
+        return result
