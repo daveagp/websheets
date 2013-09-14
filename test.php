@@ -8,15 +8,15 @@ include_once('include.php');
    <script type="text/javascript" src="CodeMirror/mode/clike/clike.js"></script>
    <script type="text/javascript" src="CodeMirror/addon/selection/mark-selection.js"></script>
    <script type="text/javascript" src="CodeMirror/addon/edit/matchbrackets.js"></script>
-   <script type="text/javascript" src="websheet.js"></script>
+   <script type="text/javascript" src="websheet.js?1"></script>
 
    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
    <link rel="stylesheet" href="CodeMirror/theme/neat.css">
-   <link rel="stylesheet" href="websheet.css">
+   <link rel="stylesheet" href="websheet.css?1">
   
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
 
-   <script type="text/javascript" src="test.js"></script>
+   <script type="text/javascript" src="test.js?1"></script>
 
 </head>
 <body>
