@@ -37,6 +37,8 @@ include_once('include.php');
 	 echo passthru("./Websheet.py list") 
 	   ?> );
    </script>
+   <button id='resetButton'>Start over</button>
+   <button id='answerButton'>View reference solution</button>
    <div id="container" style="display:none">
    <div class='exercise-header'>Exercise Description</div>
    <div id="description"></div>

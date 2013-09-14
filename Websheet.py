@@ -121,6 +121,13 @@ class Websheet:
                 if stack == [r"\["]:
                     info["blank_index"] = input_counter
                     input_counter += 1
+                    if '\n' in item.token:
+                        if (item.token[:1] != '\n'): item.token = '\n' + item.token
+                        if (item.token[-1:] != '\n'): item.token += '\n'
+                    else:
+                        if (item.token[:1] != ' '): item.token = ' ' + item.token
+                        if (item.token[-1:] != ' '): item.token += ' '
+
                 # avoid extraneous space around user-facing read-only tokens
                 if stack == [] or stack == [r"\fake["]:
                     if item.token=='\n\n':
@@ -256,6 +263,27 @@ class Websheet:
         
         return ''.join(r)
 
+    def get_reference_snippets(self):
+        r = []
+        for (item, stack, info) in self.iterate_token_list():
+            if stack == [r"\["]:
+                if "\n" in item.token: 
+                    r.append(item.token)
+                else:
+                    r.append(" "+item.token+" ")
+
+        return r
+        
+    def get_initial_snippets(self):
+        r = []
+        for (item, stack, info) in self.iterate_token_list():
+            if stack == [r"\["]:
+                if "\n" in item.token: 
+                    r.append("\n\n")
+                else:
+                    r.append("  ")
+        return r
+        
     def get_json_template(self):
         r = [""]
 

@@ -16,9 +16,10 @@ public class PizzaCalculator {
    public static void main(String[] args) {
       double PERSONAL_AREA = 100; // in square cm
 \[
-        double r = Double.parseDouble(args[0]);
+        double r = Double.parseDouble(args[0]); // radius
         double area = r*r*Math.PI;
-        int people = (int) (area / 100);
+        // cast to int rounds down:
+        int people = (int) (area / 100); 
         System.out.println(people);
 ]\
    }

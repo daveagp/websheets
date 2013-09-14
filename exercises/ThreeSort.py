@@ -15,10 +15,12 @@ public class ThreeSort {
         int a = Integer.parseInt(args[0]);
         int b = Integer.parseInt(args[1]);
         int c = Integer.parseInt(args[2]);
+
         int smallest = Math.min(a, Math.min(b, c));
         int biggest = Math.max(a, Math.max(b, c));
-        // the main trick: the original sum equals the sorted sum
+        // main trick: original sum equals the sorted sum
         int middle = a + b + c - smallest - biggest;
+
         System.out.print(smallest + " ");
         System.out.print(middle + " ");
         System.out.println(biggest);

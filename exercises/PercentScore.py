@@ -23,7 +23,15 @@ public class PercentScore {
         int total1 = Integer.parseInt(args[1]);
         int score2 = Integer.parseInt(args[2]);
         int total2 = Integer.parseInt(args[3]);
+
+        // can't do 100 * (score1 + score2) / (total1 + total2)
+        // since the division would be "integer division"
+
+        // This is one solution:
         System.out.println(100.0 * (score1 + score2) / (total1 + total2));
+
+        // many other solutions are possible, e.g.
+        //               (double) (score1 + score2) * 100 / (total1 + total2)
 ]\
     }
 }

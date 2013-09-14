@@ -1,9 +1,9 @@
 source_code = r"""
 public static void main(String[] args) {
 \[
-   System.out.print(args[0]);
+   System.out.print(args[0]); // name
    System.out.print(" is ");
-   System.out.print(args[1]);
+   System.out.print(args[1]); // age
    System.out.println(" years old.");
 ]\
 }

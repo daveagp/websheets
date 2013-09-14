@@ -114,6 +114,7 @@ p, pre {
     border-top: none;
 }
 
+/*** background colors of user input areas ***/
 .inline {background-color: #FF9}
 pre.block {background-color: #FF9}
 pre.block span {background-color: #FF9}
@@ -140,6 +141,7 @@ background: linear-gradient(to right,  #ffff99 49%,#ffffff 51%); /* W3C */
 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffff99', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
 }
 
+/*** background colors when selected ***/
 .CodeMirror-selectedtext {background-color: #AAF;}
 
 .CodeMirror-selectedtext.inline {background-color: #AAF;}
@@ -167,3 +169,29 @@ background: linear-gradient(to right,  #ccccff 49%,#ffffff 51%); /* W3C */
 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ccccff', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
 }
 
+/*** background colors when loking at reference solution ***/
+.viewing-ref .inline {background-color: #FCE}
+.viewing-ref pre.block {background-color: #FCE}
+.viewing-ref pre.block span {background-color: #FCE}
+
+.viewing-ref .inlineL {
+background: #ffffff; /* Old browsers */
+background: -moz-linear-gradient(left,  #ffffff 49%, #ffccee 51%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right top, color-stop(49%,#ffffff), color-stop(51%,#ffccee)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(left,  #ffffff 49%,#ffccee 51%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(left,  #ffffff 49%,#ffccee 51%); /* Opera 11.10+ */
+background: -ms-linear-gradient(left,  #ffffff 49%,#ffccee 51%); /* IE10+ */
+background: linear-gradient(to right,  #ffffff 49%,#ffccee 51%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffccee',GradientType=1 ); /* IE6-9 */
+}
+
+.viewing-ref .inlineR {
+background: #ffccee; /* Old browsers */
+background: -moz-linear-gradient(left,  #ffccee 49%, #ffffff 51%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, right top, color-stop(49%,#ffccee), color-stop(51%,#ffffff)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(left,  #ffccee 49%,#ffffff 51%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(left,  #ffccee 49%,#ffffff 51%); /* Opera 11.10+ */
+background: -ms-linear-gradient(left,  #ffccee 49%,#ffffff 51%); /* IE10+ */
+background: linear-gradient(to right,  #ffccee 49%,#ffffff 51%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffccee', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
+}

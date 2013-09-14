@@ -21,12 +21,15 @@ source_code = r"""
 public static void main(String[] args) {
    int age = Integer.parseInt(args[0]);        
 \[
-      if (age < 0)
+      if (age < 0) {
          System.out.println("You are a time traveller");
-      else if (age < 18)
+  }
+      else if (age < 18) {
          System.out.println("Too young to vote");
-      else
+}
+      else {
          System.out.println("You can vote");
+}
 ]\
 }
 """

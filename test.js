@@ -1,3 +1,7 @@
+var num_submissions;
+var lastload;
+var viewing_ref = false;
+var saved_chunks; // when viewing reference, remember what used to be there
 
    resetup = function(data) {
      if (typeof window.testWS != 'undefined')
@@ -8,6 +12,7 @@
    }
 
 loadProblem = function(slug) {
+  set_viewing_ref(false);
   window.location.hash = slug;
   $("#page").removeClass("passed");
   $("#page").removeClass("ever-passed");
@@ -19,6 +24,7 @@ loadProblem = function(slug) {
 	   dataType: "json",
 	   success: function(data) 
 	   {
+	       lastload = data;
 	       $('.exercise-header').html("Exercise Description: <code>" + slug + "</code>");
 	       $('#container').show();
 	       $('#selectSheet')[0].disabled = false;
@@ -27,6 +33,7 @@ loadProblem = function(slug) {
 		   testWS.setUserAreas(data.user_code);
 	       if (data.ever_passed != false)
 		   $('#page').addClass("ever-passed");
+	       num_submissions = data.num_submissions;
 	   }});
 };
 
@@ -34,15 +41,17 @@ checkSolution = function() {
   $("#results").html("Waiting for a reply...");
   $("#page").removeClass("passed");
   $("#submitButton").attr("disabled", "disabled");
-  var user_state = JSON.stringify(testWS.getUserCodeAndLocations());
+  var user_state = JSON.stringify({viewing_ref:viewing_ref,
+				   snippets:testWS.getUserCodeAndLocations()});
   $.ajax("submit.php",
          {
            data: {stdin: user_state, problem: $('#selectSheet').val()},
            dataType: "json",
            success: function(data) {
 	     //console.log(data);
+	     num_submissions++;
 	     $("#submitButton").removeAttr("disabled");
-	     if (data.category == 'Passed') {
+	     if (data.category == 'Passed' && !viewing_ref) {
 		 $("#page").addClass("passed");
 		 $('#page').addClass("ever-passed");
 	     }
@@ -65,3 +74,46 @@ var populateSheets = function(sheets) {
                              +"</option>");
   }
 }
+
+    function set_viewing_ref(show_ref) {
+	if (viewing_ref == show_ref)
+	    return;
+	// already looking at reference solution
+	if (viewing_ref) {
+	    testWS.readOnly = false;
+	    testWS.setUserAreas(saved_chunks);
+	    $("#page").removeClass("viewing-ref");
+	    $("#resetButton").removeAttr("disabled");
+	}
+	// put in the reference solution
+	else {
+	    saved_chunks = testWS.getUserCode();
+	    testWS.setUserAreas(lastload.reference_sol);
+	    $("#results").html("");
+	    $("#page").addClass("viewing-ref");
+	    var lc = testWS.cm.lineCount();
+	    for (var i=0; i<lc; i++)
+		testWS.cm.indentLine(i);
+	    testWS.readOnly = true;
+	    $("#resetButton").attr("disabled", "disabled");
+	}
+	viewing_ref = !viewing_ref;
+	$("#answerButton").html(viewing_ref ? "Go back to my solution" : "View reference solution");
+    }
+
+    $(function() {
+	    $("#resetButton").click( function(eventObject) {
+			set_viewing_ref(false);
+			testWS.setUserAreas(lastload.initial_snippets);
+		});
+	    
+	    $("#answerButton").click( function(eventObject) {
+		    if (num_submissions < 4 && !$("#page").hasClass("ever-passed")) {
+			alert("You have to make 4 attempts or complete the problem before you can view the reference solution. " +
+			      "You have made " + num_submissions + " attempts so far.");
+		    }
+		    else {
+			set_viewing_ref(!viewing_ref);
+		    }
+		});
+	});

@@ -21,13 +21,14 @@ if __name__ == "__main__":
   websheet = Websheet.Websheet.from_filesystem(sys.argv[1])
   classname = websheet.classname
   stdin = input() # assume json all on one line
+  user_state = json.loads(stdin)
 
   def main():
     global errmsg, epilogue
     if not re.match(re.compile("^[a-z0-9]+$"), student):
         return("Internal Error (Student)", "Error: invalid student name")
 
-    user_poschunks = json.loads(stdin)
+    user_poschunks = user_state["snippets"]
 
     # this is the pre-syntax check
     student_solution = websheet.make_student_solution(user_poschunks, "student."+student)
@@ -148,7 +149,11 @@ if __name__ == "__main__":
 
   passed = (category == "Passed")
   import config
-  config.save_submission(student, classname, stdin, save_this, passed)
+
+  if (not user_state["viewing_ref"]):
+    # remove positional information
+    user_snippets = [blank["code"] for blank in user_state["snippets"]]
+    config.save_submission(student, classname, user_snippets, save_this, passed)
 
   print(json.dumps(print_output))
   sys.exit(0)

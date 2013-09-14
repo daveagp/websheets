@@ -22,10 +22,15 @@ public static void main(String[] args) {
    double disc = (b*b-4*c);
    double root1 = (-b-Math.sqrt(disc))/2;
    double root2 = (-b+Math.sqrt(disc))/2;
-   if (Math.abs(disc) < 1E-6)
+
+   if (Math.abs(disc) < 1E-6) {
+      // it doesn't matter which root you print out
+      // since they will be very close
       System.out.println(root1);
-   else if (disc < 0)
+   }
+   else if (disc < 0) {
       System.out.println("There are no roots");
+   }
    else {
       System.out.println(root1);
       System.out.println(root2);

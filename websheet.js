@@ -142,13 +142,16 @@ function websheet(textarea_id, fragments) {
     }
   }
 
+  var retval;
+
   var override = false;
   
   // this is better than readOnly since it works when you surround read-only text
   // and try to change the whole selection
   cm.on("beforeChange", function(cm, change) {
-
+	  
     if (override) return;
+    if (retval.readOnly) {change.cancel(); return;}
 
     // cancel newlines in inline regions
     if (change.text.length > 1) // array of lines; is there a newline?
@@ -207,7 +210,7 @@ function websheet(textarea_id, fragments) {
       }
   }
 
-  return {
+  retval = {
     getUserCode: function() {
       var result = new Array();
       for (var i=0; i<editable.length; i++) {
@@ -234,8 +237,9 @@ function websheet(textarea_id, fragments) {
       if (hhandle != null) testWS.cm.removeLineClass(hhandle, "wrapper", "tempAlert");
       hhandle = cm.addLineClass(line-1, "wrapper", "tempAlert");
     },
+    readOnly: false,
     cm: cm,
     setUserAreas: setUserAreas
   };
-  
+  return retval;  
 }

@@ -2,7 +2,7 @@ source_code = r"""
 public static void main(String[] args) {
 \[
    System.out.print("Next year, ");
-   System.out.print(args[0]);
+   System.out.print(args[0]); // name
    System.out.print(" will be ");
    int inputAge = Integer.parseInt(args[1]);
    System.out.print(inputAge + 1);

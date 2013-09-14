@@ -67,7 +67,7 @@ sys.exit(proc.returncode)
         return mysql.connector.connect(host='publicdb.cs.princeton.edu', user='cos126',
                                        password=open('/n/fs/htdocs/'+server_username+'/websheets/.dbpwd').read(), db='cos126')
 
-    def save_submission(student, problem, submission, result_column, passed):
+    def save_submission(student, problem, user_state, result_column, passed):
         import json
         db = connect()
         cursor = db.cursor()
@@ -76,8 +76,7 @@ sys.exit(proc.returncode)
             " VALUES (%s, %s, %s, %s, %s)", 
             (student, 
              problem, 
-             # remove positional (line/ch) data from saved submission code
-             json.dumps([blank["code"] for blank in json.loads(submission)]), 
+             json.dumps(user_state),
              json.dumps(result_column),
              passed))
         db.commit()
@@ -112,6 +111,22 @@ sys.exit(proc.returncode)
         result = False
         for row in cursor: # if any results, they've passed it
             result = True
+        cursor.close()
+        db.close()
+        return result
+
+    # returns an integer
+    def num_submissions(student, problem):
+        import json
+        db = connect()
+        cursor = db.cursor()
+        cursor.execute(
+            "select count(1) from ws_history WHERE user = %s AND problem = %s;",
+            (student, 
+             problem))
+        result = -1
+        for row in cursor: # if any results, they've passed it
+            result = row[0]
         cursor.close()
         db.close()
         return result
