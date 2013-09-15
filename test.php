@@ -30,12 +30,14 @@ include_once('include.php');
    Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
    </select>
    <script type='text/javascript'>
-   populateSheets(<?php
+   var sheets = 
+  <?php
        if (array_key_exists("group", $_REQUEST))
 	 echo json_encode(explode(" ", $_REQUEST["group"]));
        else
 	 echo passthru("./Websheet.py list") 
-	   ?> );
+	   ?> 
+    populateSheets(sheets);
    </script>
    <button id='resetButton'>Start over</button>
    <button id='answerButton'>View reference solution</button>
@@ -49,7 +51,7 @@ include_once('include.php');
       var ex = window.location.hash.substring(1);
     }
     else {
-      var ex = "SquareOf";
+      var ex = sheets[0];
     }
     $('#selectSheet').val(ex);
     loadProblem(ex);
