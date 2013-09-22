@@ -32,8 +32,8 @@ if socket.gethostname().endswith("uwaterloo.ca"):
         return "false"
 
 elif socket.gethostname().endswith("princeton.edu"):
-    javac = "javac -J-Xmx128M "
-    java = "/usr/bin/java -Xmx128M "
+    javac = "/usr/bin/javac -target 1.7 -cp .:/n/fs/htdocs/cos126/java_jail/cp -J-Xmx128M "
+    java = "/usr/bin/java -cp .:/n/fs/htdocs/cos126/java_jail/cp -Xmx128M "
 
     import getpass
     server_username = getpass.getuser()
@@ -47,7 +47,7 @@ elif socket.gethostname().endswith("princeton.edu"):
         os.chdir( "/n/fs/htdocs/"+server_username+"/")
         if the_stdin != "":
             raise Exception('Cannot handle stdin in run_java yet')
-        cmd = "sandbox -M -i safeexec/safeexec -i scratch /usr/bin/python -u -S"
+        cmd = "sandbox -M -i safeexec/safeexec -i scratch -i /n/fs/htdocs/cos126/java_jail/cp/stdlibpack /usr/bin/python -u -S"
 
         input = """
 import os, resource, sys
