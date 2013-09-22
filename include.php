@@ -9,11 +9,11 @@ if (WS_PRINCETON) {
   if (isset($_REQUEST['logout'])) {
     phpCAS::logout();
   }
-  define (WS_USERNAME, phpCAS::getUser());
-  define (WS_LOGGED_IN, true);
-  define (WS_LOGOUT_LINK, "?logout=");
+  define ('WS_USERNAME', phpCAS::getUser());
+  define ('WS_LOGGED_IN', true);
+  define ('WS_LOGOUT_LINK', "?logout=");
  }
  else {
-   define (WS_USERNAME, "joestu"); // not terribly secure
-   define (WS_LOGGED_IN, false);
+   define ('WS_USERNAME', "joestu"); // not terribly secure
+   define ('WS_LOGGED_IN', false);
  }

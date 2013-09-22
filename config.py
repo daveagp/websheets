@@ -25,11 +25,17 @@ if socket.gethostname().endswith("uwaterloo.ca"):
     def run_java(command, the_stdin = ""):
         return execute(safeexec + safeexec_args + java + command, the_stdin)  
 
-    def save_submission(student, problem, submission, result):
+    def save_submission(*args):
         pass
 
     def load_submission(student, problem):
-        return "false"
+        return False
+
+    def ever_passed(student, problem):
+        return False
+
+    def num_submissions(student, problem):
+        return 0
 
 elif socket.gethostname().endswith("princeton.edu"):
     javac = "/usr/bin/javac -target 1.7 -cp .:/n/fs/htdocs/cos126/java_jail/cp -J-Xmx128M "
