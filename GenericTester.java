@@ -163,31 +163,88 @@ public abstract class GenericTester {
 		+ " but it was supposed to print this output:" + pre(referenceO);
 	}
     }	    
+    
+    abstract class Capturer {
+        String stdout;
+        boolean crashed;
+
+        Capturer() {
+            startStdoutCapture();
+        }
+        void end() {
+            stdout = endStdoutCapture();
+        }
+    }
+
+    class InvokeCapturer extends Capturer {
+        Object retval;
+        InvokeCapturer(Method m, Object dis, Object[] args) throws IllegalAccessException, InvocationTargetException {
+            super();
+            crashed = true;
+            try {
+                retval = m.invoke(dis, args);
+                crashed = false;
+            } finally {
+                end();
+            }
+        }
+    }
+
+    class ClassInitCapturer extends Capturer {
+        Class foundClass;
+        ClassInitCapturer(String className) throws ClassNotFoundException {
+            super();
+            crashed = true;
+            try {                
+                foundClass = Class.forName(className);
+                crashed = false;
+            } finally {
+                end();
+            }
+        }
+    }
+
+    Object semicopy(Object O) {
+        // basic immutable types
+        if (O == null || O instanceof String || O instanceof Integer || O instanceof Long || O instanceof Character
+            || O instanceof Boolean || O instanceof Short || O instanceof Float || O instanceof Double
+            || O instanceof Byte)
+            return O;
+        if (O instanceof int[]) return Arrays.copyOf((int[])O, ((int[])O).length);
+        if (O instanceof short[]) return Arrays.copyOf((short[])O, ((short[])O).length);
+        if (O instanceof long[]) return Arrays.copyOf((long[])O, ((long[])O).length);
+        if (O instanceof byte[]) return Arrays.copyOf((byte[])O, ((byte[])O).length);
+        if (O instanceof boolean[]) return Arrays.copyOf((boolean[])O, ((boolean[])O).length);
+        if (O instanceof float[]) return Arrays.copyOf((float[])O, ((float[])O).length);
+        if (O instanceof double[]) return Arrays.copyOf((double[])O, ((double[])O).length);
+        if (O instanceof char[]) return Arrays.copyOf((char[])O, ((char[])O).length);
+        if (O instanceof Object[]) {
+            Class cType = O.getClass().getComponentType();
+            Object[] OA = (Object[])O;
+            Object[] r = (Object[]) Array.newInstance(cType, OA.length);
+            for (int i=0; i<OA.length; i++)
+                r[i] = semicopy(OA[i]);
+            return r;
+        }
+        throw new RuntimeException("Don't know how to semicopy "+O.toString());
+    }
 
     @SuppressWarnings("unchecked")
     protected void compare(Method referenceM, Method studentM, Object[] args) {
-        String referenceO = null, studentO = null;
-        Object referenceR = null, studentR = null;
+        InvokeCapturer ref = null, stu = null;
         try {
-            startStdoutCapture();
-            referenceR = referenceM.invoke(null, args);
-            referenceO = endStdoutCapture();
+            ref = new InvokeCapturer(referenceM, null, args);
         }
         catch (IllegalAccessException | InvocationTargetException e) {
-            referenceO = endStdoutCapture();
-            throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(referenceO));
+            throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(ref.stdout));
         }
         try {
-            startStdoutCapture();
-            studentR = studentM.invoke(null, args);
-            studentO = endStdoutCapture();
+            stu = new InvokeCapturer(studentM, null, args);
         }
         catch (IllegalAccessException e) {
-            studentO = endStdoutCapture();
-            throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(studentO));
+            throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(stu.stdout));
         }
         catch (InvocationTargetException e) {
-            studentO = endStdoutCapture();            
             Throwable exc = e.getTargetException();
 
             String stackTrace = exc.toString();
@@ -199,28 +256,28 @@ public abstract class GenericTester {
                 }
             }
             throw new FailTestException("Runtime error: " + pre(stackTrace) + 
-                                        (studentO.equals("") ? "" : "<br>Partial printed output:" + pre(studentO)));
+                                        (stu.stdout.equals("") ? "" : "<br>Partial printed output:" + pre(stu.stdout)));
         }
-        if (referenceO.length() > 0) {
-	    String reason = describeOutputDifference(studentO, referenceO);
+        if (ref.stdout.length() > 0) {
+	    String reason = describeOutputDifference(stu.stdout, ref.stdout);
 	    if (reason != null)
 		throw new FailTestException(reason);
         }
-        if (referenceO.equals("") && !studentO.equals("")) {
-            System.out.println("Found this printed output (not required):" + pre(studentO));
+        if (ref.stdout.equals("") && !stu.stdout.equals("")) {
+            System.out.println("Found this printed output (not required):" + pre(stu.stdout));
         }
         if (referenceM.getReturnType() != Void.TYPE) {
-            if (!referenceR.equals(studentR)) {
-                throw new FailTestException("Expected return value " + code(repr(referenceR)) + " but instead your code returned " + code(repr(studentR)));
+            if (!ref.retval.equals(stu.retval)) {
+                throw new FailTestException("Expected return value " + code(repr(ref.retval)) + " but instead your code returned " + code(repr(stu.retval)));
             }
         }
         System.out.print("<div class='pass-test'>");
         System.out.println("Passed test!");
-        if (!referenceO.equals("")) {
-            System.out.println("Printed correct output " + pre(referenceO));
+        if (!ref.stdout.equals("")) {
+            System.out.println("Printed correct output " + pre(ref.stdout));
         }
         if (referenceM.getReturnType() != Void.TYPE) {
-            System.out.println("Returned correct value " + pre(referenceR.toString()));
+            System.out.println("Returned correct value " + pre(ref.retval.toString()));
         }
         System.out.println("</div>");
     }
@@ -246,11 +303,17 @@ public abstract class GenericTester {
 
     private void setup() {
         try {
-            studentC = Class.forName("student."+studentName+"."+className);
-            referenceC = Class.forName("reference."+className);
+            ClassInitCapturer stu = new ClassInitCapturer("student."+studentName+"."+className);
+            ClassInitCapturer ref = new ClassInitCapturer("reference."+className);
+            studentC = stu.foundClass;
+            referenceC = ref.foundClass;
+
+            if (stu.stdout.length() > 0) {
+                System.out.println("<div>Warning: your class printed the output "+pre(stu.stdout)+" before any method was called.</div>");
+            }
         }
         catch (ClassNotFoundException e) {
-            throw new RuntimeException("Internal error: class not found");
+            throw new RuntimeException("Internal error: class not found " + e);
         }
     }
     
