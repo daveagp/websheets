@@ -233,7 +233,7 @@ public abstract class GenericTester {
     protected void compare(Method referenceM, Method studentM, Object[] args) {
         InvokeCapturer ref = null, stu = null;
         try {
-            ref = new InvokeCapturer(referenceM, null, args);
+            ref = new InvokeCapturer(referenceM, null, (Object[])semicopy(args));
         }
         catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(ref.stdout));
