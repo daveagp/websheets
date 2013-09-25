@@ -8,7 +8,7 @@ var saved_chunks; // when viewing reference, remember what used to be there
        window.testWS.cm.toTextArea();
      window.testWS = websheet("code", data.template_code );
      $("#description").html(data.description);
-     testWS.cm.addKeyMap({F2: checkSolution});
+     testWS.cm.addKeyMap({F2: checkSolution, F5: function() {return false;}});
    }
 
 loadProblem = function(slug) {
