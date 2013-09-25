@@ -84,9 +84,11 @@ public abstract class GenericTester {
             
         }
         public void execute() {
+            boolean showHellip = testStdin == null;
             System.out.println("<div class='testcase-desc'>");
             describe();
-            System.out.println("&hellip;</div>");
+            if (showHellip) System.out.println("&hellip;");
+            System.out.println("</div>");
             test();
         }
     }
