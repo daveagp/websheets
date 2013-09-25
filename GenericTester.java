@@ -2,6 +2,7 @@ package framework;
 import java.util.*;
 import java.lang.reflect.*;
 import java.io.*;
+import stdlibpack.*;
 public abstract class GenericTester {
 
     /* "library" helper methods and exceptions */
@@ -53,7 +54,13 @@ public abstract class GenericTester {
                 tmp += ")";
             }
             System.out.println(code(tmp));
+	    describeStdin();
         }
+	protected void describeStdin() {
+	    if (testStdin != null) {
+		System.out.println("with standard input"+pre(testStdin));
+	    }
+	}
         protected void test() {
             for (Method m : referenceC.getMethods())
                 if (m.getName().equals(methodName)) {
@@ -115,6 +122,8 @@ public abstract class GenericTester {
     // if true, any reference line comprised of a real number
     // allows 1E-4 relative/absolute error in student output
     public boolean oneRealPerLine = false;
+
+    public String testStdin = null;
 
     protected String describeOutputDifference(String studentO, String referenceO) {
 	if (oneRealPerLine) {
@@ -232,12 +241,18 @@ public abstract class GenericTester {
     @SuppressWarnings("unchecked")
     protected void compare(Method referenceM, Method studentM, Object[] args) {
         InvokeCapturer ref = null, stu = null;
+	String currStdin = testStdin;
+	testStdin = null;
+	if (currStdin != null)
+	    StdIn.setString(currStdin);
         try {
             ref = new InvokeCapturer(referenceM, null, (Object[])semicopy(args));
         }
         catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(ref.stdout));
         }
+	if (currStdin != null)
+	    StdIn.setString(currStdin);
         try {
             stu = new InvokeCapturer(studentM, null, args);
         }
@@ -297,6 +312,7 @@ public abstract class GenericTester {
                 String tmp = "java " + className;
                 for (String a : argStrings) tmp += " " + a;        
                 System.out.println(code(tmp));
+		describeStdin();
             }}
             .execute();
     }

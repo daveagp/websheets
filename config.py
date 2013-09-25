@@ -38,7 +38,7 @@ if socket.gethostname().endswith("uwaterloo.ca"):
         return 0
 
 elif socket.gethostname().endswith("princeton.edu"):
-    javac = "/usr/bin/javac -target 1.7 -cp .:/n/fs/htdocs/cos126/java_jail/cp -J-Xmx128M "
+    javac = "/usr/bin/javac -Xlint:path -target 1.7 -cp .:/n/fs/htdocs/cos126/java_jail/cp -J-Xmx128M "
     java = "/usr/bin/java -cp .:/n/fs/htdocs/cos126/java_jail/cp -Xmx128M "
 
     import getpass
@@ -46,6 +46,7 @@ elif socket.gethostname().endswith("princeton.edu"):
     scratch_dir = "/n/fs/htdocs/"+server_username+"/scratch/"
 
     def run_javac(command, the_stdin = ""):
+        #print(javac + command)
         os.chdir(scratch_dir)
         return execute(javac + command, the_stdin)
 

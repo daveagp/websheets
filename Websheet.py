@@ -248,6 +248,7 @@ class Websheet:
         r = []
 
         r.extend('\n' if package is None else 'package '+package+';\n')
+        r.extend('import stdlibpack.*;\n')
         r.extend('public class '+self.classname+" {\n")
 
         for (item, stack, info) in self.iterate_token_list():
