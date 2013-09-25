@@ -106,12 +106,14 @@ public abstract class GenericTester {
     protected void startStdoutCapture() {
         baos = new ByteArrayOutputStream();
         System.setOut(new PrintStream(baos));
+	StdOut.resync();
     }
 
     protected String endStdoutCapture() {
         try {
-            String content = baos.toString("ISO-8859-1");
+            String content = baos.toString("UTF-8");
             System.setOut(orig_stdout);
+	    StdOut.resync();
             return content;
         }
         catch (UnsupportedEncodingException e) {
