@@ -300,7 +300,7 @@ class Websheet:
                     r[-1] += token
             elif stack == [r"\["]:
                 if len(r) % 2 == 1: r += [""]
-                r[-1] += "\n\n" if "\n" in token else "  "
+                r[-1] += "\n"*max(2, token.count("\n")) if "\n" in token else " "*max(2, len(token))
 
         if self.show_class_decl:
             for i in range(len(r)):
@@ -310,6 +310,7 @@ class Websheet:
             r[-1] += "\n}"
 
         return r
+
 
     def make_tester(self):        
         return (
