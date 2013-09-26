@@ -57,7 +57,7 @@ public abstract class GenericTester {
 	    describeStdin();
         }
 	protected void describeStdin() {
-	    if (testStdin != null) {
+	    if (testStdin != null && !suppressStdinDescription) {
 		System.out.println("with standard input"+pre(testStdin));
 	    }
 	}
@@ -90,7 +90,11 @@ public abstract class GenericTester {
             if (showHellip) System.out.println("&hellip;");
             System.out.println("</div>");
             test();
+	    cleanup();
         }
+	public void cleanup() {
+	    suppressStdinDescription = false;	    
+	}
     }
 
     // descendants must override this
@@ -128,6 +132,8 @@ public abstract class GenericTester {
     public boolean oneRealPerLine = false;
 
     public String testStdin = null;
+    public String testStdinURL = null;
+    public boolean suppressStdinDescription = false;
 
     protected String describeOutputDifference(String studentO, String referenceO) {
 	if (oneRealPerLine) {
@@ -314,8 +320,16 @@ public abstract class GenericTester {
             protected void describe() {
                 System.out.print("Testing ");
                 String tmp = "java " + className;
-                for (String a : argStrings) tmp += " " + a;        
-                System.out.println(code(tmp));
+                for (String a : argStrings) tmp += " " + a;
+		tmp = code(tmp);
+		if (testStdinURL != null) {
+		    String[] urlSplit = testStdinURL.split("/");
+		    tmp += "<code> &lt; <a target=\"_blank\" href=\""+testStdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>";
+		    testStdin = new In(testStdinURL).readAll();
+		    testStdinURL = null;
+		    suppressStdinDescription = true;
+		}
+                System.out.println(tmp);
 		describeStdin();
             }}
             .execute();
