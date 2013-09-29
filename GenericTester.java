@@ -14,7 +14,8 @@ public abstract class GenericTester {
     }
             
     public static String pre(String S, String attr) {
-	return "<pre "+attr+">\n" + esc(S) + "</pre>";
+	String adjust = S.equals("") ? "<br>" : "";
+	return "<pre "+attr+">" + adjust + esc(S) + "</pre>";
     }
     public static String pre(String S) {return pre(S, "");}
 

@@ -25,6 +25,10 @@ class Websheet:
     close_delim = {']\\'} # not rawstring to make emacs happy
 
     @staticmethod
+    def sized_blank(token):
+        return "\n"*max(2, token.count("\n")) if "\n" in token else " "*max(2, len(token))
+
+    @staticmethod
     def parse_websheet_source(source):
         # allowing source to start with a newline 
         # makes the source files prettier
@@ -280,10 +284,7 @@ class Websheet:
         r = []
         for (item, stack, info) in self.iterate_token_list():
             if stack == [r"\["]:
-                if "\n" in item.token: 
-                    r.append("\n\n")
-                else:
-                    r.append("  ")
+                r.append(Websheet.sized_blank(item.token))
         return r
         
     def get_json_template(self):
@@ -300,7 +301,7 @@ class Websheet:
                     r[-1] += token
             elif stack == [r"\["]:
                 if len(r) % 2 == 1: r += [""]
-                r[-1] += "\n"*max(2, token.count("\n")) if "\n" in token else " "*max(2, len(token))
+                r[-1] += Websheet.sized_blank(token)
 
         if self.show_class_decl:
             for i in range(len(r)):
