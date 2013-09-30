@@ -24,10 +24,27 @@ public abstract class GenericTester {
     }
     public static String code(String S) {return code(S, "");}
 
+    // only works for int[] so far
+    public static String typerepr(Object O) {
+	if (O instanceof int[]) return "int[]";
+	return "???";
+    }
+
     public static String repr(Object O) {
         if (O instanceof String) {
             return '"' + (String)O + '"';
         }
+	else if (O == null) {
+	    return "null";
+	}
+	else if (O.getClass().isArray()) {
+	    String tmp = "new " + typerepr(O)+" {";
+	    for (int i=0; i<Array.getLength(O); i++) {
+		if (i != 0) tmp += ", ";
+		tmp += repr(Array.get(O, i));
+	    }
+	    return tmp + "}";
+	}
         else return O.toString();
     }
 
@@ -303,7 +320,7 @@ public abstract class GenericTester {
             System.out.println("Printed correct output " + pre(ref.stdout));
         }
         if (referenceM.getReturnType() != Void.TYPE) {
-            System.out.println("Returned correct value " + pre(ref.retval.toString()));
+            System.out.println("Returned correct value " + pre(repr(ref.retval)));
         }
         System.out.println("</div>");
     }
