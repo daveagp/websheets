@@ -13,16 +13,17 @@ public static int find(\[int]\ needle, \[int[]]\ haystack) {
 
 public static void main(String[] args) {
    int[] testArr = {1, 2, 6};
-   System.out.println("index of 6: " + find(6, testArr));
-   System.out.println("index of 2: " + find(2, testArr));
-   System.out.println("index of 1: " + find(1, testArr));
-   System.out.println("index of 4: " + find(4, testArr));
+   System.out.println("index of 6 in testArr: " + find(6, testArr));
+   System.out.println("index of 2 in testArr: " + find(2, testArr));
+   System.out.println("index of 1 in testArr: " + find(1, testArr));
+   System.out.println("index of 4 in testArr: " + find(4, testArr));
 }
 """
 
 tests = r"""
 testMain();
-test("find", 1, new int[]{4, 1, 6, 1});
+test("find", 9, new int[]{4, 9, 6, 9, 8});
+test("find", 126, new int[]{});
 """
 
 description = r"""
