@@ -11,6 +11,8 @@ public static void main (String[] args) {
    StdOut.println("126 is positive? " + isPositive(126));
    StdOut.println("-126 is positive? " + isPositive(-126));
    StdOut.println("0 is positive? " + isPositive(0));
+   StdOut.println("1 or -1 is positive? " 
+               + (isPositive(-1) || isPositive(1)));
 }
 """
 

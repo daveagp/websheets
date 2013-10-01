@@ -24,9 +24,26 @@ public abstract class GenericTester {
     }
     public static String code(String S) {return code(S, "");}
 
+    public static boolean smartEquals(Object a, Object b) {
+        if ((a == null) != (b == null))
+            return false;
+        if (a.getClass().isArray() != b.getClass().isArray())
+            return false;
+        if (a.getClass().isArray()) {
+            if (Array.getLength(a) != Array.getLength(b))
+                return false;
+            for (int i=0; i<Array.getLength(a); i++)
+                if (!smartEquals(Array.get(a, i), Array.get(b, i)))
+                    return false;
+            return true;
+        }
+        return a.equals(b);
+    }
+
     // only works for int[] so far
     public static String typerepr(Object O) {
 	if (O instanceof int[]) return "int[]";
+	if (O instanceof String[]) return "String[]";
 	return "???";
     }
 
@@ -38,7 +55,8 @@ public abstract class GenericTester {
 	    return "null";
 	}
 	else if (O.getClass().isArray()) {
-	    String tmp = "new " + typerepr(O)+" {";
+	    String tmp = //"new " + typerepr(O) +" "+
+                       "{";
 	    for (int i=0; i<Array.getLength(O); i++) {
 		if (i != 0) tmp += ", ";
 		tmp += repr(Array.get(O, i));
@@ -166,6 +184,7 @@ public abstract class GenericTester {
 		double r, s;
 		try {
 		    r = Double.parseDouble(reflines[i]);
+                    if (reflines[i].indexOf(".") < 0) throw new Exception();
 		    try {
 			s = Double.parseDouble(stulines[i]);
 		    }
@@ -310,7 +329,7 @@ public abstract class GenericTester {
             System.out.println("Found this printed output (not required):" + pre(stu.stdout));
         }
         if (referenceM.getReturnType() != Void.TYPE) {
-            if (!ref.retval.equals(stu.retval)) {
+            if (!smartEquals(ref.retval, stu.retval)) {
                 throw new FailTestException("Expected return value " + code(repr(ref.retval)) + " but instead your code returned " + code(repr(stu.retval)));
             }
         }

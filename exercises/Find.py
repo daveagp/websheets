@@ -27,12 +27,19 @@ test("find", 126, new int[]{});
 """
 
 description = r"""
-Write a class <code>Find</code> with a method <code>find()</code>
+<div><i>This exercise practices using arrays as arguments, 
+and using more than one <code>return</code> statement.
+</i></div>
+<div>Write a class <code>Find</code> with a method <code>find()</code>
 that takes two arguments, an integer <code>needle</code>
 and an array of integers <code>haystack</code>. If <code>needle</code>
 is one of the elements of <code>haystack</code>, then return the
-index at which it appears<sup>*</sup>. Otherwise, if <code>needle</code>
+index at which it appears<sup>*</sup>. (For example, if the initial
+element of <code>haystack</code> equals <code>needle</code>, you should
+return <code>0</code> since <code>haystack[0] == needle</code>.)
+Otherwise, if <code>needle</code>
 is not one of the elements of the array, return <code>-1</code>.
+</div>
 <div><sup>*</sup>: if it occurs multiple times, return the least-indexed
 position</div>"""
 
