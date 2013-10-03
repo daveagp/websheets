@@ -12,11 +12,11 @@ public static int find(\[int]\ needle, \[int[]]\ haystack) {
 }
 
 public static void main(String[] args) {
-   int[] testArr = {1, 2, 6};
-   System.out.println("index of 6 in testArr: " + find(6, testArr));
-   System.out.println("index of 2 in testArr: " + find(2, testArr));
-   System.out.println("index of 1 in testArr: " + find(1, testArr));
-   System.out.println("index of 4 in testArr: " + find(4, testArr));
+   int[] arr = {1, 2, 6};
+   System.out.println("index of 1 in arr: " + find(1, arr)); // should be 0
+   System.out.println("index of 2 in arr: " + find(2, arr)); // should be 1
+   System.out.println("index of 6 in arr: " + find(6, arr)); // should be 2
+   System.out.println("index of 4 in arr: " + find(4, arr)); // should be -1
 }
 """
 
@@ -40,7 +40,7 @@ return <code>0</code> since <code>haystack[0] == needle</code>.)
 Otherwise, if <code>needle</code>
 is not one of the elements of the array, return <code>-1</code>.
 </div>
-<div><sup>*</sup>: if it occurs multiple times, return the least-indexed
+<div><sup>*</sup>: if it occurs multiple times, return the lowest-indexed
 position</div>"""
 
 

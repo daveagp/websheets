@@ -296,7 +296,8 @@ public abstract class GenericTester {
             ref = new InvokeCapturer(referenceM, null, (Object[])semicopy(args));
         }
         catch (IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(ref.stdout));
+            e.printStackTrace();
+            throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + ((ref != null && ref.stdout != null) ? pre(ref.stdout) : ""));
         }
 	if (currStdin != null)
 	    StdIn.setString(currStdin);
@@ -317,8 +318,11 @@ public abstract class GenericTester {
                     first = false;
                 }
             }
-            throw new FailTestException("Runtime error: " + pre(stackTrace) + 
-                                        (stu.stdout.equals("") ? "" : "<br>Partial printed output:" + pre(stu.stdout)));
+            throw new FailTestException("Runtime error: " 
+					+ 
+					pre(stackTrace) 
+					+ 
+                                        (stu == null || stu.stdout == null || stu.stdout.equals("") ? "" : "<br>Partial printed output:" + pre(stu.stdout)));
         }
         if (ref.stdout.length() > 0) {
 	    String reason = describeOutputDifference(stu.stdout, ref.stdout);

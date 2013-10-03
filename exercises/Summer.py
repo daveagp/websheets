@@ -1,6 +1,6 @@
 description = r"""
 Write a program <code>Summer</code> whose API contains
-two overloaded (same-name) public static boolean methods
+two overloaded (same-name) public static methods
 <ul>
 <li>
 <code>sum(double[] a)</code>,

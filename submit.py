@@ -48,7 +48,7 @@ if __name__ == "__main__":
     reference_solution = websheet.get_reference_solution("reference")
 
     with open("GenericTester.java") as file:
-        GTjava = "\n".join(file)
+        GTjava = "".join(file)
 
     dump = {
         "reference/" + classname + ".java" : reference_solution,
@@ -104,6 +104,7 @@ if __name__ == "__main__":
         result += cgi.escape(errmsg)
         result += "</code>"
         result += "</div>"
+        result += "<!--" + runUser.stderr + "-->"
         return ("Sandbox Limit", result)
 
     runtimeOutput = re.sub(
@@ -117,7 +118,7 @@ if __name__ == "__main__":
     
     if "<div class='error'>Runtime error:" in runtimeOutput:
       category = "Runtime Error"
-      errmsg = ssf(runtimeOutput, "<pre >\n", "\n")
+      errmsg = ssf(runtimeOutput, "<pre >", "\n")
     elif "<div class='all-passed'>" in runtimeOutput:
       category = "Passed"
       epilogue = websheet.epilogue
