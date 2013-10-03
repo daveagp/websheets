@@ -13,8 +13,8 @@ def execute(command, the_stdin):
 if socket.gethostname().endswith("uwaterloo.ca"):
     jail = "/home/cscircles/dev_java_jail/"
     scratch_dir = jail + "scratch/"
-    javac = jail + "java/bin/javac -J-Xmx128M "
-    java = "/java/bin/java -Xmx128M "
+    javac = jail + "java/bin/javac -J-Xmx128M -cp .:../cp "
+    java = "/java/bin/java -cp .:../cp -Xmx128M "
     safeexec = "/home/cscircles/dev/safeexec/safeexec"
     safeexec_args = " --chroot_dir "+ jail +" --exec_dir /scratch --env_vars '' --nproc 50 --mem 500000 --nfile 30 --clock 2 --exec "
     
