@@ -8,6 +8,7 @@ resetup = function(data) {
 	window.testWS.cm.toTextArea();
     window.testWS = websheet("code", data.template_code );
     $("#description").html(data.description);
+    MathJax.Hub.Typeset();
     testWS.cm.addKeyMap({F2: checkSolution, F5: function() {return false;}});
 }
 

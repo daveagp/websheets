@@ -9,6 +9,14 @@ include_once('include.php');
    <script type="text/javascript" src="CodeMirror/addon/selection/mark-selection.js"></script>
    <script type="text/javascript" src="CodeMirror/addon/edit/matchbrackets.js"></script>
    <script type="text/javascript" src="websheet.js?1"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+      });
+</script>
+<script type="text/javascript"
+  src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
    <link rel="stylesheet" href="CodeMirror/theme/neat.css">
