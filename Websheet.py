@@ -306,7 +306,7 @@ class Websheet:
         if self.show_class_decl:
             for i in range(len(r)):
                 if i % 2 == 0: r[i] = r[i].replace("\n", "\n   ")
-                if i % 2 == 1 and r[i][-1] == "\n": r[i+1] = "   "+r[i+1]
+                if i % 2 == 1 and r[i] != "" and i < len(r)-1 and r[i][-1] == "\n": r[i+1] = "   "+r[i+1]
             if len(r) % 2 == 0: r.extend("")
             r[-1] += "\n}"
 

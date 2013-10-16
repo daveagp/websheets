@@ -23,6 +23,7 @@ public abstract class GenericTester {
         return "<code "+attr+">" + esc(S) + "</code>";
     }
     public static String code(String S) {return code(S, "");}
+    public static String code(Object O) {return code(O.toString(), "");}
 
     public static boolean smartEquals(Object a, Object b) {
         if ((a == null) != (b == null))
@@ -285,15 +286,51 @@ public abstract class GenericTester {
         throw new RuntimeException("Don't know how to semicopy "+O.toString());
     }
 
+    // only works for non-nested arrays so far
+    void checkForArgMutations(Object[] orig, Object[] ref, Object[] stu) {
+        String commentary = "";
+        int n = orig.length;
+        for (int i=0; i<n; i++) {
+            if (orig[i].getClass().isArray()) {
+                int len = Array.getLength(orig[i]);
+                for (int j=0; j<len; j++) {
+                    Object oj = Array.get(orig[i], j);
+                    Object rj = Array.get(ref[i], j);
+                    Object sj = Array.get(stu[i], j);
+                    boolean correct = smartEquals(rj, sj);
+                    boolean refChanged = !smartEquals(rj, oj);
+                    boolean stuChanged = !smartEquals(sj, oj);
+                    if (refChanged && correct)
+                        commentary += "<p>Changed element "+code(j)+" of arg "+code(i)+" to "+code(repr(rj))+" as expected.";
+                    else if (refChanged && !stuChanged)
+                        throw new FailTestException
+                            ("Missing side-effect, your code was supposed to change element "+code(j)+" of arg "+code(i)+" from " + code(repr(oj))+" to "+code(repr(rj)));
+                    else if (refChanged)
+                        throw new FailTestException
+                            ("Wrong side-effect, your code changed element "+code(j)+" of arg "+code(i)+" from " + code(repr(oj))+" to "+code(repr(sj))
+                             + ", was expected to change to " + code(repr(rj)));
+                    if (!refChanged && stuChanged)
+                        throw new FailTestException
+                            ("Unexpected side-effect, your code changed element "+code(j)+" of arg "+code(i)+" from " + code(repr(oj))+" to "+code(repr(sj)));
+                }
+            }
+        }
+        if (commentary != "") { // passed, and some expected mutations were performed 
+            System.out.println("<div class='side-effects'>"+commentary+"</div>");
+        }
+    }
+
     @SuppressWarnings("unchecked")
     protected void compare(Method referenceM, Method studentM, Object[] args) {
         InvokeCapturer ref = null, stu = null;
 	String currStdin = testStdin;
 	testStdin = null;
+        Object[] argsPassedToRef = (Object[])semicopy(args);
+        Object[] argsPassedToStu = (Object[])semicopy(args);
 	if (currStdin != null)
 	    StdIn.setString(currStdin);
         try {
-            ref = new InvokeCapturer(referenceM, null, (Object[])semicopy(args));
+            ref = new InvokeCapturer(referenceM, null, argsPassedToRef);
         }
         catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
@@ -302,7 +339,7 @@ public abstract class GenericTester {
 	if (currStdin != null)
 	    StdIn.setString(currStdin);
         try {
-            stu = new InvokeCapturer(studentM, null, args);
+            stu = new InvokeCapturer(studentM, null, argsPassedToStu);
         }
         catch (IllegalAccessException e) {
             throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(stu.stdout));
@@ -337,6 +374,9 @@ public abstract class GenericTester {
                 throw new FailTestException("Expected return value " + code(repr(ref.retval)) + " but instead your code returned " + code(repr(stu.retval)));
             }
         }
+        
+        checkForArgMutations(args, argsPassedToRef, argsPassedToStu);
+        
         System.out.print("<div class='pass-test'>");
         System.out.println("Passed test!");
         if (!ref.stdout.equals("")) {
