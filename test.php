@@ -3,6 +3,9 @@ include_once('include.php');
 ?><html>
 <head>
    <title>Websheets</title>
+   <link rel="icon" 
+      type="image/png" 
+      href="favicon.png">
    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
    <script type="text/javascript" src="CodeMirror/lib/codemirror.js"></script>
    <script type="text/javascript" src="CodeMirror/mode/clike/clike.js"></script>
