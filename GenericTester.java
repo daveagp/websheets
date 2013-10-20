@@ -1,5 +1,6 @@
 package framework;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.lang.reflect.*;
 import java.io.*;
 import stdlibpack.*;
@@ -65,6 +66,18 @@ public abstract class GenericTester {
 	    return tmp + "}";
 	}
         else return O.toString();
+    }
+
+    private static Pattern RTRIMLINE = Pattern.compile(" +\n");
+    private static Pattern RTRIMEND = Pattern.compile(" +$");
+    
+    public static String rtrimLines(String S) {
+        String tmp = RTRIMLINE.matcher(S).replaceAll("\n");
+        return RTRIMEND.matcher(tmp).replaceAll("");
+    }
+
+    public static String rtrim(String S) {
+        return RTRIMEND.matcher(S).replaceAll("");
     }
 
     private static class FailTestException extends RuntimeException {
@@ -173,6 +186,10 @@ public abstract class GenericTester {
     public boolean suppressStdinDescription = false;
 
     protected String describeOutputDifference(String studentO, String referenceO) {
+        // get rid 
+        String studentOTrim = rtrimLines(studentO);
+        String referenceOTrim = rtrimLines(referenceO);
+
 	if (oneRealPerLine) {
 	    String[] stulines = studentO.split("\n");
 	    String[] reflines = referenceO.split("\n");
@@ -187,7 +204,7 @@ public abstract class GenericTester {
 		    r = Double.parseDouble(reflines[i]);
                     if (reflines[i].indexOf(".") < 0) throw new Exception();
 		    try {
-			s = Double.parseDouble(stulines[i]);
+			s = Double.parseDouble(rtrim(stulines[i]));
 		    }
 		    catch (Exception e) {
 			return "Line "+(i+1)+" of your output is not a number. " + desc;
@@ -197,7 +214,7 @@ public abstract class GenericTester {
 		}
 		catch (Exception e) {
 		    // reference line not a double
-		    if (!stulines[i].equals(reflines[i]))
+		    if (!rtrim(stulines[i]).equals(rtrim(reflines[i])))
 			return "Line "+(i+1)+" of your output doesn't match ours. " + desc;
 
 		}
@@ -205,14 +222,14 @@ public abstract class GenericTester {
 	    return null;
 	}
 	else {
-	    if (referenceO.equals(studentO))
+	    if (referenceOTrim.equals(studentOTrim))
 		return null;
 
-	    if (referenceO.equals(studentO+"\n"))
+	    if (referenceOTrim.equals(studentOTrim+"\n"))
 		return "Your program printed this output:" + pre(studentO)
 		    + " which is almost correct but <i>a newline character is missing at the end</i>.";
 	    
-	    if (studentO.equals(referenceO+"\n"))
+	    if (studentOTrim.equals(referenceOTrim+"\n"))
 		return "Your program printed this output:" + pre(studentO)
 		    + " which is almost correct but <i>an extra newline character was printed at the end</i>.";
 	    
@@ -287,7 +304,7 @@ public abstract class GenericTester {
     }
 
     // only works for non-nested arrays so far
-    void checkForArgMutations(Object[] orig, Object[] ref, Object[] stu) {
+    String checkForArgMutations(Object[] orig, Object[] ref, Object[] stu) {
         String commentary = "";
         int n = orig.length;
         for (int i=0; i<n; i++) {
@@ -301,7 +318,7 @@ public abstract class GenericTester {
                     boolean refChanged = !smartEquals(rj, oj);
                     boolean stuChanged = !smartEquals(sj, oj);
                     if (refChanged && correct)
-                        commentary += "<p>Changed element "+code(j)+" of arg "+code(i)+" to "+code(repr(rj))+" as expected.";
+                        commentary += "<p>Changed element "+code(j)+" of arg "+code(i)+" from " + code(repr(oj)) + " to "+code(repr(rj))+" as expected.";
                     else if (refChanged && !stuChanged)
                         throw new FailTestException
                             ("Missing side-effect, your code was supposed to change element "+code(j)+" of arg "+code(i)+" from " + code(repr(oj))+" to "+code(repr(rj)));
@@ -315,9 +332,7 @@ public abstract class GenericTester {
                 }
             }
         }
-        if (commentary != "") { // passed, and some expected mutations were performed 
-            System.out.println("<div class='side-effects'>"+commentary+"</div>");
-        }
+        return commentary;
     }
 
     @SuppressWarnings("unchecked")
@@ -375,16 +390,17 @@ public abstract class GenericTester {
             }
         }
         
-        checkForArgMutations(args, argsPassedToRef, argsPassedToStu);
+        String mutationCommentary = checkForArgMutations(args, argsPassedToRef, argsPassedToStu);
         
         System.out.print("<div class='pass-test'>");
         System.out.println("Passed test!");
         if (!ref.stdout.equals("")) {
-            System.out.println("Printed correct output " + pre(ref.stdout));
+            System.out.println("Printed correct output " + pre(stu.stdout));
         }
         if (referenceM.getReturnType() != Void.TYPE) {
-            System.out.println("Returned correct value " + pre(repr(ref.retval)));
+            System.out.println("Returned correct value " + pre(repr(stu.retval)));
         }
+        System.out.println(mutationCommentary);        
         System.out.println("</div>");
     }
 

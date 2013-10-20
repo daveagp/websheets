@@ -7,7 +7,7 @@ of the form
 <pre>ATG...TAG</pre>
 where the region <tt>...</tt> has a length that is a 
 <i>positive multiple
-of three</i>. If such a region exists, print out the <tt>...</tt> part (the gene).
+of three</i>. If such a region exists, return the <tt>...</tt> part (the gene).
 
 For example, if <tt>dna</tt> is <tt>"CATTATGGTTCACTAGCC"</tt> then the
 gene you should return is <tt>"GTTCAC"</tt>. Here are some additional rules

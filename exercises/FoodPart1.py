@@ -1,5 +1,6 @@
 description = r"""
-Please see the description in <a href="http://www.cs.princeton.edu/courses/archive/fall13/cos126/docs/mid1-s13-prog.pdf">
+<i>COS 126 Spring 2013 Programming Midterm 1, part 1/2</i><br>
+Please see the problem description in <a href="http://www.cs.princeton.edu/courses/archive/fall13/cos126/docs/mid1-s13-prog.pdf">
 this PDF link</a>.
 <p>
 This websheet is intended as a practice exam. However, in a real exam,
@@ -8,8 +9,9 @@ This websheet is intended as a practice exam. However, in a real exam,
 <li>You'll get limited feedback from Dropbox during the exam, and a different full set of test cases for grading
 <li>Real humans will grade your real exams and also mark you on style and apply partial credit where appropriate
 <li>Because of Websheet formatting, on this page you have to put your header inside the class. On the exam, put it at the top as usual
-<li>We recommend coding in DrJava and/or the command-line, then only copying your last version here for testing
+<li>We recommend coding in DrJava and/or the command-line and doing basic tests on your own, then copying here for full testing
 </ul>
+We recommend doing this practice in a timed environment; give yourself 90 minutes.
 """
 
 source_code = r"""\[
@@ -86,10 +88,10 @@ source_code = r"""\[
 tests = r"""
 test("score", (Object)new int[]{7, 14, 20, 12, 15, 16});
 test("score", (Object)new int[]{10, 16, 10, 20, 14, 10});
-//testStdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Food/german.txt";
-//testMain();
-//testStdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Food/na.txt";
-//testMain();
+testStdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Food/german.txt";
+testMain();
+testStdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Food/na.txt";
+testMain();
 test("score", (Object)new int[]{15, 5, 10});
 test("score", (Object)new int[]{7, 7, 7});
 test("score", (Object)new int[]{4, 8, 12, 16});

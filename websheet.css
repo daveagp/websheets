@@ -90,7 +90,7 @@ body {
     max-width: 100%;
 }
 
-code, pre {
+code, pre, tt {
     font-family: 'Source Code Pro';
 }
 
