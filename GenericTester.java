@@ -89,12 +89,15 @@ public abstract class GenericTester {
     protected class BasicTestCase {
         final protected String methodName;
         final protected Object[] args;
+	final String objectName;
         protected BasicTestCase(String methodName, Object[] args) {
             this.methodName = methodName;
             this.args = args;
+	    this.objectName = GenericTester.objectName;
+	    GenericTester.objectName = null;
         }
         protected void describe() {
-            System.out.print("Testing ");
+            System.out.print(objectName == null ? "Testing " : "Defining "+objectName+" ");
             String tmp = methodName + "(";
             if (args.length == 0) tmp += ");";
             else {
@@ -183,7 +186,16 @@ public abstract class GenericTester {
 
     public String testStdin = null;
     public String testStdinURL = null;
+    public String objectName = null;
     public boolean suppressStdinDescription = false;
+
+    TreeMap<String,Object> studentObjects = new TreeMap<>();
+    TreeMap<String,Object> referenceObjects = new TreeMap<>();
+
+    static class NamedObject {
+	final String name;
+	NamedObject(String S) {name = S;}
+    }
 
     protected String describeOutputDifference(String studentO, String referenceO) {
         // get rid 
@@ -408,6 +420,10 @@ public abstract class GenericTester {
         new BasicTestCase(methodName, args).execute();
     }
 
+    protected void construct(String typeName, Object... args) {
+
+    }
+
     // mainArgs is final just so we can inherit in-line
     protected void testMain(final Object... argObjs) {
 	final String[] argStrings = new String[argObjs.length];
@@ -415,7 +431,7 @@ public abstract class GenericTester {
 	    argStrings[i] = argObjs[i].toString();
         new BasicTestCase("main", new Object[] {argStrings}) {
             protected void describe() {
-                System.out.print("Testing ");
+		System.out.print(objectName == null ? "Testing " : "Defining "+objectName+" ");
                 String tmp = "java " + className;
                 for (String a : argStrings) tmp += " " + a;
 		tmp = code(tmp);
