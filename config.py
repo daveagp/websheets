@@ -75,6 +75,7 @@ sys.exit(proc.returncode)
                                        password=open('/n/fs/htdocs/'+server_username+'/websheets/.dbpwd').read(), db='cos126')
 
     def save_submission(student, problem, user_state, result_column, passed):
+        if student == "fakestudentthatcannotbelogged": return
         import json
         db = connect()
         cursor = db.cursor()

@@ -10,21 +10,20 @@ sometimes produces:
  - errmsg, the high-level description of the error (without line numbers)
  - epilogue, commentary after a submission
 """
-errmsg = None
-epilogue = None
 
-if __name__ == "__main__":
+def submit_and_log(websheet_name, student, stdin):
   import sys, Websheet, json, re, cgi, os
   from config import run_java, run_javac, scratch_dir
 
-  student = sys.argv[2]
-  websheet = Websheet.Websheet.from_filesystem(sys.argv[1])
+  websheet = Websheet.Websheet.from_filesystem(websheet_name)
   classname = websheet.classname
-  stdin = input() # assume json all on one line
   user_state = json.loads(stdin)
 
-  def main():
-    global errmsg, epilogue
+  errmsg = None
+  epilogue = None
+  
+  def compile_and_run():
+    nonlocal errmsg, epilogue
     if not re.match(re.compile("^[a-z0-9]+$"), student):
         return("Internal Error (Student)", "Error: invalid student name")
 
@@ -33,6 +32,8 @@ if __name__ == "__main__":
     # this is the pre-syntax check
     student_solution = websheet.make_student_solution(user_poschunks, "student."+student)
     if student_solution[0] == False:
+        if student_solution[1] == "Internal error! Wrong number of inputs":
+          return("Internal Error (Wrong number of snippets)", "Error: wrong number of snippets")
         errmsg = student_solution[1].split('\n')[1]
         return("Pre-syntax Error",
                "<div class='pre-syntax-error'>Syntax error:" + 
@@ -118,7 +119,7 @@ if __name__ == "__main__":
     
     if "<div class='error'>Runtime error:" in runtimeOutput:
       category = "Runtime Error"
-      errmsg = ssf(runtimeOutput, "<pre >", "\n")
+      errmsg = ssf(runtimeOutput[runtimeOutput.index("<div class='error'>Runtime error:"):], "<pre >", "\n")
     elif "<div class='all-passed'>" in runtimeOutput:
       category = "Passed"
       epilogue = websheet.epilogue
@@ -129,7 +130,7 @@ if __name__ == "__main__":
     return (category, runtimeOutput)
 
   try:
-    category, results = main()
+    category, results = compile_and_run()
   except Exception:
     category = "Internal Error (Script)"
     import traceback
@@ -156,5 +157,46 @@ if __name__ == "__main__":
     user_snippets = [blank["code"] for blank in user_state["snippets"]]
     config.save_submission(student, classname, user_snippets, save_this, passed)
 
-  print(json.dumps(print_output))
+  return json.dumps(print_output)
+
+def bugfix_2013_11_01():
+ import config, json
+ print("<pre>")
+ for i in range(1):
+  db = config.connect()
+  cursor = db.cursor()
+  cursor.execute(
+    "SELECT id, problem, submission FROM `ws_history` WHERE `result` LIKE '%Runtime Error%' AND `result` NOT LIKE '%errmsg\": \"java.%'OR `result` LIKE  '%Internal Error (Script)%' limit 1;"
+    )
+  for row in cursor: 
+    id, websheet, snippets = row
+  cursor = db.cursor()
+  snippets = json.loads(snippets)
+  snippets = [{"code": snippet, "from":{"line":1,"ch":1},"to":{"line":1,"ch":1}} for snippet in snippets]
+  user_state = {"viewing_ref": True, "snippets": snippets}
+  print(user_state)
+  result = json.loads(submit_and_log(websheet, "fakestudentthatcannotbelogged", json.dumps(user_state)))
+  del result["results"]
+  newresults = json.dumps(result)
+  cursor.execute("UPDATE ws_history SET result=%s WHERE id="+str(id)+";", (newresults,))
+  print(row)
+  print(id)
+  print(newresults)
+  db.commit()
+  cursor.close()
+  db.close()
+
+ sys.exit(0)
+
+if __name__ == "__main__":
+  import sys
+
+#  if sys.argv[1] == "bugfix_2013_11_01":
+#    bugfix_2013_11_01()
+
+  student = sys.argv[2]
+  websheet_name = sys.argv[1]
+  stdin = input() # assume json all on one line
+  print(submit_and_log(websheet_name, student, stdin))
   sys.exit(0)
+
