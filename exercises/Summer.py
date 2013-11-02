@@ -39,4 +39,6 @@ public static void main(String[] args) {
 tests = r"""
 oneRealPerLine = true;
 testMain();
+test("sum", (Object)new int[]{-5, -4, -3, -2, -1});
+test("sum", (Object)new double[]{1E10, 1E11, 1E12});
 """

@@ -1,14 +1,8 @@
 description = r"""
 Write a program <code>Reverse</code> that takes any number
 of command-line arguments and prints them out on a single
-line in reverse order. For example,
-<code>
-java Reverse these words will be reversed
-</code>
-should output
-<pre>
-reversed be will words these
-</pre>
+line in reverse order. For example, <code>java Reverse these words will be reversed</code> should output
+<pre>reversed be will words these</pre>
 For simplicity, add spaces after each word, including the last one.
 """
 

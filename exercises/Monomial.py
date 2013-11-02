@@ -63,5 +63,9 @@ public static void main(String[] args) {
 """
 
 tests = r"""
+saveAs = "mono";
+testConstructor(4.0, 3);
+testOn("mono", "toString");
+testOn("mono", "evaluate", 4.5);
 testMain(1, 2, 6, 126);
 """

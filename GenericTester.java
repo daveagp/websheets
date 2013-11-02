@@ -29,6 +29,8 @@ public abstract class GenericTester {
     public static boolean smartEquals(Object a, Object b) {
         if ((a == null) != (b == null))
             return false;
+        if (a==null && b==null)
+            return true;
         if (a.getClass().isArray() != b.getClass().isArray())
             return false;
         if (a.getClass().isArray()) {
@@ -50,7 +52,10 @@ public abstract class GenericTester {
     }
 
     public static String repr(Object O) {
-        if (O instanceof String) {
+        if (O instanceof NamedObject) {
+            return ((NamedObject)O).name;
+        }
+        else if (O instanceof String) {
             return '"' + (String)O + '"';
         }
 	else if (O == null) {
@@ -86,20 +91,40 @@ public abstract class GenericTester {
         }
     }
     
+    static BasicTestCase currentlyExecutingTestCase;
+    
     protected class BasicTestCase {
         final protected String methodName;
         final protected Object[] args;
-	final String objectName;
+	final String saveAs;
+        final String apparentName;
+        final String thisName;
         protected BasicTestCase(String methodName, Object[] args) {
+            this(methodName, args, methodName, null);
+        }
+        protected BasicTestCase(String methodName, Object[] args, String apparentName) {
+            this(methodName, args, apparentName, null);
+        }
+        protected BasicTestCase(String methodName, Object[] args, String apparentName, String thisName) {
+            currentlyExecutingTestCase = this;
             this.methodName = methodName;
             this.args = args;
-	    this.objectName = GenericTester.objectName;
-	    GenericTester.objectName = null;
+	    this.saveAs = GenericTester.this.saveAs;
+	    GenericTester.this.saveAs = null; //reset
+            this.thisName = thisName;
+            this.apparentName = apparentName;
         }
         protected void describe() {
-            System.out.print(objectName == null ? "Testing " : "Defining "+objectName+" ");
-            String tmp = methodName + "(";
-            if (args.length == 0) tmp += ");";
+            String tmp = "";
+            if (saveAs == null) {
+                System.out.print("Calling ");
+            }
+            else {
+                System.out.print("Defining ");
+                tmp = saveAs + " = ";
+            }
+            tmp += apparentName + "(";
+            if (args.length == 0) tmp += ")";
             else {
                 tmp += repr(args[0]);
                 for (int i=1; i<args.length; i++)
@@ -114,28 +139,77 @@ public abstract class GenericTester {
 		System.out.println("with standard input"+pre(testStdin));
 	    }
 	}
+
         protected void test() {
-            for (Method m : referenceC.getMethods())
+            boolean notfound = true;
+            tryMethods: for (Method m : referenceC.getMethods())
                 if (m.getName().equals(methodName)) {
+                    Class[] formalParms = m.getParameterTypes();
+                    if (formalParms.length != args.length) continue;
+                    for (int i=0; i<args.length; i++) {
+                        if (args[i] instanceof NamedObject) continue; // ok
+                        if (formalParms[i] == int.class && args[i].getClass() == Integer.class) continue; // ok
+                        if (formalParms[i] == double.class && args[i].getClass() == Double.class) continue; // ok
+                        if (!formalParms[i].isAssignableFrom(args[i].getClass())) continue tryMethods;
+                    }
+
+                    notfound = false;
+                    String argTypes = Arrays.toString(m.getParameterTypes());
+                    argTypes = "(" + argTypes.substring(1, argTypes.length()-1) + ")";
                     try {
                         Method referenceM = m;
-                        Method studentM = studentC.getMethod(methodName, m.getParameterTypes());
+                        Class[] stuParamTypes = m.getParameterTypes();
+                        for (int i=0; i<stuParamTypes.length; i++)
+                            if (stuParamTypes[i] == referenceC)
+                                stuParamTypes[i] = studentC;
+                        Method studentM = studentC.getMethod(methodName, stuParamTypes);
                         if (! referenceM.getReturnType().equals(studentM.getReturnType())) {
-                            throw new FailTestException("Your method " + code(methodName) + " should have return type " + code(referenceM.getReturnType().toString()));
+                            throw new FailTestException("Your method " + code(methodName +"("+argTypes+")") + " should have return type " + code(referenceM.getReturnType().toString()));
                         }
                         if (referenceM.getModifiers() != studentM.getModifiers()) {
-                            throw new FailTestException("Incorrect declaration for " + code(methodName) + "; check use of " + code("public") + " and " + code("static") + " or other modifiers");
+                            throw new FailTestException("Incorrect declaration for " + code(methodName + "("+argTypes+")") + "; check use of " + code("public") + " and " + code("static") + " or other modifiers");
                         }
-                        compare(m, studentM, args);
+                        compare(m, studentM, args, thisName);
                     }
                     catch (NoSuchMethodException e) {
-                        String argTypes = Arrays.toString(m.getParameterTypes());
-                        argTypes = "(" + argTypes.substring(1, argTypes.length()-1) + ")";
                         throw new FailTestException("You need to declare a public method " + code(methodName) + " that accepts arguments" + code(argTypes));
                     }
-                }
-            
+                }            
+            if (notfound) throw new RuntimeException("Could not find the reference method! Check that floating-point numbers are explicitly specified.");
         }
+
+        protected void testConstructor() {
+            boolean notfound = true;
+            tryMethods: for (Constructor m : referenceC.getConstructors()) {
+                Class[] formalParms = m.getParameterTypes();
+                if (formalParms.length != args.length) continue;
+                checkParms: for (int i=0; i<args.length; i++) {
+                    if (args[i] instanceof NamedObject) continue; // ok
+                    if (formalParms[i] == int.class && args[i].getClass() == Integer.class) continue checkParms;
+                    if (formalParms[i] == double.class && args[i].getClass() == Double.class) continue checkParms;
+                    if (!formalParms[i].isAssignableFrom(args[i].getClass())) continue tryMethods;
+                }
+                notfound = false;
+                String argTypes = Arrays.toString(m.getParameterTypes());                
+                argTypes = "(" + argTypes.substring(1, argTypes.length()-1) + ")";
+                try {
+                    Constructor referenceM = m;
+                    Constructor studentM = studentC.getConstructor(m.getParameterTypes());
+                    if (referenceM.getModifiers() != studentM.getModifiers()) {
+                        throw new FailTestException("Incorrect declaration for " + code(className+"("+argTypes+")") + " constructor; check use of " + code("public") + " and " + code("static") + " or other modifiers");
+                    }
+
+                    compare(m, studentM, args, null);                    
+                }
+                catch (NoSuchMethodException e) {
+                    throw new FailTestException("You need to declare a public constructor for " + code(className) + " that accepts arguments" + code(argTypes));
+                }
+            }
+            if (notfound) throw new RuntimeException("Could not find the reference constructor! Check that floating-point numbers are explicitly specified.");
+        }
+
+
+
         public void execute() {
             boolean showHellip = testStdin == null;
             System.out.println("<div class='testcase-desc'>");
@@ -146,7 +220,9 @@ public abstract class GenericTester {
 	    cleanup();
         }
 	public void cleanup() {
-	    suppressStdinDescription = false;	    
+	    suppressStdinDescription = false;
+            currentlyExecutingTestCase = null;
+            expectException = false;
 	}
     }
 
@@ -186,15 +262,20 @@ public abstract class GenericTester {
 
     public String testStdin = null;
     public String testStdinURL = null;
-    public String objectName = null;
+    public String saveAs = null;
     public boolean suppressStdinDescription = false;
+    public boolean expectException = false;
 
     TreeMap<String,Object> studentObjects = new TreeMap<>();
     TreeMap<String,Object> referenceObjects = new TreeMap<>();
 
     static class NamedObject {
-	final String name;
+	public final String name;
 	NamedObject(String S) {name = S;}
+    }
+
+    public NamedObject var(String name) {
+        return new NamedObject(name);
     }
 
     protected String describeOutputDifference(String studentO, String referenceO) {
@@ -260,15 +341,43 @@ public abstract class GenericTester {
         void end() {
             stdout = endStdoutCapture();
         }
+
+        Object retval; // not used by class initializer; used by invoke and construct
+
     }
 
     class InvokeCapturer extends Capturer {
-        Object retval;
-        InvokeCapturer(Method m, Object dis, Object[] args) throws IllegalAccessException, InvocationTargetException {
+        Method m;
+        Object dis;
+        Object[] args;
+        InvokeCapturer(Method m, Object dis, Object[] args) {
             super();
+            this.m=m; this.dis=dis; this.args=args;
             crashed = true;
+        }
+        void runUserCode() throws IllegalAccessException, InvocationTargetException {
             try {
                 retval = m.invoke(dis, args);
+                crashed = false;
+            } 
+            finally {
+                end();
+            }
+        }
+    }
+
+    class ConstructCapturer extends Capturer {
+        Constructor c;
+        Object[] args;
+        ConstructCapturer(Constructor c, Object[] args) {
+            super();
+            this.c=c; this.args=args;
+            crashed = true;
+        }
+        void runUserCode() throws IllegalAccessException, InvocationTargetException,
+        InstantiationException {
+            try {
+                retval = c.newInstance(args);
                 crashed = false;
             } finally {
                 end();
@@ -278,9 +387,13 @@ public abstract class GenericTester {
 
     class ClassInitCapturer extends Capturer {
         Class foundClass;
-        ClassInitCapturer(String className) throws ClassNotFoundException {
+        String className;
+        ClassInitCapturer(String className) {
             super();
+            this.className = className;
             crashed = true;
+        }
+        void runUserCode() throws ClassNotFoundException {
             try {                
                 foundClass = Class.forName(className);
                 crashed = false;
@@ -290,7 +403,7 @@ public abstract class GenericTester {
         }
     }
 
-    Object semicopy(Object O) {
+    Object semicopy(Object O, TreeMap<String, Object> dict) {
         // basic immutable types
         if (O == null || O instanceof String || O instanceof Integer || O instanceof Long || O instanceof Character
             || O instanceof Boolean || O instanceof Short || O instanceof Float || O instanceof Double
@@ -309,9 +422,10 @@ public abstract class GenericTester {
             Object[] OA = (Object[])O;
             Object[] r = (Object[]) Array.newInstance(cType, OA.length);
             for (int i=0; i<OA.length; i++)
-                r[i] = semicopy(OA[i]);
+                r[i] = semicopy(OA[i], dict);
             return r;
         }
+        if (O instanceof NamedObject) return dict.get(((NamedObject)O).name);
         throw new RuntimeException("Don't know how to semicopy "+O.toString());
     }
 
@@ -347,81 +461,139 @@ public abstract class GenericTester {
         return commentary;
     }
 
+    // the arguments can either be two Methods or two Constructors
     @SuppressWarnings("unchecked")
-    protected void compare(Method referenceM, Method studentM, Object[] args) {
-        InvokeCapturer ref = null, stu = null;
+        protected void compare(AccessibleObject referenceM, AccessibleObject studentM, Object[] args, String thisName) {
+        boolean methods = referenceM instanceof Method;
+        boolean constructors = referenceM instanceof Constructor;
+
+        Capturer ref = null, stu = null;
 	String currStdin = testStdin;
 	testStdin = null;
-        Object[] argsPassedToRef = (Object[])semicopy(args);
-        Object[] argsPassedToStu = (Object[])semicopy(args);
+        Object[] argsPassedToRef = (Object[])semicopy(args, referenceObjects);
+        Object[] argsPassedToStu = (Object[])semicopy(args, studentObjects);
+        Throwable referenceException = null;
+        Throwable studentException = null;
 	if (currStdin != null)
 	    StdIn.setString(currStdin);
         try {
-            ref = new InvokeCapturer(referenceM, null, argsPassedToRef);
+            if (methods) {
+                //if (thisName != null) System.out.println(thisName+" "+referenceObjects.get(thisName));
+                ref = new InvokeCapturer((Method)referenceM, thisName==null?null:referenceObjects.get(thisName), argsPassedToRef);
+                ((InvokeCapturer)ref).runUserCode();
+            }
+            else { // constructors
+                ref = new ConstructCapturer((Constructor)referenceM, argsPassedToRef);
+                ((ConstructCapturer)ref).runUserCode();
+            }
+            if (expectException) throw new RuntimeException("Internal error: bad exception flag");
         }
-        catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + ((ref != null && ref.stdout != null) ? pre(ref.stdout) : ""));
+        catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+
+            if (e instanceof InvocationTargetException && expectException) {
+                referenceException = ((InvocationTargetException)e).getTargetException();
+            }
+            else {
+                e.printStackTrace();
+                throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + ((ref != null && ref.stdout != null) ? pre(ref.stdout) : ""));
+            }
         }
 	if (currStdin != null)
 	    StdIn.setString(currStdin);
         try {
-            stu = new InvokeCapturer(studentM, null, argsPassedToStu);
+            if (methods) {                
+                stu = new InvokeCapturer((Method)studentM, thisName==null?null:studentObjects.get(thisName), argsPassedToStu);
+                ((InvokeCapturer)stu).runUserCode();
+            }
+            else { // constructors
+                stu = new ConstructCapturer((Constructor)studentM, argsPassedToStu);
+                ((ConstructCapturer)stu).runUserCode();
+            }
+            if (expectException) throw new FailTestException("Was supposed to throw a " + referenceException.getClass().getSimpleName() + " but did not.");
         }
         catch (IllegalAccessException e) {
             throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(stu.stdout));
         }
-        catch (InvocationTargetException e) {
-            Throwable exc = e.getTargetException();
-
-            String stackTrace = exc.toString();
-            boolean first = true;
-            for (StackTraceElement ste : exc.getStackTrace()) {
-                if (ste.getClassName().equals("student."+studentName+"."+className)) {
-                    stackTrace += "\n   "+(first?"at":"called from")+" line " + ste.getLineNumber() + " in " + ste.getMethodName() + "()";
-                    first = false;
-                }
-            }
-            throw new FailTestException("Runtime error: " 
-					+ 
-					pre(stackTrace) 
-					+ 
-                                        (stu == null || stu.stdout == null || stu.stdout.equals("") ? "" : "<br>Partial printed output:" + pre(stu.stdout)));
+        catch (InstantiationException e) {
+            throw new FailTestException("Error: " + className + " must not be abstract.");
         }
+        catch (InvocationTargetException e) {
+            studentException = e.getTargetException();
+            
+            if (referenceException != null && referenceException.getClass() == studentException.getClass()) {
+                // passed!
+            }
+            else {
+                String stackTrace = studentException.toString();
+                boolean first = true;
+                for (StackTraceElement ste : studentException.getStackTrace()) {
+                    if (ste.getClassName().equals("student."+studentName+"."+className)) {
+                        stackTrace += "\n   "+(first?"at":"called from")+" line " + ste.getLineNumber() + " in " + ste.getMethodName() + "()";
+                        first = false;
+                    }
+                }
+                String msg = "Runtime error:";
+                if (referenceException != null) // expected an exception, but not this kind.
+                    msg = "An unexpected error was thrown: expected a "+repr(referenceException.getClass().getSimpleName())+" but got a "
+                        +repr(studentException.getClass().getSimpleName()+":");
+                throw new FailTestException(msg
+                                            + 
+                                            pre(stackTrace) 
+                                            + 
+                                            (stu == null || stu.stdout == null || stu.stdout.equals("") ? "" : "<br>Partial printed output:" + pre(stu.stdout)));
+            }
+        }
+        
         if (ref.stdout.length() > 0) {
-	    String reason = describeOutputDifference(stu.stdout, ref.stdout);
-	    if (reason != null)
-		throw new FailTestException(reason);
+            String reason = describeOutputDifference(stu.stdout, ref.stdout);
+            if (reason != null)
+                throw new FailTestException(reason);
+            
         }
         if (ref.stdout.equals("") && !stu.stdout.equals("")) {
             System.out.println("Found this printed output (not required):" + pre(stu.stdout));
         }
-        if (referenceM.getReturnType() != Void.TYPE) {
+        if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE) {
             if (!smartEquals(ref.retval, stu.retval)) {
                 throw new FailTestException("Expected return value " + code(repr(ref.retval)) + " but instead your code returned " + code(repr(stu.retval)));
             }
         }
+
+        if (currentlyExecutingTestCase.saveAs != null) {
+            studentObjects.put(currentlyExecutingTestCase.saveAs, stu.retval);
+            referenceObjects.put(currentlyExecutingTestCase.saveAs, ref.retval);
+        }
         
         String mutationCommentary = checkForArgMutations(args, argsPassedToRef, argsPassedToStu);
         
-        System.out.print("<div class='pass-test'>");
-        System.out.println("Passed test!");
+        String goodStuff = "";
         if (!ref.stdout.equals("")) {
-            System.out.println("Printed correct output " + pre(stu.stdout));
+            goodStuff += "Printed correct output " + pre(stu.stdout) + "\n";
         }
-        if (referenceM.getReturnType() != Void.TYPE) {
-            System.out.println("Returned correct value " + pre(repr(stu.retval)));
+        if (methods && ((Method)referenceM).getReturnType() != Void.TYPE) {
+            goodStuff += "Returned correct value " + pre(repr(stu.retval)) + "\n";
         }
-        System.out.println(mutationCommentary);        
-        System.out.println("</div>");
+        if (expectException) {
+            goodStuff += "Threw a "+code(referenceException.getClass().getSimpleName())+" as required!";
+        }
+        goodStuff += mutationCommentary;
+        if (!goodStuff.equals("")) {
+            System.out.print("<div class='pass-test'>");
+            System.out.print("Passed test!\n"+goodStuff);
+            System.out.println("</div>");
+        }
     }
 
     protected void test(String methodName, Object... args) {
-        new BasicTestCase(methodName, args).execute();
+        new BasicTestCase(methodName, args, methodName).execute();
     }
 
-    protected void construct(String typeName, Object... args) {
+    protected void testConstructor(Object... args) {
+        new BasicTestCase(className, args, "new " + className) {protected void test() {testConstructor();}}.execute();
+    }
 
+    protected void testOn(final String thisName, String methodName, Object... args) {
+        new BasicTestCase(methodName, args, thisName+"."+methodName, thisName).execute();
     }
 
     // mainArgs is final just so we can inherit in-line
@@ -429,9 +601,9 @@ public abstract class GenericTester {
 	final String[] argStrings = new String[argObjs.length];
 	for (int i=0; i<argStrings.length; i++)
 	    argStrings[i] = argObjs[i].toString();
-        new BasicTestCase("main", new Object[] {argStrings}) {
+        new BasicTestCase("main", new Object[] {argStrings}, "main") {
             protected void describe() {
-		System.out.print(objectName == null ? "Testing " : "Defining "+objectName+" ");
+		System.out.print("Testing "); // can't be saved as an object
                 String tmp = "java " + className;
                 for (String a : argStrings) tmp += " " + a;
 		tmp = code(tmp);
@@ -451,7 +623,9 @@ public abstract class GenericTester {
     private void setup() {
         try {
             ClassInitCapturer stu = new ClassInitCapturer("student."+studentName+"."+className);
+            stu.runUserCode();
             ClassInitCapturer ref = new ClassInitCapturer("reference."+className);
+            ref.runUserCode();
             studentC = stu.foundClass;
             referenceC = ref.foundClass;
 

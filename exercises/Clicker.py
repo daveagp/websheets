@@ -69,5 +69,14 @@ public static void main(String[] args) {
 }
 """
 tests = r"""
+saveAs = "attendance";
+testConstructor();
+testOn("attendance", "curr");
+testOn("attendance", "inc");
+testOn("attendance", "inc");
+testOn("attendance", "curr");
+testOn("attendance", "dec");
+testOn("attendance", "curr");
+testOn("attendance", "curr");
 testMain();
 """
