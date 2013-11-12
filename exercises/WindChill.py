@@ -10,11 +10,8 @@ Use <code>Math.pow</code> to compute the exponent.
 <i>Source</i>: <a href="http://www.nws.noaa.gov/om/windchill/index.shtml">National Weather Service</a>
 """
 
-tester_preamble = r"""
-{oneRealPerLine = true;}
-"""
-
 tests = r"""
+oneRealPerLine = true;
 testMain("32.0", "15.0");
 testMain("-40", "6.2");
 testMain("79.5", "27.62");

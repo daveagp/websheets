@@ -26,11 +26,15 @@ public abstract class GenericTester {
     public static String code(String S) {return code(S, "");}
     public static String code(Object O) {return code(O.toString(), "");}
 
-    public static boolean smartEquals(Object a, Object b) {
+    public boolean smartEquals(Object a, Object b) {
         if ((a == null) != (b == null))
             return false;
         if (a==null && b==null)
             return true;
+        if (a.getClass() == stdlibpack.Queue.class)
+            return b.getClass() == stdlibpack.Queue.class;
+        if (a.getClass() == studentC || a.getClass() == referenceC)
+            return (b.getClass() == studentC || b.getClass() == referenceC);
         if (a.getClass().isArray() != b.getClass().isArray())
             return false;
         if (a.getClass().isArray()) {
@@ -99,6 +103,7 @@ public abstract class GenericTester {
 	final String saveAs;
         final String apparentName;
         final String thisName;
+        final String packaje;
         protected BasicTestCase(String methodName, Object[] args) {
             this(methodName, args, methodName, null);
         }
@@ -106,9 +111,16 @@ public abstract class GenericTester {
             this(methodName, args, apparentName, null);
         }
         protected BasicTestCase(String methodName, Object[] args, String apparentName, String thisName) {
+            this(null, methodName, args, apparentName, thisName);
+        }
+        protected BasicTestCase(String packaje, String methodName, Object[] args, String apparentName) {
+            this(packaje, methodName, args, apparentName, null);
+        }
+        protected BasicTestCase(String packaje, String methodName, Object[] args, String apparentName, String thisName) {
             currentlyExecutingTestCase = this;
             this.methodName = methodName;
             this.args = args;
+            this.packaje = packaje;
 	    this.saveAs = GenericTester.this.saveAs;
 	    GenericTester.this.saveAs = null; //reset
             this.thisName = thisName;
@@ -141,8 +153,12 @@ public abstract class GenericTester {
 	}
 
         protected void test() {
+            test(null);
+        }
+
+        protected void test(Class clazz) {
             boolean notfound = true;
-            tryMethods: for (Method m : referenceC.getMethods())
+            tryMethods: for (Method m : (clazz!=null?clazz:referenceC).getMethods())
                 if (m.getName().equals(methodName)) {
                     Class[] formalParms = m.getParameterTypes();
                     if (formalParms.length != args.length) continue;
@@ -162,8 +178,10 @@ public abstract class GenericTester {
                         for (int i=0; i<stuParamTypes.length; i++)
                             if (stuParamTypes[i] == referenceC)
                                 stuParamTypes[i] = studentC;
-                        Method studentM = studentC.getMethod(methodName, stuParamTypes);
-                        if (! referenceM.getReturnType().equals(studentM.getReturnType())) {
+                        Method studentM = (clazz!=null?clazz:studentC).getMethod(methodName, stuParamTypes);
+                        Class expectedReturn = referenceM.getReturnType();
+                        if (expectedReturn == referenceC) expectedReturn = studentC;
+                        if (! studentM.getReturnType().equals(expectedReturn)) {
                             throw new FailTestException("Your method " + code(methodName +"("+argTypes+")") + " should have return type " + code(referenceM.getReturnType().toString()));
                         }
                         if (referenceM.getModifiers() != studentM.getModifiers()) {
@@ -179,8 +197,11 @@ public abstract class GenericTester {
         }
 
         protected void testConstructor() {
+            testConstructor(null);
+        }
+        protected void testConstructor(Class clazz) {
             boolean notfound = true;
-            tryMethods: for (Constructor m : referenceC.getConstructors()) {
+            tryMethods: for (Constructor m : (clazz != null ? clazz : referenceC).getConstructors()) {
                 Class[] formalParms = m.getParameterTypes();
                 if (formalParms.length != args.length) continue;
                 checkParms: for (int i=0; i<args.length; i++) {
@@ -194,7 +215,7 @@ public abstract class GenericTester {
                 argTypes = "(" + argTypes.substring(1, argTypes.length()-1) + ")";
                 try {
                     Constructor referenceM = m;
-                    Constructor studentM = studentC.getConstructor(m.getParameterTypes());
+                    Constructor studentM = (clazz != null ? clazz : studentC).getConstructor(m.getParameterTypes());
                     if (referenceM.getModifiers() != studentM.getModifiers()) {
                         throw new FailTestException("Incorrect declaration for " + code(className+"("+argTypes+")") + " constructor; check use of " + code("public") + " and " + code("static") + " or other modifiers");
                     }
@@ -216,7 +237,11 @@ public abstract class GenericTester {
             describe();
             if (showHellip) System.out.println("&hellip;");
             System.out.println("</div>");
-            test();
+            if (thisName != null && studentObjects.get(thisName).getClass() != studentC) {
+                test(studentObjects.get(thisName).getClass());
+            }
+            else
+                test();
 	    cleanup();
         }
 	public void cleanup() {
@@ -534,8 +559,8 @@ public abstract class GenericTester {
                 }
                 String msg = "Runtime error:";
                 if (referenceException != null) // expected an exception, but not this kind.
-                    msg = "An unexpected error was thrown: expected a "+repr(referenceException.getClass().getSimpleName())+" but got a "
-                        +repr(studentException.getClass().getSimpleName()+":");
+                    msg = "An unexpected error was thrown: expected a "+code(referenceException.getClass().getSimpleName())+" but got a "
+                        +code(studentException.getClass().getSimpleName()+":");
                 throw new FailTestException(msg
                                             + 
                                             pre(stackTrace) 
@@ -553,7 +578,8 @@ public abstract class GenericTester {
         if (ref.stdout.equals("") && !stu.stdout.equals("")) {
             System.out.println("Found this printed output (not required):" + pre(stu.stdout));
         }
-        if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE) {
+        if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
+            && ((Method)referenceM).getReturnType() != referenceC) {
             if (!smartEquals(ref.retval, stu.retval)) {
                 throw new FailTestException("Expected return value " + code(repr(ref.retval)) + " but instead your code returned " + code(repr(stu.retval)));
             }
@@ -570,7 +596,8 @@ public abstract class GenericTester {
         if (!ref.stdout.equals("")) {
             goodStuff += "Printed correct output " + pre(stu.stdout) + "\n";
         }
-        if (methods && ((Method)referenceM).getReturnType() != Void.TYPE) {
+        if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
+            && ((Method)referenceM).getReturnType() != referenceC) {
             goodStuff += "Returned correct value " + pre(repr(stu.retval)) + "\n";
         }
         if (expectException) {
@@ -590,6 +617,19 @@ public abstract class GenericTester {
 
     protected void testConstructor(Object... args) {
         new BasicTestCase(className, args, "new " + className) {protected void test() {testConstructor();}}.execute();
+    }
+
+    protected void construct(String packaje, final String className, final String typeParams, Object... args) {
+        new BasicTestCase(packaje, className, args, "new " + className + typeParams) {protected void test() {
+            Class clazz;
+            try {
+                clazz = Class.forName(packaje+"."+className);
+            }
+            catch (Throwable t) {
+                throw new RuntimeException("Internal error finding class "+packaje+"."+className);
+            }
+            testConstructor(clazz);
+        }}.execute();
     }
 
     protected void testOn(final String thisName, String methodName, Object... args) {

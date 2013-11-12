@@ -6,7 +6,8 @@ public static void main(String[] args) {
    String[] colors = ...; // e.g. new String[] {"red", "blue", "green"};
 ]\
 \hide[
-   String[] colors = args;
+   String[] colors = new String[args.length];
+   for (int i=0; i<args.length; i++) colors[i] = args[i];
 ]\
 
    int n = colors.length; // for convenience

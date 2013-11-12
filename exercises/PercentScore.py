@@ -37,9 +37,8 @@ public class PercentScore {
 }
 """
 
-tests_preamble = "{realPerLine = true;}"
-
 tests = """
+oneRealPerLine = true;
 testMain("8", "10", "15", "17");
 testMain("10", "10", "5", "5");
 testMain(randgen.nextInt(130)+"", "130", randgen.nextInt(70)+"", "70");

@@ -32,6 +32,7 @@ include_once('include.php');
 </head>
 <body>
 <div id="page">
+  <div class="menu-bar noprint">
 <?php if (WS_LOGGED_IN) {
    echo "<p>Logged in as <b>" . WS_USERNAME . "</b>. " .
    "Click to <a href='" . WS_LOGOUT_LINK . "'>log out</a>.</p>";
@@ -52,10 +53,11 @@ include_once('include.php');
    </script>
    <button id='resetButton'>Start over</button>
    <button id='answerButton'>View reference solution</button>
+   </div> <!-- menu-bar -->
    <div id="container" style="display:none">
    <div class='exercise-header'>Exercise Description</div>
    <div id="description"></div>
-   <p><i>Enter code in the yellow areas. F2: submit code. PgDn/PgUp: next/prev blank. Tab: reindent.</i></p>
+   <p class="noprint"><i>Enter code in the yellow areas. F2: submit code. PgDn/PgUp: next/prev blank. Tab: reindent.</i></p>
    <textarea id="code" name="code"></textarea>
    <script type='text/javascript'>
     if (window.location.hash) {
@@ -67,9 +69,9 @@ include_once('include.php');
     $('#selectSheet').val(ex);
     loadProblem(ex);
    </script>
-   <button id="submitButton" onClick="checkSolution()">Submit code</button>
-   <p>Results will appear below.</p>
-   <div id="results"></div>
+   <button class="noprint" id="submitButton" onClick="checkSolution()">Submit code</button>
+   <p class="noprint">Results will appear below.</p>
+   <div class="noprint" id="results"></div>
    </div>
 </div>
 </body>

@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-
 """
 always produces:
  - results, an html fragment to display to the user

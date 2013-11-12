@@ -18,3 +18,8 @@ Allow from All
 Allow from All
 </FilesMatch>
 
+# allow txt
+<FilesMatch "\.txt$">
+Allow from All
+</FilesMatch>
+

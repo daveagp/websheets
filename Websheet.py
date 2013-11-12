@@ -86,6 +86,10 @@ class Websheet:
         for field in optional_fields:
             setattr(self, field, field_dict[field] if field in field_dict else optional_fields[field])
 
+        # avoid things getting screwed up. used to be that ]\ at end of line consumed following \n
+        import re
+        self.source_code = re.sub(r"(^|(?<=[^\n]))\]\\\n", r"]\\ \n", self.source_code)
+
         # remove "public class" if there
         lines = self.source_code.split("\n")
         while lines[:1] == [""]: lines = lines[1:]
@@ -94,6 +98,10 @@ class Websheet:
             lines = lines[1:-1]
             spc = 0
             while (lines[0].startswith(" "*(spc+1))): spc += 1
+            # allow "public class {\n\n   blah"
+            if spc == 0: 
+                while (lines[1].startswith(" "*(spc+1))): spc += 1
+            
             for i in range(len(lines)):
                 if (lines[i].startswith(" "*spc)): lines[i] = lines[i][spc:]
             self.source_code = "\n".join(lines) + "\n"

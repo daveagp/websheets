@@ -37,6 +37,21 @@
     border-top: 1px solid #DDD;
     }
 
+.pass-test pre { /* for long outputs */
+   max-height: 18em;
+   overflow-y: auto;
+}
+
+@media print {
+    .noprint, .noprint * { display: none; } 
+    .CodeMirror, .CodeMirror * {font-size: 15px; line-height: 20px}
+    .CodeMirror {margin-left, margin-right: -1em}
+    .cm-comment {color: #444 !important}
+    .inline:not(.inlineL):not(.inlineR) {border-bottom: 1px dotted black}
+}
+
+@media screen {.printonly, .printonly * { display: none; } }
+
 #page.passed {
     background-color: #EFE;
 }
@@ -44,12 +59,14 @@
     border-color: #9E9;
     background-color: #EFE;
 }
-#page.ever-passed .exercise-header {
-    background-color: #AFA;
-}
-/* goes after the problem name */
-#page.ever-passed .exercise-header code:after {
-    content: " [\002713]"
+@media screen {
+ #page.ever-passed .exercise-header {
+     background-color: #AFA;
+ }
+ /* goes after the problem name */
+ #page.ever-passed .exercise-header code:after {
+     content: " [\002713]"
+ }
 }
 #results pre {
     background-color: rgba(240, 240, 240, 0.5);
