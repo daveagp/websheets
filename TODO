@@ -1,0 +1,2 @@
+fix overly agressive whitespace (auto-delete at end)
+do stuff in memory instead of using file system
