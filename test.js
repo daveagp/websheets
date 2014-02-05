@@ -6,7 +6,7 @@ var saved_chunks; // when viewing reference, remember what used to be there
 resetup = function(data) {
     if (typeof window.testWS != 'undefined')
 	window.testWS.cm.toTextArea();
-    window.testWS = websheet("code", data.template_code );
+  window.testWS = websheet("code", data.template_code, lastload.initial_snippets);
     $("#description").html(data.description);
     MathJax.Hub.Typeset();
     testWS.cm.addKeyMap({F2: checkSolution, F5: function() {return false;}});
@@ -107,8 +107,7 @@ $(function() {
 		set_viewing_ref(false);
 		testWS.setUserAreas(lastload.initial_snippets);
 	    });
-	
-	$("#answerButton").click( function(eventObject) {
+		$("#answerButton").click( function(eventObject) {
 		if (num_submissions < 4 && !$("#page").hasClass("ever-passed")) {
 		    alert("You have to make 4 attempts or complete the problem before you can view the reference solution. " +
 			  "You have made " + num_submissions + " attempts so far.");

@@ -1,5 +1,6 @@
 
-function websheet(textarea_id, fragments) {
+function websheet(textarea_id, fragments, initial_snippets) {
+
   function compare(pos1, pos2) {
     // 1: pos1 later; -1: pos1 earlier; 0: identical
     if (pos1.line < pos2.line) return -1;
@@ -74,6 +75,9 @@ function websheet(textarea_id, fragments) {
   var inline = new Array();
   var block = new Array();
   var editable = new Array();
+  var editable_info = new Array();
+  var inline_width = new Array();
+  var block_height = new Array();
 
   var line = 0;
   var ch = 0;
@@ -124,8 +128,12 @@ function websheet(textarea_id, fragments) {
         {line: line, ch: ch},
         {className: lastNL==-1?"inline":"block"});
       editable.push(marker);
+      editable_info.push(lastNL==-1?{"type":"inline", "index":inline.length}
+                         :{"type":"block", "index":block.length});
       if (lastNL==-1) { // inline
         inline.push(marker);
+        inline_width.push(initial_snippets[(i-1)/2].length);
+        
         // mark half-char widths
         cm.markText({line: oldline, ch: oldch},
                     {line: oldline, ch: oldch+1},
@@ -136,6 +144,7 @@ function websheet(textarea_id, fragments) {
       }
       else { // block
         block.push(marker);
+        block_height.push(initial_snippets[(i-1)/2].length);
         for (var ell=oldline+1; ell<line; ell++)
           cm.indentLine(ell, "smart");
       }
@@ -145,6 +154,9 @@ function websheet(textarea_id, fragments) {
   var retval;
 
   var override = false;
+
+  var latest_change = -1; //{"type": "block" or "inline"; "index": integer; "delta": integer}
+  // delta is # added lines for block, # added chars for inline
   
   // this is better than readOnly since it works when you surround read-only text
   // and try to change the whole selection
@@ -166,16 +178,80 @@ function websheet(textarea_id, fragments) {
     // only allow changes within editable regions
     for (var i=0; i<editable.length; i++) {
       var fixedrange = editable[i].find();
-      if (contains_strictly(fixedrange, change)) return;
+      
+      latest_change = i; // for removing excess trailing space
+      
+      if (editable_info[i].type == "inline" && change.to.ch == fixedrange.to.ch-1)
+        latest_change = -1; // don't apply in this case
+
+      if (editable_info[i].type == "block" && change.to.line == fixedrange.to.line-1)
+        latest_change = -1; // don't apply in this case
+
+      // allow changes within an editable region
+      if (contains_strictly(fixedrange, change)) {
+        //console.log(change.to, fixedrange.to);
+        return;
+      }
+
       // the editor often replaces '\n...' by '\n...', allow it
       if (compare(fixedrange.from, change.from)==0
           && compare(fixedrange.to, change.to)<0
           && cm.getLine(fixedrange.from.line).charAt(fixedrange.ch.from.ch)=='\n'
-          && change.test.length > 1 && change[0] == '') // first char is '\n'
+          && change.test.length > 1 && change[0] == '') // first char is '\n' 
+      {
+        //console.log(change.to, fixedrange.to);
         return;
+      }
     }
-
+    latest_change = -1; // nothing to fix up
     change.cancel();
+  });
+
+  // prevent trailing space bloating
+  cm.on("change", function(cm, change) {
+    if (latest_change == -1) return;
+    var change_info = editable_info[latest_change];
+    var region = editable[latest_change].find();
+    if (change_info.type == "inline") {
+      var addedChars = change.text[0].length-change.removed[0].length;
+      var excessChars = Math.max(0, region.to.ch - region.from.ch - inline_width[change_info.index]);
+      var maxCharsToRemove = Math.max(0, Math.min(addedChars, excessChars));
+      if (maxCharsToRemove > 0) {
+        var charsToRemove = 0;
+        var curr = cm.getRange(
+          {"line":region.to.line, "ch":region.to.ch-1-maxCharsToRemove},
+          {"line":region.to.line, "ch":region.to.ch-1});
+        for (var i=maxCharsToRemove-1; i>=0; i--) {
+          if (curr.charAt(i)!=" ") break;
+          charsToRemove++;
+        }
+        if (charsToRemove > 0)
+          cm.replaceRange("",
+                          {"line":region.to.line, "ch":region.to.ch-1-charsToRemove},
+                          {"line":region.to.line, "ch":region.to.ch-1});
+      }
+    }
+    else {
+      var addedLines = change.text.length-change.removed.length;
+      var excessLines = Math.max(0, region.to.line - region.from.line - block_height[change_info.index]);
+      var maxLinesToRemove = Math.max(0, Math.min(addedLines, excessLines));
+      if (maxLinesToRemove > 0) {
+        var linesToRemove = 0;
+        var curr = cm.getRange(
+          {"ch":0, "line":region.to.line-1-maxLinesToRemove},
+          {"ch":0, "line":region.to.line-1}).split("\n"); // there's a trailing empty at the end, not a big deal
+        for (var i=maxLinesToRemove-1; i>=0; i--) {
+          if (!curr[i].match(/^\s*$/)) break;
+          linesToRemove++;
+        }
+        //console.log(maxLinesToRemove, curr, linesToRemove);
+        if (linesToRemove > 0)
+          cm.replaceRange("",
+                          {"ch":0, "line":region.to.line-1-linesToRemove},
+                          {"ch":0, "line":region.to.line-1});
+      }
+    }
+    latest_change = -1; // don't correct it twice
   });
   
   cm.on("renderLine", function(cm, line, elt) {
