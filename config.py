@@ -4,7 +4,7 @@ from Websheet import record
 
 def execute(command, the_stdin):
     proc = Popen(command.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    result = proc.communicate(input = the_stdin)
+    result = proc.communicate(input = the_stdin.encode("UTF-8"))
     return record(stdout = result[0].decode("UTF-8"),
                   stderr = result[1].decode("UTF-8"),
                   returncode = proc.returncode)
@@ -12,11 +12,11 @@ def execute(command, the_stdin):
 
 if socket.gethostname().endswith("uwaterloo.ca"):
     jail = "/home/cscircles/dev_java_jail/"
-    scratch_dir = jail + "scratch/"
-    javac = jail + "java/bin/javac -J-Xmx128M -cp .:../cp "
-    java = "/java/bin/java -cp .:../cp -Xmx128M "
+    scratch_dir = jail + "cp/"
+    javac = jail + "java/bin/javac -J-Xmx128M -cp . "
+    java = "/java/bin/java -cp .:javax.json-1.0.jar -Xmx128M "
     safeexec = "/home/cscircles/dev/safeexec/safeexec"
-    safeexec_args = " --chroot_dir "+ jail +" --exec_dir /scratch --env_vars '' --nproc 50 --mem 500000 --nfile 30 --clock 2 --exec "
+    safeexec_args = " --chroot_dir "+ jail +" --exec_dir /cp --env_vars '' --nproc 50 --mem 500000 --nfile 30 --clock 2 --exec "
     
     def run_javac(command, the_stdin = ""):
         os.chdir(scratch_dir)

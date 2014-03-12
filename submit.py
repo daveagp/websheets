@@ -12,7 +12,7 @@ sometimes produces:
 
 def submit_and_log(websheet_name, student, stdin):
   import sys, Websheet, json, re, cgi, os
-  from config import run_java, run_javac, scratch_dir
+  from config import run_java, run_javac
 
   websheet = Websheet.Websheet.from_filesystem(websheet_name)
   classname = websheet.classname
@@ -51,50 +51,63 @@ def submit_and_log(websheet_name, student, stdin):
         GTjava = "".join(file)
 
     dump = {
-        "reference/" + classname + ".java" : reference_solution,
-        "student/" + student + "/" + classname + ".java" : student_solution[1],
-        "tester/" + classname + ".java" : websheet.make_tester(),
-        "framework/GenericTester.java" : GTjava,
+        "reference." + classname : reference_solution,
+        "student." + student + "." + classname : student_solution[1],
+        "tester." + classname : websheet.make_tester(),
+        "framework.GenericTester" : GTjava,
         }
 
-    studir = scratch_dir + "student/" + student + "/"
-    if not os.path.exists(studir):
-      os.makedirs(studir)
+#    studir = scratch_dir + "student/" + student + "/"
+#    if not os.path.exists(studir):
+#      os.makedirs(studir)
 
-    for filename in dump:
-        file = open(scratch_dir + filename, "w")
-        file.write(dump[filename])
-        file.close()
+#    for filename in dump:
+#        file = open(scratch_dir + filename, "w")
+#        file.write(dump[filename])
+#        file.close()
 
-    compileTester = run_javac("framework/GenericTester.java "
-                              + "reference/" + classname + ".java "
-                              + "tester/" + classname + ".java")
+#    compileTester = run_javac("framework/GenericTester.java "
+#                              + "reference/" + classname + ".java "
+#                              + "tester/" + classname + ".java")
+
+#print(json.dumps(dump))
+    compileRun = run_java("traceprinter/ramtools/CompileToBytes", json.dumps(dump))
+    compileResult = compileRun.stdout
+    if (compileResult==""):
+      return ("Internal Error (Compiling)", "<pre>\n" + 
+              cgi.escape(compileRun.stderr) +
+              "</pre>")
     
-    if compileTester.returncode != 0:
-        return ("Internal Error (Compiling)", "<pre>\n" + 
-                cgi.escape(compileTester.stdout) + "\n" +
-                cgi.escape(compileTester.stderr) +
-                "</pre>")
+    compileObj = json.loads(compileResult)
 
-    compileUser = run_javac("student/" + student + "/" + classname + ".java")
-        
-    if compileUser.returncode != 0:
+#    print(compileObj['status'])
+
+    if compileObj['status'] == 'Internal Error':
+      return ("Internal Error (Compiling)", "<pre>\n" + 
+              cgi.escape(compileObj["errmsg"]) +
+              "</pre>")
+    elif compileObj['status'] == 'Compile-time Error':
         result = "Syntax error (could not compile):"
+        result += "<br>"
+        errorObj = compileObj['error']
+        result += '<tt>'+errorObj['filename'].split('.')[-2]+'</tt>, line '
+        result += str(translate_line(errorObj['row'])) + ':'
         result += "<pre>\n"
         #remove the safeexec bits
-        compilerOutput = cgi.escape(compileUser.stderr).split("\n")
-        for i in range(0, len(compilerOutput)):
-            # transform error messages
-            if compilerOutput[i].startswith("student/"+student+"/"+classname+".java:"):
-                linesep = compilerOutput[i].split(':')
-                if errmsg is None: errmsg = ":".join(linesep[2:])
-                linesep[1] = "Line " + translate_line(linesep[1])
-                compilerOutput[i] = ":".join(linesep[1:])
-            result += compilerOutput[i] + "\n"
+        result += cgi.escape(errorObj["errmsg"])
         result += "</pre>"
         return ("Syntax Error", result)
 
-    runUser = run_java("tester." + classname + " " + student)
+#    print(compileResult)
+    
+    runUser = run_java("traceprinter/ramtools/RAMRun tester." + classname + " " +student, compileResult)
+    #runUser = run_java("tester." + classname + " " + student)
+
+    #print(runUser.stdout)
+    RAMRunError = runUser.stdout.startswith("Error")
+    RAMRunErrmsg = runUser.stdout[:runUser.stdout.index('\n')]
+
+    runUser.stdout = runUser.stdout[runUser.stdout.index('\n')+1:]
 
     if runUser.returncode != 0:
         errmsg = runUser.stderr.split('\n')[0]
@@ -107,10 +120,20 @@ def submit_and_log(websheet_name, student, stdin):
         result += "<!--" + runUser.stderr + "-->"
         return ("Sandbox Limit", result)
 
+    if RAMRunError:
+        result += "<div class='safeexec'>Could not execute! "
+        result += "<code>"
+        result += cgi.escape(RAMRunErrmsg)
+        result += "</code>"
+        result += "</div>"
+        return ("Internal Error (RAMRun)", result)
+      
     runtimeOutput = re.sub(
         re.compile("at line (\d+) "),
         lambda match: "at line " + translate_line(match.group(1)) + " ",
         runUser.stdout)
+
+    #print(runtimeOutput)
 
     def ssf(s, t, u): # substring from of s from after t to before u
       s = s[s.index(t)+len(t) : ]
