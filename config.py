@@ -24,13 +24,13 @@ if socket.gethostname().endswith("uwaterloo.ca"):
 
     def run_java(command, the_stdin = ""):
         os.chdir(scratch_dir)
-        return execute(java + command, the_stdin)  
-        #return execute(safeexec + safeexec_args + java + command, the_stdin)  
+        #return execute(java + command, the_stdin)  
+        return execute(safeexec + safeexec_args + java + command, the_stdin)  
 
     def save_submission(*args):
         pass
 
-    def load_submission(student, problem):
+    def load_submission(student, problem, onlyPassed = False):
         return False
 
     def ever_passed(student, problem):

@@ -64,8 +64,8 @@ def submit_and_log(websheet_name, student, stdin):
       submission = config.load_submission(student, dep, True)
       if submission == False:
         return("Dependency Error",
-               "<div class='dependency-error'>Dependency error:" + 
-               "You need to successfully complete the <tt>"+dep+"<tt> websheet first.</div>") # error text
+               "<div class='dependency-error'><i>Dependency error</i>: " + 
+               "You need to successfully complete the <a href='javascript:loadProblem(\""+dep+"\")'><tt>"+dep+"</tt></a> websheet first (while logged in).</div>") # error text
       submission = [{'code': x, 'from': {'line': 0, 'ch':0}, 'to': {'line': 0, 'ch': 0}} for x in submission]
       dump["student."+dep] = depws.make_student_solution(submission, "student")[1]
       

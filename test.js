@@ -20,6 +20,7 @@ loadProblem = function(slug) {
   $("#results").html("");
   $('#container').hide();
   $('#selectSheet')[0].disabled = true;
+  $('#selectSheet').val(slug);
   $.ajax("load.php",
    {data: {problem: slug},
 	   dataType: "json",
