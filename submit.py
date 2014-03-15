@@ -11,9 +11,11 @@ sometimes produces:
 """
 import config
 
-def submit_and_log(websheet_name, student, stdin):
+def submit_and_log(websheet_name, student, stdin, authdomain):
   import sys, Websheet, json, re, cgi, os
   from config import run_java, run_javac
+
+  config.authdomain = authdomain
 
   websheet = Websheet.Websheet.from_filesystem(websheet_name)
   classname = websheet.classname
@@ -24,8 +26,8 @@ def submit_and_log(websheet_name, student, stdin):
   
   def compile_and_run():
     nonlocal errmsg, epilogue
-    if not re.match(re.compile("^[a-z0-9]+$"), student):
-        return("Internal Error (Student)", "Error: invalid student name")
+    #if not re.match(re.compile("^[a-z0-9]+$"), student):
+    #    return("Internal Error (Student)", "Error: invalid student name")
 
     user_poschunks = user_state["snippets"]
 
@@ -235,7 +237,8 @@ if __name__ == "__main__":
 
   student = sys.argv[2]
   websheet_name = sys.argv[1]
+  authdomain = sys.argv[3]
   stdin = input() # assume json all on one line
-  print(submit_and_log(websheet_name, student, stdin))
+  print(submit_and_log(websheet_name, student, stdin, authdomain))
   sys.exit(0)
 

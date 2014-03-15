@@ -27,17 +27,10 @@ if socket.gethostname().endswith("uwaterloo.ca"):
         #return execute(java + command, the_stdin)  
         return execute(safeexec + safeexec_args + java + command, the_stdin)  
 
-    def save_submission(*args):
-        pass
-
-    def load_submission(student, problem, onlyPassed = False):
-        return False
-
-    def ever_passed(student, problem):
-        return False
-
-    def num_submissions(student, problem):
-        return 0
+    def connect():
+        import mysql.connector
+        return mysql.connector.connect(host='localhost', user='cscircles',
+                                       password=open('/home/cscircles/dev/www/websheets/.dbpwd').read(), db='cscircles')
 
 elif socket.gethostname().endswith("princeton.edu"):
     javac = "/usr/bin/javac -Xlint:path -target 1.7 -cp .:/n/fs/htdocs/cos126/java_jail/cp -J-Xmx128M "
@@ -57,30 +50,33 @@ elif socket.gethostname().endswith("princeton.edu"):
 
         return execute(cmd, the_stdin)
 
+
     def connect():
         import mysql.connector
         return mysql.connector.connect(host='publicdb.cs.princeton.edu', user='cos126',
                                        password=open('/n/fs/htdocs/'+server_username+'/websheets/.dbpwd').read(), db='cos126')
 
-    def save_submission(student, problem, user_state, result_column, passed):
-        if student == "fakestudentthatcannotbelogged": return
+
+def save_submission(student, problem, user_state, result_column, passed):
         import json
         db = connect()
         cursor = db.cursor()
         cursor.execute(
-            "insert into ws_history (user, problem, submission, result, passed)" + 
-            " VALUES (%s, %s, %s, %s, %s)", 
+            "insert into ws_history (user, problem, submission, result, passed, authdomain)" + 
+            " VALUES (%s, %s, %s, %s, %s, %s)", 
             (student, 
              problem, 
              json.dumps(user_state),
              json.dumps(result_column),
-             passed))
+             passed,
+             authdomain))
         db.commit()
         cursor.close()
         db.close()
 
-    # returns a json list of code fragments
-    def load_submission(student, problem, onlyPassed = False):
+# returns a json list of code fragments, or False
+def load_submission(student, problem, onlyPassed = False):
+        if student=="anonymous": return False
         import json
         db = connect()
         cursor = db.cursor()
@@ -96,8 +92,9 @@ elif socket.gethostname().endswith("princeton.edu"):
         db.close()
         return json.loads(result)
 
-    # returns a boolean
-    def ever_passed(student, problem):
+# returns a boolean
+def ever_passed(student, problem):
+        if student=="anonymous": return False
         import json
         db = connect()
         cursor = db.cursor()
@@ -112,8 +109,9 @@ elif socket.gethostname().endswith("princeton.edu"):
         db.close()
         return result
 
-    # returns an integer
-    def num_submissions(student, problem):
+# returns an integer
+def num_submissions(student, problem):
+        if student=="anonymous": return 0
         import json
         db = connect()
         cursor = db.cursor()

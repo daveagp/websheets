@@ -34,9 +34,18 @@ include_once('include.php');
 <div id="page">
   <div class="menu-bar noprint">
 <?php if (WS_LOGGED_IN) {
-   echo "<p>Logged in as <b>" . WS_USERNAME . "</b>. " .
-   "Click to <a href='" . WS_LOGOUT_LINK . "'>log out</a>.</p>";
-} ?>
+   echo "<p>Logged in as <b>" . WS_USERNAME . " (logged in through ". WS_AUTHDOMAIN. ")</b>. " .
+   "Click to ";
+   echo '<a href="javascript:auth(\'logout\')">log out</a>.';
+}
+  else {
+    echo '<p><b style="color:red">Not logged in, your work will not be saved.</b> ';
+    echo 'Log in with: ';
+    foreach (explode(" ", WS_PROVIDERS) as $authprovider) {
+      echo '<a href="javascript:auth(\''.$authprovider.'\')">'.$authprovider.'</a> ';
+    }
+  }
+ ?>
    <p>This is an experimental system. <a href="mailto:dp6@cs.princeton.edu">Contact us</a>
     if you find bugs, typos, user interface issues, inaccurate grading or anything else.</p>
    Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
@@ -48,8 +57,11 @@ include_once('include.php');
 	 echo json_encode(explode(" ", $_REQUEST["group"]));
        else
 	 echo passthru("./Websheet.py list") 
-	   ?> 
-    populateSheets(sheets);
+	   ?> ;
+       var hasGroup = <?php echo array_key_exists("group", $_REQUEST) ? 'true':'false'; ?>;
+       var hasStart = <?php echo array_key_exists("start", $_REQUEST) ? 'true':'false'; ?>;
+       var start = <?php echo array_key_exists("start", $_REQUEST) ? $_REQUEST["start"] : -1 ?>;
+       populateSheets(sheets);
    </script>
    <button id='resetButton'>Start over</button>
    <button id='answerButton'>View reference solution</button>
@@ -60,7 +72,11 @@ include_once('include.php');
    <p class="noprint"><i>Enter code in the yellow areas. F2: submit code. PgDn/PgUp: next/prev blank. Tab: reindent.</i></p>
    <textarea id="code" name="code"></textarea>
    <script type='text/javascript'>
-    if (window.location.hash) {
+    // facebook auth adds a weird hash
+      if (hasStart) {
+        var ex = sheets[start];
+      }
+    else if (window.location.hash && window.location.hash != '#_=_') {
       var ex = window.location.hash.substring(1);
     }
     else {

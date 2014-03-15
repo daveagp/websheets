@@ -86,6 +86,15 @@ var populateSheets = function(sheets) {
   }
 }
 
+var auth = function(provider) {
+  // go to ?group=prob1+prob2&start=prob2&auth=provider
+  var url = '?auth='+provider;
+  if (window.hasGroup)
+    url += '&group=' + sheets.join('+');    
+  url += '&start=' + sheets.indexOf($('#selectSheet').val());
+  window.location.href = url;
+}
+
     function set_viewing_ref(show_ref) {
 	if (viewing_ref == show_ref)
 	    return;
