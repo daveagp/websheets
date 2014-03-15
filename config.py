@@ -45,7 +45,7 @@ elif socket.gethostname().endswith("princeton.edu"):
 
     import getpass
     server_username = getpass.getuser()
-    scratch_dir = "/n/fs/htdocs/"+server_username+"/scratch/"
+    scratch_dir = "/n/fs/htdocs/"+server_username+"/"
 
     def run_javac(command, the_stdin = ""):
         os.chdir(scratch_dir)
@@ -53,7 +53,7 @@ elif socket.gethostname().endswith("princeton.edu"):
 
     def run_java(command, the_stdin = ""):
         os.chdir( "/n/fs/htdocs/"+server_username+"/")
-        cmd = "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp {java}{command}".format(command=command, scratch=scratch_dir, java=java)
+        cmd = "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp {java}{command}".format(command=command, java=java)
 
         return execute(cmd, the_stdin)
 
