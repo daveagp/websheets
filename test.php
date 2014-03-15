@@ -27,7 +27,7 @@ include_once('include.php');
   
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
 
-   <script type="text/javascript" src="test.js?1"></script>
+   <script type="text/javascript" src="test.js?2"></script>
 
 </head>
 <body>
