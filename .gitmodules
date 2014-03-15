@@ -4,3 +4,6 @@
 [submodule "java_syntax"]
 	path = java_syntax
 	url = git@github.com:daveagp/java_syntax.git
+[submodule "hybridauth"]
+	path = hybridauth
+	url = https://github.com/hybridauth/hybridauth.git
