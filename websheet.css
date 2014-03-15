@@ -44,7 +44,7 @@
 
 @media print {
     .noprint, .noprint * { display: none; } 
-    .CodeMirror, .CodeMirror * {font-size: 15px; line-height: 20px}
+    .CodeMirror, .CodeMirror * {font-size: 14px; line-height: 16px}
     .CodeMirror {margin-left, margin-right: -1em}
     .cm-comment {color: #444 !important}
     .inline:not(.inlineL):not(.inlineR) {border-bottom: 1px dotted black}

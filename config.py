@@ -23,7 +23,9 @@ if socket.gethostname().endswith("uwaterloo.ca"):
         return execute(javac + command, the_stdin)
 
     def run_java(command, the_stdin = ""):
-        return execute(safeexec + safeexec_args + java + command, the_stdin)  
+        os.chdir(scratch_dir)
+        return execute(java + command, the_stdin)  
+        #return execute(safeexec + safeexec_args + java + command, the_stdin)  
 
     def save_submission(*args):
         pass
@@ -39,7 +41,7 @@ if socket.gethostname().endswith("uwaterloo.ca"):
 
 elif socket.gethostname().endswith("princeton.edu"):
     javac = "/usr/bin/javac -Xlint:path -target 1.7 -cp .:/n/fs/htdocs/cos126/java_jail/cp -J-Xmx128M "
-    java = "/usr/bin/java -cp .:/n/fs/htdocs/cos126/java_jail/cp -Xmx128M "
+    java = "/usr/bin/java -cp .:/n/fs/htdocs/cos126/java_jail/cp:/n/fs/htdocs/cos126/java_jail/cp/javax.json-1.0.jar -Xmx128M "
 
     import getpass
     server_username = getpass.getuser()
@@ -52,14 +54,16 @@ elif socket.gethostname().endswith("princeton.edu"):
 
     def run_java(command, the_stdin = ""):
         os.chdir( "/n/fs/htdocs/"+server_username+"/")
-        if the_stdin != "":
-            raise Exception('Cannot handle stdin in run_java yet')
-        cmd = "sandbox -M -i safeexec/safeexec -i scratch -i /n/fs/htdocs/cos126/java_jail/cp/stdlibpack /usr/bin/python -u -S"
+   #     if the_stdin != "":
+   #         raise Exception('Cannot handle stdin in run_java yet')
+        cmd = "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp {java}{command}".format(command=command, scratch=scratch_dir, java=java)
 
         input = """
 import os, resource, sys
 from subprocess import Popen, PIPE
-cmd = 'safeexec/safeexec --exec_dir {scratch} --nproc 50 --mem 4000000 --clock 3 --nfile 30 --exec {java}{command}'
+#cmd = 'safeexec/safeexec --exec_dir {scratch} --nproc 50 --mem 4000000 --clock 3 --nfile 30 --exec {java}{command}'
+os.chdir('{scratch}')
+cmd = '{java}{command}'
 proc = Popen(cmd.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
 result = proc.communicate(input = '')
 sys.stdout.write(result[0])
@@ -67,7 +71,7 @@ sys.stderr.write(result[1])
 sys.exit(proc.returncode)
 """.format(command=command, scratch=scratch_dir, java=java).encode('ASCII')
             
-        return execute(cmd, input)
+        return execute(cmd, the_stdin)
 
     def connect():
         import mysql.connector

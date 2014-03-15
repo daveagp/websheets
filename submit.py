@@ -29,7 +29,7 @@ def submit_and_log(websheet_name, student, stdin):
     user_poschunks = user_state["snippets"]
 
     # this is the pre-syntax check
-    student_solution = websheet.make_student_solution(user_poschunks, "student."+student)
+    student_solution = websheet.make_student_solution(user_poschunks, "student")
     if student_solution[0] == False:
         if student_solution[1] == "Internal error! Wrong number of inputs":
           return("Internal Error (Wrong number of snippets)", "Error: wrong number of snippets")
@@ -52,7 +52,7 @@ def submit_and_log(websheet_name, student, stdin):
 
     dump = {
         "reference." + classname : reference_solution,
-        "student." + student + "." + classname : student_solution[1],
+        "student." + classname : student_solution[1],
         "tester." + classname : websheet.make_tester(),
         "framework.GenericTester" : GTjava,
         }
@@ -109,7 +109,10 @@ def submit_and_log(websheet_name, student, stdin):
 
     runUser.stdout = runUser.stdout[runUser.stdout.index('\n')+1:]
 
-    if runUser.returncode != 0:
+    #print(runUser.stdout)
+    #print(runUser.stderr)
+
+    if runUser.returncode != 0 or runUser.stdout.startswith("Time Limit Exceeded"):
         errmsg = runUser.stderr.split('\n')[0]
         result = runUser.stdout
         result += "<div class='safeexec'>Crashed! The grader reported "
@@ -136,6 +139,7 @@ def submit_and_log(websheet_name, student, stdin):
     #print(runtimeOutput)
 
     def ssf(s, t, u): # substring from of s from after t to before u
+      if t not in s: raise ValueError("Can't ssf("+s+","+t+","+u+")") 
       s = s[s.index(t)+len(t) : ]
       return s[ : s.index(u)]
     

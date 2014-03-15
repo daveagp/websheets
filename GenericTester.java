@@ -6,6 +6,13 @@ import java.io.*;
 import stdlibpack.*;
 public abstract class GenericTester {
 
+    public static PrintStream graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
+
+    public static PrintStream orig_graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
+
+
+    public static ByteArrayOutputStream gbaos = null;
+
     /* "library" helper methods and exceptions */
 
     public static String esc(String S) {
@@ -26,13 +33,23 @@ public abstract class GenericTester {
     public static String code(String S) {return code(S, "");}
     public static String code(Object O) {return code(O.toString(), "");}
 
+    public boolean opaque(Object a) {
+        if (a==null) return false;
+        if (a.getClass() == stdlibpack.Queue.class)
+            return true;
+        if (a.getClass() == stdlibpack.Stack.class)
+            return true;
+        return false;
+    }
+
     public boolean smartEquals(Object a, Object b) {
         if ((a == null) != (b == null))
             return false;
         if (a==null && b==null)
             return true;
-        if (a.getClass() == stdlibpack.Queue.class)
-            return b.getClass() == stdlibpack.Queue.class;
+        if (a.getClass() == stdlibpack.Queue.class) {
+            return (b.getClass() == stdlibpack.Queue.class);
+        }
         if (a.getClass() == studentC || a.getClass() == referenceC)
             return (b.getClass() == studentC || b.getClass() == referenceC);
         if (a.getClass().isArray() != b.getClass().isArray())
@@ -96,6 +113,8 @@ public abstract class GenericTester {
     }
     
     static BasicTestCase currentlyExecutingTestCase;
+
+    public static boolean quietOnPass = false;
     
     protected class BasicTestCase {
         final protected String methodName;
@@ -129,10 +148,10 @@ public abstract class GenericTester {
         protected void describe() {
             String tmp = "";
             if (saveAs == null) {
-                System.out.print("Calling ");
+                graderOut.print("Calling ");
             }
             else {
-                System.out.print("Defining ");
+                graderOut.print("Defining ");
                 tmp = saveAs + " = ";
             }
             tmp += apparentName + "(";
@@ -143,24 +162,30 @@ public abstract class GenericTester {
                     tmp += ", " + repr(args[i]);
                 tmp += ")";
             }
-            System.out.println(code(tmp));
+            graderOut.println(code(tmp));
 	    describeStdin();
         }
 	protected void describeStdin() {
 	    if (testStdin != null && !suppressStdinDescription) {
-		System.out.println("with standard input"+pre(testStdin));
+		graderOut.println("with standard input"+pre(testStdin));
 	    }
 	}
 
         protected void test() {
-            test(null);
+            test(referenceC, studentC);
         }
 
         protected void test(Class clazz) {
+            test(clazz, clazz);
+        }
+
+        protected void test(Class refClazz, Class stuClazz) {
             boolean notfound = true;
-            tryMethods: for (Method m : (clazz!=null?clazz:referenceC).getMethods())
+            tryMethods: for (Method m : refClazz.getMethods())
                 if (m.getName().equals(methodName)) {
                     Class[] formalParms = m.getParameterTypes();
+                    //System.out.println(java.util.Arrays.toString(formalParms));
+                    //System.out.println(java.util.Arrays.toString(args));
                     if (formalParms.length != args.length) continue;
                     for (int i=0; i<args.length; i++) {
                         if (args[i] instanceof NamedObject) continue; // ok
@@ -172,17 +197,25 @@ public abstract class GenericTester {
                     notfound = false;
                     String argTypes = Arrays.toString(m.getParameterTypes());
                     argTypes = "(" + argTypes.substring(1, argTypes.length()-1) + ")";
+                    argTypes = argTypes.replace("class ", "");
+                    argTypes = argTypes.replace("java.lang.", "");
                     try {
                         Method referenceM = m;
                         Class[] stuParamTypes = m.getParameterTypes();
-                        for (int i=0; i<stuParamTypes.length; i++)
+                        for (int i=0; i<stuParamTypes.length; i++) {
                             if (stuParamTypes[i] == referenceC)
                                 stuParamTypes[i] = studentC;
-                        Method studentM = (clazz!=null?clazz:studentC).getMethod(methodName, stuParamTypes);
+                            else if (stuParamTypes[i].getPackage() == referenceC.getPackage())
+                                stuParamTypes[i] = setup(stuParamTypes[i].getSimpleName())[1];
+                        }
+                        Method studentM = stuClazz.getMethod(methodName, stuParamTypes);
                         Class expectedReturn = referenceM.getReturnType();
                         if (expectedReturn == referenceC) expectedReturn = studentC;
+                        else if (expectedReturn.toString().startsWith("reference."))
+                            {
+     expectedReturn = setup(expectedReturn.getSimpleName())[1];                                                }    
                         if (! studentM.getReturnType().equals(expectedReturn)) {
-                            throw new FailTestException("Your method " + code(methodName +"("+argTypes+")") + " should have return type " + code(referenceM.getReturnType().toString()));
+                            throw new FailTestException("Your method " + code(methodName +argTypes) + " should have return type " + code(referenceM.getReturnType().getName()));
                         }
                         if (referenceM.getModifiers() != studentM.getModifiers()) {
                             throw new FailTestException("Incorrect declaration for " + code(methodName + "("+argTypes+")") + "; check use of " + code("public") + " and " + code("static") + " or other modifiers");
@@ -197,11 +230,14 @@ public abstract class GenericTester {
         }
 
         protected void testConstructor() {
-            testConstructor(null);
+            testConstructor(referenceC, studentC);
         }
         protected void testConstructor(Class clazz) {
+            testConstructor(clazz, clazz);
+        }
+        protected void testConstructor(Class refClass, Class stuClass) {
             boolean notfound = true;
-            tryMethods: for (Constructor m : (clazz != null ? clazz : referenceC).getConstructors()) {
+            tryMethods: for (Constructor m : refClass.getConstructors()) {
                 Class[] formalParms = m.getParameterTypes();
                 if (formalParms.length != args.length) continue;
                 checkParms: for (int i=0; i<args.length; i++) {
@@ -215,7 +251,7 @@ public abstract class GenericTester {
                 argTypes = "(" + argTypes.substring(1, argTypes.length()-1) + ")";
                 try {
                     Constructor referenceM = m;
-                    Constructor studentM = (clazz != null ? clazz : studentC).getConstructor(m.getParameterTypes());
+                    Constructor studentM = stuClass.getConstructor(m.getParameterTypes());
                     if (referenceM.getModifiers() != studentM.getModifiers()) {
                         throw new FailTestException("Incorrect declaration for " + code(className+"("+argTypes+")") + " constructor; check use of " + code("public") + " and " + code("static") + " or other modifiers");
                     }
@@ -232,17 +268,42 @@ public abstract class GenericTester {
 
 
         public void execute() {
+            if (quietOnPass) {
+                gbaos = new ByteArrayOutputStream();
+                graderOut = new PrintStream(gbaos);
+            }
             boolean showHellip = testStdin == null;
-            System.out.println("<div class='testcase-desc'>");
+            graderOut.println("<div class='testcase-desc'>");
             describe();
-            if (showHellip) System.out.println("&hellip;");
-            System.out.println("</div>");
-            if (thisName != null && studentObjects.get(thisName).getClass() != studentC) {
-                test(studentObjects.get(thisName).getClass());
+            if (showHellip) graderOut.println("&hellip;");
+            graderOut.println("</div>");
+            if (thisName != null) {
+                // calling instance method on student code
+                if (studentObjects.get(thisName).getClass() == studentC) {
+                    test();
+                }
+                // calling instance method in student code from another class
+                else if (studentObjects.get(thisName).getClass().getPackage() == studentC.getPackage()) {
+                    Class[] c = setup(studentObjects.get(thisName).getClass().getSimpleName());
+                    test(c[0], c[1]);
+                }
+                else // calling on a built-in or stdlibpack
+                    test(studentObjects.get(thisName).getClass());
             }
             else
                 test();
 	    cleanup();
+            if (quietOnPass) {
+                graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));//orig_graderOut;
+                try {
+                    String content = gbaos.toString("UTF-8");
+                    if (content.indexOf("class='pass-test'")<0)
+                        graderOut.print(content);
+                }
+                catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e.toString());
+                }                
+            }
         }
 	public void cleanup() {
 	    suppressStdinDescription = false;
@@ -420,7 +481,9 @@ public abstract class GenericTester {
         }
         void runUserCode() throws ClassNotFoundException {
             try {                
+                //System.err.println("[["+className+"[[");
                 foundClass = Class.forName(className);
+                //System.err.println("]]"+className+"]]");
                 crashed = false;
             } finally {
                 end();
@@ -552,7 +615,7 @@ public abstract class GenericTester {
                 String stackTrace = studentException.toString();
                 boolean first = true;
                 for (StackTraceElement ste : studentException.getStackTrace()) {
-                    if (ste.getClassName().equals("student."+studentName+"."+className)) {
+                    if (ste.getClassName().equals("student."+className)) {
                         stackTrace += "\n   "+(first?"at":"called from")+" line " + ste.getLineNumber() + " in " + ste.getMethodName() + "()";
                         first = false;
                     }
@@ -576,10 +639,11 @@ public abstract class GenericTester {
             
         }
         if (ref.stdout.equals("") && !stu.stdout.equals("")) {
-            System.out.println("Found this printed output (not required):" + pre(stu.stdout));
+            graderOut.println("Found this printed output (not required):" + pre(stu.stdout));
         }
         if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
-            && ((Method)referenceM).getReturnType() != referenceC) {
+            && ((Method)referenceM).getReturnType() != referenceC
+            && ((Method)referenceM).getReturnType().getPackage() != referenceC.getPackage()) {
             if (!smartEquals(ref.retval, stu.retval)) {
                 throw new FailTestException("Expected return value " + code(repr(ref.retval)) + " but instead your code returned " + code(repr(stu.retval)));
             }
@@ -597,7 +661,9 @@ public abstract class GenericTester {
             goodStuff += "Printed correct output " + pre(stu.stdout) + "\n";
         }
         if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
-            && ((Method)referenceM).getReturnType() != referenceC) {
+            && ((Method)referenceM).getReturnType() != referenceC
+            && ((Method)referenceM).getReturnType().getPackage() != referenceC.getPackage()
+            && (!opaque(stu.retval))) {
             goodStuff += "Returned correct value " + pre(repr(stu.retval)) + "\n";
         }
         if (expectException) {
@@ -605,9 +671,9 @@ public abstract class GenericTester {
         }
         goodStuff += mutationCommentary;
         if (!goodStuff.equals("")) {
-            System.out.print("<div class='pass-test'>");
-            System.out.print("Passed test!\n"+goodStuff);
-            System.out.println("</div>");
+            graderOut.print("<div class='pass-test'>");
+            graderOut.print("Passed test!\n"+goodStuff);
+            graderOut.println("</div>");
         }
     }
 
@@ -621,14 +687,22 @@ public abstract class GenericTester {
 
     protected void construct(String packaje, final String className, final String typeParams, Object... args) {
         new BasicTestCase(packaje, className, args, "new " + className + typeParams) {protected void test() {
-            Class clazz;
+            Class stuClazz, refClazz;
             try {
-                clazz = Class.forName(packaje+"."+className);
+                if (packaje == null) {
+                    Class[] classes = setup(className);
+                    refClazz = classes[0];
+                    stuClazz = classes[1];
+                }
+                else {
+                    stuClazz = Class.forName(packaje+"."+className);
+                    refClazz = stuClazz;
+                }
             }
             catch (Throwable t) {
-                throw new RuntimeException("Internal error finding class "+packaje+"."+className);
+                throw new RuntimeException("Internal error finding class "+(packaje==null?"":(packaje+"."))+className);
             }
-            testConstructor(clazz);
+            testConstructor(refClazz, stuClazz);
         }}.execute();
     }
 
@@ -638,13 +712,17 @@ public abstract class GenericTester {
 
     // mainArgs is final just so we can inherit in-line
     protected void testMain(final Object... argObjs) {
+        testNamedMain("main", className, argObjs);
+    }
+
+    protected void testNamedMain(String realNameOfMain, final String fakeNameOfClass, final Object... argObjs) {
 	final String[] argStrings = new String[argObjs.length];
 	for (int i=0; i<argStrings.length; i++)
 	    argStrings[i] = argObjs[i].toString();
-        new BasicTestCase("main", new Object[] {argStrings}, "main") {
+        new BasicTestCase(realNameOfMain, new Object[] {argStrings}, "main") {
             protected void describe() {
-		System.out.print("Testing "); // can't be saved as an object
-                String tmp = "java " + className;
+		graderOut.print("Testing "); // can't be saved as an object
+                String tmp = "java " + fakeNameOfClass;
                 for (String a : argStrings) tmp += " " + a;
 		tmp = code(tmp);
 		if (testStdinURL != null) {
@@ -654,24 +732,32 @@ public abstract class GenericTester {
 		    testStdinURL = null;
 		    suppressStdinDescription = true;
 		}
-                System.out.println(tmp);
+                graderOut.println(tmp);
 		describeStdin();
             }}
             .execute();
     }
 
-    private void setup() {
+    private Class[] setup() {
+        return setup(className);
+    }
+    
+    // return the reference class and the student class with this name
+    private Class[] setup(String whichClass) {
         try {
-            ClassInitCapturer stu = new ClassInitCapturer("student."+studentName+"."+className);
+            ClassInitCapturer stu = new ClassInitCapturer("student."+whichClass);
             stu.runUserCode();
-            ClassInitCapturer ref = new ClassInitCapturer("reference."+className);
+            ClassInitCapturer ref = new ClassInitCapturer("reference."+whichClass);
             ref.runUserCode();
-            studentC = stu.foundClass;
-            referenceC = ref.foundClass;
+            if (whichClass == className) {
+                studentC = stu.foundClass;
+                referenceC = ref.foundClass;
+            }
 
             if (stu.stdout.length() > 0) {
-                System.out.println("<div>Warning: your class printed the output "+pre(stu.stdout)+" before any method was called.</div>");
+                graderOut.println("<div>Warning: your class printed the output "+pre(stu.stdout)+" before any method was called.</div>");
             }
+            return new Class[]{ref.foundClass, stu.foundClass};
         }
         catch (ClassNotFoundException e) {
             throw new RuntimeException("Internal error: class not found " + e);
@@ -686,6 +772,17 @@ public abstract class GenericTester {
             System.out.println("<div class='all-passed'>All tests passed!</div>");
         }
         catch (FailTestException e) {
+            if (quietOnPass) {
+                graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));//orig_graderOut;
+                try {
+                    String content = gbaos.toString("UTF-8");
+                    if (content.indexOf("class='pass-test'")<0)
+                        graderOut.print(content);
+                }
+                catch (UnsupportedEncodingException ex) {
+                    throw new RuntimeException(ex.toString());
+                }                
+            }
             System.out.println("<div class='error'>"+e.getMessage()+"</div>");
             System.out.println("<div class='not-all-passed'>Did not pass all tests.</div>");
         }

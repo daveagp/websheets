@@ -48,6 +48,15 @@ checkSolution = function() {
          {
            data: {stdin: user_state, problem: $('#selectSheet').val()},
            dataType: "json",
+           error: function(jqXHR, textStatus, errorThrown) {
+	     $("#submitButton").removeAttr("disabled");
+             $("#results").html("Internal Ajax Error!!! Please contact course staff. <br>" + 
+                                "status: " + textStatus + "<br>" + 
+                                (textStatus == "parsererror" ? "" : 
+                                 ("error thrown: " + errorThrown + "<br>")) + 
+                                "response text:<br><pre>" 
+                                + jqXHR.responseText + "</pre>");  
+             },
            success: function(data) {
 	     //console.log(data);
 	     num_submissions++;

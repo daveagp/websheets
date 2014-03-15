@@ -1,5 +1,5 @@
 description = r"""
- Read an the integer N from standard input, then a list
+ Read an integer N from standard input, then a list
   of N student records, where each record consists of four
   fields, separated by whitespace:
 <ul>

@@ -37,7 +37,7 @@ public class Distinct {
 tests = r"""
 testMain(11, 23, -7, 0, 99, 5, 42);
 testMain(2, 4, 6, 3, 6);
-testMain(-3, -2, -1, -0, +3, +2, +1, +0);
+testMain(-3, -2, -1, -0, "+3", "+2", "+1", "+0");
 testMain(2, 3, -3, -2);
 testMain(126);
 testMain();

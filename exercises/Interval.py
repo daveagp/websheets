@@ -7,7 +7,7 @@ For example, the interval [3, 6] from 3 to 6 contains 3, &pi;, 5, and 6, but it 
 (All intervals we deal with will include both endpoints.) 
 Your code must produce the following API:
 <pre>
-public Interval(double lo, double hi) // construct inveral from lo to hi; but 
+public Interval(double lo, double hi) // construct interval from lo to hi; but 
                                       // throw a RuntimeException if lo > hi
 String toString()                  // return text representation, e.g. "[3, 6]"
 boolean contains(double x)         // does this interval contain x?
