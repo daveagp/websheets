@@ -36,7 +36,11 @@ include_once('include.php');
 <?php if (WS_LOGGED_IN) {
    echo "<p>Logged in as <b>" . WS_USERNAME . "</b>. " .
    "Click to <a href='" . WS_LOGOUT_LINK . "'>log out</a>.</p>";
-} ?>
+  }
+   else {
+     echo "<p><b>Not logged in, your work will not be saved.</b> Log in: <a href='" . WS_LOGIN_LINK . "'>with your Princeton account</a>.</p>";
+   }
+ ?>
    <p>This is an experimental system. <a href="mailto:dp6@cs.princeton.edu">Contact us</a>
     if you find bugs, typos, user interface issues, inaccurate grading or anything else.</p>
    Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">

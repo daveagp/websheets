@@ -4,6 +4,10 @@ import java.util.regex.Pattern;
 import java.lang.reflect.*;
 import java.io.*;
 import stdlibpack.*;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public abstract class GenericTester {
 
     public static PrintStream graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
@@ -226,7 +230,7 @@ public abstract class GenericTester {
                         throw new FailTestException("You need to declare a public method " + code(methodName) + " that accepts arguments" + code(argTypes));
                     }
                 }            
-            if (notfound) throw new RuntimeException("Could not find the reference method! Check that floating-point numbers are explicitly specified.");
+            if (notfound) throw new RuntimeException("Could not find the reference method "+ code(methodName)+"! Check that floating-point numbers are explicitly specified.");
         }
 
         protected void testConstructor() {
@@ -766,6 +770,12 @@ public abstract class GenericTester {
     
     protected void genericMain(String[] args) {
         studentName = args[0];
+
+        // quit with code -1 after 5 seconds
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() { public void run() {System.err.println("Time Limit Exceeded"); System.exit(-1);}},
+                       new Date(System.currentTimeMillis()+5*1000));
+
         setup();
         try {
             runTests();
