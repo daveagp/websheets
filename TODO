@@ -1,2 +1,11 @@
 tabbing between blanks seems to have broken
+
 when using dependencies, uncaught exceptions may translate improperly if they're not from the current file
+
+\[public]\ String \[playback()]\ 
+ didn't work, until added space at start
+
+check API
+
+]\
+""" at end of input breaks

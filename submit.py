@@ -60,6 +60,7 @@ def submit_and_log(websheet_name, student, stdin, authdomain):
         "framework.GenericTester" : GTjava,
         }
 
+    #print(student_solution[1])
 
     for dep in websheet.dependencies:
       depws = Websheet.Websheet.from_filesystem(dep)
@@ -106,8 +107,9 @@ def submit_and_log(websheet_name, student, stdin, authdomain):
         result = "Syntax error (could not compile):"
         result += "<br>"
         errorObj = compileObj['error']
-        result += '<tt>'+errorObj['filename'].split('.')[-2]+'</tt>, line '
+        result += '<tt>'+errorObj['filename'].split('.')[-2]+'.java</tt>, line '
         result += str(translate_line(errorObj['row'])) + ':'
+        #result += str(errorObj['row']) + ':'
         result += "<pre>\n"
         #remove the safeexec bits
         result += cgi.escape(errorObj["errmsg"])
