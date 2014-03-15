@@ -1,18 +1,8 @@
 <?php
 define ('WS_PRINCETON', substr($_SERVER['SERVER_NAME'], -13)=='princeton.edu');
-if (WS_PRINCETON) {
 
-  include_once('../CAS-1.3.2/CAS.php');
-  phpCAS::setDebug();
-  phpCAS::client(CAS_VERSION_2_0,'fed.princeton.edu',443,'cas');
-  phpCAS::setNoCasServerValidation();
-  if (isset($_REQUEST['login'])) {
-    phpCAS::forceAuthentication();
-  }
-  define ('WS_USERNAME', phpCAS::getUser());
-  define ('WS_LOGGED_IN', true);
-}
-else {
+//** needs some work to sanitize secrets and deal with base_url **//
+ 
    $config = array( 
         "base_url" => "http://cscircles.cemc.uwaterloo.ca/dev/websheets/hybridauth/hybridauth/index.php",  
         "providers" => array (
@@ -34,15 +24,16 @@ else {
               //                    "hd"              => "domain.com" // optional
               )));
    
+if (WS_PRINCETON) {
+  $config['base_url'] = "http://www.cs.princeton.edu/~cos126/websheets/hybridauth/hybridauth/index.php";
+}
+
    require_once( "hybridauth/hybridauth/Hybrid/Auth.php" );
    
    $hybridauth = new Hybrid_Auth( $config );
 
    if ($_REQUEST['auth']=='logout') {
      $hybridauth->logoutAllProviders();
-     if (WS_PRINCETON) {
-       phpCAS::logout();
-     }
    }
 
    $providers = "";
@@ -67,14 +58,19 @@ else {
      $providers = " Princeton" . $providers;
 
      include_once('../CAS-1.3.2/CAS.php');
+     phpCAS::setDebug();
+     phpCAS::client(CAS_VERSION_2_0,'fed.princeton.edu',443,'cas');
+     phpCAS::setNoCasServerValidation();
+
      if ($_REQUEST['auth']=='Princeton') {
-       phpCAS::setDebug();
-       phpCAS::client(CAS_VERSION_2_0,'fed.princeton.edu',443,'cas');
-       phpCAS::setNoCasServerValidation();
        phpCAS::forceAuthentication();
      }
 
      if (phpCAS::isAuthenticated() &&  !defined('WS_LOGGED_IN')) {
+       if ($_REQUEST['auth']=='logout') {
+         phpCAS::logout();
+       }
+
        define ('WS_USERNAME', phpCAS::getUser() . '@princeton.edu');
        define ('WS_AUTHDOMAIN', 'Princeton'); 
        define ('WS_LOGGED_IN', true);
@@ -89,4 +85,4 @@ else {
      define('WS_USERNAME', "anonymous");
      define('WS_AUTHDOMAIN', "n/a"); 
    }
-}
+

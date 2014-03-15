@@ -9,3 +9,5 @@ check API
 
 ]\
 """ at end of input breaks
+
+sanitize secrets
