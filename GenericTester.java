@@ -205,13 +205,13 @@ public abstract class GenericTester {
                         for (int i=0; i<stuParamTypes.length; i++) {
                             if (stuParamTypes[i] == referenceC)
                                 stuParamTypes[i] = studentC;
-                            else if (stuParamTypes[i].getPackage() == referenceC.getPackage())
+                            else if (stuParamTypes[i].getName().startsWith("reference."))
                                 stuParamTypes[i] = setup(stuParamTypes[i].getSimpleName())[1];
                         }
                         Method studentM = stuClazz.getMethod(methodName, stuParamTypes);
                         Class expectedReturn = referenceM.getReturnType();
                         if (expectedReturn == referenceC) expectedReturn = studentC;
-                        else if (expectedReturn.toString().startsWith("reference."))
+                        else if (expectedReturn.getName().startsWith("reference."))
                             {
      expectedReturn = setup(expectedReturn.getSimpleName())[1];                                                }    
                         if (! studentM.getReturnType().equals(expectedReturn)) {
@@ -283,7 +283,7 @@ public abstract class GenericTester {
                     test();
                 }
                 // calling instance method in student code from another class
-                else if (studentObjects.get(thisName).getClass().getPackage() == studentC.getPackage()) {
+                else if (studentObjects.get(thisName).getClass().getName().startsWith("student.")) {
                     Class[] c = setup(studentObjects.get(thisName).getClass().getSimpleName());
                     test(c[0], c[1]);
                 }
@@ -643,7 +643,7 @@ public abstract class GenericTester {
         }
         if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
             && ((Method)referenceM).getReturnType() != referenceC
-            && ((Method)referenceM).getReturnType().getPackage() != referenceC.getPackage()) {
+            && (!((Method)referenceM).getReturnType().getName().startsWith("reference."))) {
             if (!smartEquals(ref.retval, stu.retval)) {
                 throw new FailTestException("Expected return value " + code(repr(ref.retval)) + " but instead your code returned " + code(repr(stu.retval)));
             }
@@ -662,7 +662,7 @@ public abstract class GenericTester {
         }
         if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
             && ((Method)referenceM).getReturnType() != referenceC
-            && ((Method)referenceM).getReturnType().getPackage() != referenceC.getPackage()
+            && (!((Method)referenceM).getReturnType().getName().startsWith("reference."))
             && (!opaque(stu.retval))) {
             goodStuff += "Returned correct value " + pre(repr(stu.retval)) + "\n";
         }

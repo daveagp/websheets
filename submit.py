@@ -9,6 +9,7 @@ sometimes produces:
  - errmsg, the high-level description of the error (without line numbers)
  - epilogue, commentary after a submission
 """
+import config
 
 def submit_and_log(websheet_name, student, stdin):
   import sys, Websheet, json, re, cgi, os
@@ -57,6 +58,19 @@ def submit_and_log(websheet_name, student, stdin):
         "framework.GenericTester" : GTjava,
         }
 
+
+    for dep in websheet.dependencies:
+      depws = Websheet.Websheet.from_filesystem(dep)
+      submission = config.load_submission(student, dep, True)
+      if submission == False:
+        return("Dependency Error",
+               "<div class='dependency-error'>Dependency error:" + 
+               "You need to successfully complete the <tt>"+dep+"<tt> websheet first.</div>") # error text
+      submission = [{'code': x, 'from': {'line': 0, 'ch':0}, 'to': {'line': 0, 'ch': 0}} for x in submission]
+      dump["student."+dep] = depws.make_student_solution(submission, "student")[1]
+      
+      dump["reference."+dep] = depws.get_reference_solution("reference")
+      
 #    studir = scratch_dir + "student/" + student + "/"
 #    if not os.path.exists(studir):
 #      os.makedirs(studir)
@@ -176,7 +190,6 @@ def submit_and_log(websheet_name, student, stdin):
     print_output['epilogue'] = epilogue
 
   passed = (category == "Passed")
-  import config
 
   if (not user_state["viewing_ref"]):
     # remove positional information
@@ -186,7 +199,7 @@ def submit_and_log(websheet_name, student, stdin):
   return json.dumps(print_output)
 
 def bugfix_2013_11_01():
- import config, json
+ import json
  print("<pre>")
  for i in range(1):
   db = config.connect()

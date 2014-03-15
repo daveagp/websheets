@@ -78,7 +78,7 @@ class Websheet:
 
         # optional fields AND default values
         optional_fields = {"tester_preamble": None, "show_class_decl": True,
-                           "epilogue": None}
+                           "epilogue": None, "dependencies": []}
 
         for field in mandatory_fields:
             setattr(self, field, field_dict[field])

@@ -48,29 +48,13 @@ elif socket.gethostname().endswith("princeton.edu"):
     scratch_dir = "/n/fs/htdocs/"+server_username+"/scratch/"
 
     def run_javac(command, the_stdin = ""):
-        #print(javac + command)
         os.chdir(scratch_dir)
         return execute(javac + command, the_stdin)
 
     def run_java(command, the_stdin = ""):
         os.chdir( "/n/fs/htdocs/"+server_username+"/")
-   #     if the_stdin != "":
-   #         raise Exception('Cannot handle stdin in run_java yet')
         cmd = "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp {java}{command}".format(command=command, scratch=scratch_dir, java=java)
 
-        input = """
-import os, resource, sys
-from subprocess import Popen, PIPE
-#cmd = 'safeexec/safeexec --exec_dir {scratch} --nproc 50 --mem 4000000 --clock 3 --nfile 30 --exec {java}{command}'
-os.chdir('{scratch}')
-cmd = '{java}{command}'
-proc = Popen(cmd.split(' '), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-result = proc.communicate(input = '')
-sys.stdout.write(result[0])
-sys.stderr.write(result[1])
-sys.exit(proc.returncode)
-""".format(command=command, scratch=scratch_dir, java=java).encode('ASCII')
-            
         return execute(cmd, the_stdin)
 
     def connect():
@@ -96,12 +80,13 @@ sys.exit(proc.returncode)
         db.close()
 
     # returns a json list of code fragments
-    def load_submission(student, problem):
+    def load_submission(student, problem, onlyPassed = False):
         import json
         db = connect()
         cursor = db.cursor()
+        pc = " AND passed = 1 " if onlyPassed else "" # passed clause
         cursor.execute(
-            "select submission from ws_history WHERE user = %s AND problem = %s ORDER BY ID DESC LIMIT 1;",
+            "select submission from ws_history WHERE user = %s AND problem = %s "+pc+" ORDER BY ID DESC LIMIT 1;",
             (student, 
              problem))
         result = "false"

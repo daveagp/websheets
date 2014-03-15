@@ -139,3 +139,5 @@ testNamedMain("exampleClientMain", "ExampleClient");
 testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/data/TigerBook/monologue.txt";
 testNamedMain("exampleClientMain", "ExampleClient");
 """
+
+dependencies = ["Person"]
