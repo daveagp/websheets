@@ -169,8 +169,11 @@ def submit_and_log(websheet_name, student, stdin, authdomain):
       epilogue = websheet.epilogue
     else:
       category = "Failed Tests"
-      errmsg = ssf(runtimeOutput, "<div class='error'>", '</div>')
-      
+      if "<div class='error'>" in runtimeOutput:
+        errmsg = ssf(runtimeOutput, "<div class='error'>", '</div>')
+      else:
+        return ("Internal Error", "<b>stderr</b><pre>" + runUser.stderr + "</pre><b>stdout</b><br>" + runUser.stdout)
+        
     return (category, runtimeOutput)
 
   try:

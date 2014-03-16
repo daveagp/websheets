@@ -16,7 +16,7 @@ if socket.gethostname().endswith("uwaterloo.ca"):
     javac = jail + "java/bin/javac -J-Xmx128M -cp . "
     java = "/java/bin/java -cp .:javax.json-1.0.jar -Xmx128M "
     safeexec = "/home/cscircles/dev/safeexec/safeexec"
-    safeexec_args = " --chroot_dir "+ jail +" --exec_dir /cp --env_vars '' --nproc 50 --mem 500000 --nfile 30 --clock 2 --exec "
+    safeexec_args = " --chroot_dir "+ jail +" --exec_dir /cp --env_vars '' --nproc 50 --mem 500000 --nfile 30 --gid 1001 --clock 2 --exec "
     
     def run_javac(command, the_stdin = ""):
         os.chdir(scratch_dir)

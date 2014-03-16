@@ -421,6 +421,7 @@ if __name__ == "__main__":
         r = []
         for file in os.listdir("exercises"):
             if file.endswith(".py") and not file.startswith("_"): r.append(file[:-3])
+        r.sort()
         print(json.dumps(r))
         sys.exit(0)
 

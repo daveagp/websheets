@@ -777,28 +777,42 @@ public abstract class GenericTester {
                        new Date(System.currentTimeMillis()+5*1000));
 
         setup();
+        Error throw_e = null;
+        RuntimeException throw_rte = null;
         try {
-            runTests();
-            System.out.println("<div class='all-passed'>All tests passed!</div>");
-        }
-        catch (FailTestException e) {
-            if (quietOnPass) {
-                graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));//orig_graderOut;
-                try {
-                    String content = gbaos.toString("UTF-8");
-                    if (content.indexOf("class='pass-test'")<0)
-                        graderOut.print(content);
-                }
-                catch (UnsupportedEncodingException ex) {
-                    throw new RuntimeException(ex.toString());
-                }                
+            try {
+                runTests();
+                System.out.println("<div class='all-passed'>All tests passed!</div>");
             }
-            System.out.println("<div class='error'>"+e.getMessage()+"</div>");
-            System.out.println("<div class='not-all-passed'>Did not pass all tests.</div>");
+            catch (FailTestException e) {
+                if (quietOnPass) {
+                    graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));//orig_graderOut;
+                    try {
+                        String content = gbaos.toString("UTF-8");
+                        if (content.indexOf("class='pass-test'")<0)
+                            graderOut.print(content);
+                    }
+                    catch (UnsupportedEncodingException ex) {
+                        throw new RuntimeException(ex.toString());
+                    }                
+                }
+                System.out.println("<div class='error'>"+e.getMessage()+"</div>");
+                System.out.println("<div class='not-all-passed'>Did not pass all tests.</div>");
+            }
+            timer.cancel();
+            timer.purge();
         }
-
-        timer.cancel();
-        timer.purge();
+        // now, any usercode errors should already have been caught.
+        // but this is to make sure internally generated errors are handles sanely
+        catch (Error | RuntimeException t) { // throwable == catchable
+            // don't hang forever
+            timer.cancel();
+            timer.purge();
+            if (t instanceof Error) throw_e = (Error) t;
+            else throw_rte = (RuntimeException) t;
+        }
+        if (throw_e != null) throw throw_e;
+        if (throw_rte != null) throw throw_rte;
     }
 
 }
