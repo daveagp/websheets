@@ -796,6 +796,9 @@ public abstract class GenericTester {
             System.out.println("<div class='error'>"+e.getMessage()+"</div>");
             System.out.println("<div class='not-all-passed'>Did not pass all tests.</div>");
         }
+
+        timer.cancel();
+        timer.purge();
     }
 
 }
