@@ -12,19 +12,11 @@ def execute(command, the_stdin):
 
 if socket.gethostname().endswith("uwaterloo.ca"):
     jail = "/home/cscircles/dev_java_jail/"
-    scratch_dir = jail + "cp/"
-    javac = jail + "java/bin/javac -J-Xmx128M -cp . "
     java = "/java/bin/java -cp .:javax.json-1.0.jar -Xmx128M "
     safeexec = "/home/cscircles/dev/safeexec/safeexec"
     safeexec_args = " --chroot_dir "+ jail +" --exec_dir /cp --env_vars '' --nproc 50 --mem 500000 --nfile 30 --gid 1001 --clock 2 --exec "
     
-    def run_javac(command, the_stdin = ""):
-        os.chdir(scratch_dir)
-        return execute(javac + command, the_stdin)
-
     def run_java(command, the_stdin = ""):
-        os.chdir(scratch_dir)
-        #return execute(java + command, the_stdin)  
         return execute(safeexec + safeexec_args + java + command, the_stdin)  
 
     def connect():
@@ -33,21 +25,14 @@ if socket.gethostname().endswith("uwaterloo.ca"):
                                        password=open('/home/cscircles/dev/www/websheets/.dbpwd').read(), db='cscircles')
 
 elif socket.gethostname().endswith("princeton.edu"):
-    javac = "/usr/bin/javac -Xlint:path -target 1.7 -cp .:/n/fs/htdocs/cos126/java_jail/cp -J-Xmx128M "
     java = "/usr/bin/java -cp .:/n/fs/htdocs/cos126/java_jail/cp:/n/fs/htdocs/cos126/java_jail/cp/javax.json-1.0.jar -Xmx128M "
 
     import getpass
     server_username = getpass.getuser()
-    scratch_dir = "/n/fs/htdocs/"+server_username+"/"
-
-    def run_javac(command, the_stdin = ""):
-        os.chdir(scratch_dir)
-        return execute(javac + command, the_stdin)
 
     def run_java(command, the_stdin = ""):
         os.chdir( "/n/fs/htdocs/"+server_username+"/")
         cmd = "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp {java}{command}".format(command=command, java=java)
-
         return execute(cmd, the_stdin)
 
 

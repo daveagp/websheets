@@ -1,4 +1,26 @@
-websheets
-=========
+websheets: Online version of coding handouts with blanks
+========================================================
 
-Online version of coding handouts with blanks
+Here is an abbreviated version of how to install websheets on your computer.
+
+1) Install https://github.com/cemc/safeexec (follow instructions therein)
+2) Install https://github.com/daveagp/java_jail (follow instructions therein)
+3) Now clone the websheets repo, as well as its submodules
+4) Edit config.py and/or .dbpwd to show where the other modules 1) and 2) are, and setup the database
+5) Edit include.php with your API keys for Google and Facebook
+
+Here's the db table format:
+
+CREATE TABLE IF NOT EXISTS `ws_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `problem` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `submission` varchar(5000) COLLATE utf8_unicode_ci NOT NULL,
+  `result` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `passed` tinyint(1) NOT NULL DEFAULT '0',
+  `authdomain` text COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user` (`user`,`problem`,`passed`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+

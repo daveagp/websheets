@@ -47,7 +47,7 @@ include_once('include.php');
   }
  ?>
    <p>This is an experimental system. <a href="mailto:dp6@cs.princeton.edu">Contact us</a>
-    if you find bugs, typos, user interface issues, inaccurate grading or anything else.</p>
+    if you find bugs or have feedback. Visit the <a href="https://github.com/daveagp/websheets">source code</a> on GitHub.</p>
    Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
    </select>
    <script type='text/javascript'>

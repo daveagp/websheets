@@ -1,7 +1,7 @@
 source_code = r"""
 // instance variables
-char firstInitial;
-String lastName;
+private char firstInitial;
+private String lastName;
 
 // constructor, takes two parameters
 public Name(char firstInit, String lastName) {
