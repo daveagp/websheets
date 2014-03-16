@@ -11,7 +11,7 @@ public CombinationLock(String initpass)
 <li><tt>// if current password equals attempt, unlock (no effect if already unlocked)<br>
 public void tryUnlock(String attempt)</tt>
 <li><tt>// make this lock become locked (no effect if already locked)<br>public void lock()</tt>
-<li><tt>// if locked, print "ERROR - LOCKED" else change password to newpass<br>
+<li><tt>// if locked, print "ERROR: LOCKED" else change password to newpass<br>
 public void changePassword(String newpass)</tt>
 </ul>
 Make sure you use <tt>.equals()</tt> to compare strings in <tt>tryUnlock()</tt>, not the <tt>==</tt> operator. 
@@ -43,10 +43,10 @@ public void lock() {
    locked = true;
 }
 
-// if locked, print "ERROR" else change password to newpass
+// if locked, print "ERROR: LOCKED" else change password to newpass
 public void changePassword(String newpass) {
    if (locked) 
-      StdOut.println("ERROR - LOCKED");
+      StdOut.println("ERROR: LOCKED");
    else
       password = newpass;
 }
