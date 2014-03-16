@@ -13,7 +13,7 @@ import config
 
 def submit_and_log(websheet_name, student, stdin, authdomain):
   import sys, Websheet, json, re, cgi, os
-  from config import run_java, run_javac
+  from config import run_java
 
   config.authdomain = authdomain
 
