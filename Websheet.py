@@ -343,7 +343,8 @@ self.classname + " to = new " + self.classname + "();\n" +
     def from_module(module):
         # convert module to a dict
         dicted = {attname: getattr(module, attname) for attname in dir(module)}
-        dicted["classname"] = module.__name__.split(".")[-1]
+        if "classname" not in dicted:
+            dicted["classname"] = module.__name__.split(".")[-1]
         return Websheet(dicted)
 
     @staticmethod

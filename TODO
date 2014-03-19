@@ -11,3 +11,5 @@ check API
 """ at end of input breaks
 
 sanitize secrets
+
+add ability for public remarks in tests
