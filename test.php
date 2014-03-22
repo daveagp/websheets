@@ -28,6 +28,9 @@ include_once('include.php');
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
 
    <script type="text/javascript" src="test.js?3"></script>
+    <?php if (!WS_LOGGED_IN) {
+    echo "<script type='text/javascript'>alert('None of your work will be saved until you log in (see links at top).');</script>";
+  } ?>
 
 </head>
 <body>
