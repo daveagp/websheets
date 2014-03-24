@@ -3,27 +3,29 @@ define ('WS_PRINCETON', substr($_SERVER['SERVER_NAME'], -13)=='princeton.edu');
 
 //** needs some work to sanitize secrets and deal with base_url **//
  
-   $config = array( 
-        "base_url" => "http://cscircles.cemc.uwaterloo.ca/dev/websheets/hybridauth/hybridauth/index.php",  
-        "providers" => array (
-            "Facebook" => array ( 
-               "enabled" => true,
-               "keys"    => array ( "id" => "493038877467966", 
-                                    "secret" => "b1eaebe81d4be9cc3010c8f6e6e0f65d" ), 
-               "scope"   => "email", // optional
-               //"display" => "popup" // optional
-               ),                                    
-            "Google" => array ( 
-              "enabled" => true,
-              "keys"    => array ( "id" => "179206563569-936o4fmit27ua72ldeqvfmsbeu46uull.apps.googleusercontent.com", 
-                                   "secret" => "wVKNo_KuR6gFJMxmbtjhtd9P" ), 
-              "scope"           => //"https://www.googleapis.com/auth/userinfo.profile ". // optional
-              "https://www.googleapis.com/auth/userinfo.email"   , // optional
-              "access_type"     => "online",   // optional
-              "approval_prompt" => "force",     // optional
-              //                    "hd"              => "domain.com" // optional
-              )));
-   
+$config = array( 
+                "base_url" => "http://cscircles.cemc.uwaterloo.ca/dev/websheets/hybridauth/hybridauth/index.php",  
+                "providers" => 
+                array("Facebook" => 
+                      array("enabled" => true,
+                            "keys"    => 
+                            array("id" => file_get_contents("keys/facebook-id"),
+                                  "secret" => file_get_contents("keys/facebook-secret"),
+                                  ),
+                            "scope"   => "email",
+                            ),    
+
+                      "Google" => 
+                      array("enabled" => true,
+                            "keys"    => 
+                            array("id" => file_get_contents("keys/google-id"),
+                                  "secret" => file_get_contents("keys/google-secret"),
+                                  ),
+                            "scope"           => "https://www.googleapis.com/auth/userinfo.email",
+                            "access_type"     => "online",
+                            "approval_prompt" => "force",
+                            )));
+
 if (WS_PRINCETON) {
   $config['base_url'] = "http://www.cs.princeton.edu/~cos126/websheets/hybridauth/hybridauth/index.php";
 }
