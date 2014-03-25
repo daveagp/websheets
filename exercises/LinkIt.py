@@ -98,7 +98,7 @@ public static void main(String[] args) {
    StdOut.println(test2); // should be: over well
    test2.deleteKth(2);
    StdOut.println(test2); // should be: over
-   test2.deleteKth(2);    // should cause your code to throw a RuntimeException
+   test2.deleteKth(2);    // your code should throw a RuntimeException
 }
 """
 
@@ -154,7 +154,7 @@ For maximum challenge, don't use <tt>new Node()</tt> in this method.
 the kth item from the list, where the first is k=1. Your code should throw a <tt>RuntimeException</tt>
 if k is invalid. 
 For example, if the list currently contains the 4 items "link", "think", "sink", "wink", then
-<tt>deleteKth(2)</tt> should alter the list to "wink", "think", "link".
+<tt>deleteKth(2)</tt> should alter the list to "link", "think", "wink".
 </li>
 </ul>
 See the test main for more examples.
