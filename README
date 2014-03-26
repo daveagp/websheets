@@ -8,6 +8,7 @@ Here is an abbreviated version of how to install websheets on your computer.
 3) Now clone the websheets repo, as well as its submodules
 4) Setup config.json (see below)
 5) Create the db table (see below)
+6) Edit definition of java_prefix in config.py to however you like to securely run java
 
 Here's the db table format:
 
