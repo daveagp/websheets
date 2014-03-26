@@ -71,7 +71,7 @@ else {
                   ),
             "scope"           => "https://www.googleapis.com/auth/userinfo.email",
             "access_type"     => "online",
-            "approval_prompt" => "force",
+            "approval_prompt" => "auto",
             );
   }
 
