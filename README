@@ -6,8 +6,8 @@ Here is an abbreviated version of how to install websheets on your computer.
 1) Install https://github.com/cemc/safeexec (follow instructions therein)
 2) Install https://github.com/daveagp/java_jail (follow instructions therein)
 3) Now clone the websheets repo, as well as its submodules
-4) Edit config.py and/or .dbpwd to show where the other modules 1) and 2) are, and setup the database
-5) Edit include.php with your API keys for Google and Facebook
+4) Setup config.json (see below)
+5) Create the db table (see below)
 
 Here's the db table format:
 
@@ -24,3 +24,18 @@ CREATE TABLE IF NOT EXISTS `ws_history` (
   KEY `user` (`user`,`problem`,`passed`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 
+config.json is a json-formatted file, variously loaded by php and python,
+that contains all the secrets that are specific to your setup. it should
+look like this if you want to use Google and Facebook:
+
+{
+        "hybridauth-base_url":"http://your-server.../websheets/hybridauth/hybridauth/index.php",
+        "db-host": "...",
+        "db-user": "...",
+        "db-password": "...",
+        "db-database": "...",
+        "facebook-id": "your facebook api id",
+        "facebook-secret": "your facebook api secret key",
+        "google-id":"your google api id",
+        "google-secret":"your google api secret key"
+}

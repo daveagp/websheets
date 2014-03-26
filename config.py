@@ -1,6 +1,8 @@
 import socket, os
 from subprocess import Popen, PIPE
 from Websheet import record
+import json
+config_jo = json.loads(open('config.json').read())
 
 def execute(command, the_stdin):
     proc = Popen(command.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -9,41 +11,33 @@ def execute(command, the_stdin):
                   stderr = result[1].decode("UTF-8"),
                   returncode = proc.returncode)
     
+def connect():
+    import mysql.connector
+    return mysql.connector.connect(host=config_jo["db-host"],
+                                   user=config_jo["db-user"],
+                                   password=config_jo["db-password"],
+                                   db=config_jo["db-database"])
 
+# if you are using safeexec, securely running java should be something like this:
 if socket.gethostname().endswith("uwaterloo.ca"):
     jail = "/home/cscircles/dev_java_jail/"
     java = "/java/bin/java -cp .:javax.json-1.0.jar -Xmx128M "
     safeexec = "/home/cscircles/dev/safeexec/safeexec"
     safeexec_args = " --chroot_dir "+ jail +" --exec_dir /cp --env_vars '' --nproc 50 --mem 500000 --nfile 30 --gid 1001 --clock 2 --exec "
-    
-    def run_java(command, the_stdin = ""):
-        return execute(safeexec + safeexec_args + java + command, the_stdin)  
+    java_prefix = safeexec + safeexec_args + java
 
-    def connect():
-        import mysql.connector
-        return mysql.connector.connect(host='localhost', user='cscircles',
-                                       password=open('/home/cscircles/dev/www/websheets/.dbpwd').read(), db='cscircles')
-
+# at princeton, they use "sandbox" instead
 elif socket.gethostname().endswith("princeton.edu"):
     java = "/usr/bin/java -cp .:/n/fs/htdocs/cos126/java_jail/cp:/n/fs/htdocs/cos126/java_jail/cp/javax.json-1.0.jar -Xmx128M "
+    java_prefix = "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp "+java
 
-    import getpass
-    server_username = getpass.getuser()
+# in either case "java_prefix" is like the 'java' binary,
+# ready to accept the class name and cmd line args
 
-    def run_java(command, the_stdin = ""):
-        os.chdir( "/n/fs/htdocs/"+server_username+"/")
-        cmd = "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp {java}{command}".format(command=command, java=java)
-        return execute(cmd, the_stdin)
-
-
-    def connect():
-        import mysql.connector
-        return mysql.connector.connect(host='publicdb.cs.princeton.edu', user='cos126',
-                                       password=open('/n/fs/htdocs/'+server_username+'/websheets/.dbpwd').read(), db='cos126')
-
+def run_java(command, the_stdin = ""):
+    return execute(java_prefix + command, the_stdin)
 
 def save_submission(student, problem, user_state, result_column, passed):
-        import json
         db = connect()
         cursor = db.cursor()
         cursor.execute(
@@ -62,7 +56,6 @@ def save_submission(student, problem, user_state, result_column, passed):
 # returns a json list of code fragments, or False
 def load_submission(student, problem, onlyPassed = False):
         if student=="anonymous": return False
-        import json
         db = connect()
         cursor = db.cursor()
         pc = " AND passed = 1 " if onlyPassed else "" # passed clause
@@ -80,7 +73,6 @@ def load_submission(student, problem, onlyPassed = False):
 # returns a boolean
 def ever_passed(student, problem):
         if student=="anonymous": return False
-        import json
         db = connect()
         cursor = db.cursor()
         cursor.execute(
@@ -97,7 +89,6 @@ def ever_passed(student, problem):
 # returns an integer
 def num_submissions(student, problem):
         if student=="anonymous": return 0
-        import json
         db = connect()
         cursor = db.cursor()
         cursor.execute(

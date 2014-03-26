@@ -1,6 +1,5 @@
 *.py[cod]
 *~
-.dbpwd
 index.*
 CodeMirror
-keys
+config.json

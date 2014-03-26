@@ -29,14 +29,15 @@ include_once('include.php');
 
    <script type="text/javascript" src="test.js?3"></script>
     <?php if (!WS_LOGGED_IN) {
-    echo "<script type='text/javascript'>alert('None of your work will be saved until you log in (see links at top).');</script>";
+    echo "<script type='text/javascript'>$(function(){alert('None of your work will be saved until you log in (see links at top).');});</script>";
   } ?>
 
 </head>
 <body>
 <div id="page">
   <div class="menu-bar noprint">
-<?php if (WS_LOGGED_IN) {
+    <?php echo WS_CONFIG_ERROR;
+if (WS_LOGGED_IN) {
    echo "<p>Logged in as <b>" . WS_USERNAME . " (logged in through ". WS_AUTHDOMAIN. ")</b>. " .
    "Click to ";
    echo '<a href="javascript:auth(\'logout\')">log out</a>.';
