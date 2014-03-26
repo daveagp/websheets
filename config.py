@@ -2,7 +2,12 @@ import socket, os
 from subprocess import Popen, PIPE
 from Websheet import record
 import json
-config_jo = json.loads(open('config.json').read())
+
+# we already checked for this error in php land
+try:
+    config_jo = json.loads(open('config.json').read())
+except:
+    config_jo = None
 
 def execute(command, the_stdin):
     proc = Popen(command.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -37,7 +42,10 @@ elif socket.gethostname().endswith("princeton.edu"):
 def run_java(command, the_stdin = ""):
     return execute(java_prefix + command, the_stdin)
 
+# don't run if not configured correctly,
+# but run if configured correctly & not logged in
 def save_submission(student, problem, user_state, result_column, passed):
+        if config_jo == None: return 
         db = connect()
         cursor = db.cursor()
         cursor.execute(
@@ -52,6 +60,8 @@ def save_submission(student, problem, user_state, result_column, passed):
         db.commit()
         cursor.close()
         db.close()
+
+# the rest don't run if not logged in
 
 # returns a json list of code fragments, or False
 def load_submission(student, problem, onlyPassed = False):
