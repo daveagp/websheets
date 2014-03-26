@@ -3,29 +3,9 @@ from subprocess import Popen, PIPE
 from Websheet import record
 import json
 
-# we already checked for this error in php land
-try:
-    config_jo = json.loads(open('config.json').read())
-except:
-    config_jo = None
-
-def execute(command, the_stdin):
-    proc = Popen(command.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
-    result = proc.communicate(input = the_stdin.encode("UTF-8"))
-    return record(stdout = result[0].decode("UTF-8"),
-                  stderr = result[1].decode("UTF-8"),
-                  returncode = proc.returncode)
-    
-def connect():
-    import mysql.connector
-    return mysql.connector.connect(host=config_jo["db-host"],
-                                   user=config_jo["db-user"],
-                                   password=config_jo["db-password"],
-                                   db=config_jo["db-database"])
-
 # if you are using safeexec, securely running java should be something like this:
 if socket.gethostname().endswith("uwaterloo.ca"):
-    jail = "/home/cscircles/dev_java_jail/"
+    jail = "/home/cscircles/java_jail/"
     java = "/java/bin/java -cp .:javax.json-1.0.jar -Xmx128M "
     safeexec = "/home/cscircles/dev/safeexec/safeexec"
     safeexec_args = " --chroot_dir "+ jail +" --exec_dir /cp --env_vars '' --nproc 50 --mem 500000 --nfile 30 --gid 1001 --clock 2 --exec "
@@ -39,8 +19,29 @@ elif socket.gethostname().endswith("princeton.edu"):
 # in either case "java_prefix" is like the 'java' binary,
 # ready to accept the class name and cmd line args
 
+def execute(command, the_stdin):
+    proc = Popen(command.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    result = proc.communicate(input = the_stdin.encode("UTF-8"))
+    return record(stdout = result[0].decode("UTF-8"),
+                  stderr = result[1].decode("UTF-8"),
+                  returncode = proc.returncode)
+    
 def run_java(command, the_stdin = ""):
     return execute(java_prefix + command, the_stdin)
+
+# we already checked for this error in php land
+try:
+    config_jo = json.loads(open('config.json').read())
+except:
+    config_jo = None
+
+# database stuff
+def connect():
+    import mysql.connector
+    return mysql.connector.connect(host=config_jo["db-host"],
+                                   user=config_jo["db-user"],
+                                   password=config_jo["db-password"],
+                                   db=config_jo["db-database"])
 
 # don't run if not configured correctly,
 # but run if configured correctly & not logged in
