@@ -9,17 +9,16 @@ sometimes produces:
  - errmsg, the high-level description of the error (without line numbers)
  - epilogue, commentary after a submission
 """
-import config
+import config, json
 
-def submit_and_log(websheet_name, student, stdin, authdomain):
-  import sys, Websheet, json, re, cgi, os
+def submit_and_log(websheet_name, student, client_request, meta):
+  import sys, Websheet, re, cgi, os
   from config import run_java
 
-  config.authdomain = authdomain
+  config.meta = meta
 
   websheet = Websheet.Websheet.from_filesystem(websheet_name)
   classname = websheet.classname
-  user_state = json.loads(stdin)
 
   errmsg = None
   epilogue = None
@@ -29,7 +28,7 @@ def submit_and_log(websheet_name, student, stdin, authdomain):
     #if not re.match(re.compile("^[a-z0-9]+$"), student):
     #    return("Internal Error (Student)", "Error: invalid student name")
 
-    user_poschunks = user_state["snippets"]
+    user_poschunks = client_request["snippets"]
 
     # this is the pre-syntax check
     student_solution = websheet.make_student_solution(user_poschunks, "student")
@@ -198,15 +197,14 @@ def submit_and_log(websheet_name, student, stdin, authdomain):
 
   passed = (category == "Passed")
 
-  if (not user_state["viewing_ref"]):
+  if (not client_request["viewing_ref"]):
     # remove positional information
-    user_snippets = [blank["code"] for blank in user_state["snippets"]]
+    user_snippets = [blank["code"] for blank in client_request["snippets"]]
     config.save_submission(student, classname, user_snippets, save_this, passed)
 
   return json.dumps(print_output)
 
 def bugfix_2013_11_01():
- import json
  print("<pre>")
  for i in range(1):
   db = config.connect()
@@ -219,9 +217,9 @@ def bugfix_2013_11_01():
   cursor = db.cursor()
   snippets = json.loads(snippets)
   snippets = [{"code": snippet, "from":{"line":1,"ch":1},"to":{"line":1,"ch":1}} for snippet in snippets]
-  user_state = {"viewing_ref": True, "snippets": snippets}
-  print(user_state)
-  result = json.loads(submit_and_log(websheet, "fakestudentthatcannotbelogged", json.dumps(user_state)))
+  client_request = {"viewing_ref": True, "snippets": snippets}
+  print(client_request)
+  result = json.loads(submit_and_log(websheet, "fakestudentthatcannotbelogged", json.dumps(client_request)))
   del result["results"]
   newresults = json.dumps(result)
   cursor.execute("UPDATE ws_history SET result=%s WHERE id="+str(id)+";", (newresults,))
@@ -240,10 +238,9 @@ if __name__ == "__main__":
 #  if sys.argv[1] == "bugfix_2013_11_01":
 #    bugfix_2013_11_01()
 
-  student = sys.argv[2]
-  websheet_name = sys.argv[1]
-  authdomain = sys.argv[3]
-  stdin = input() # assume json all on one line
-  print(submit_and_log(websheet_name, student, stdin, authdomain))
+  stdin = json.loads(input()) # assume json all on one line
+  student = stdin["php_data"]["user"]
+  websheet_name = stdin["php_data"]["problem"]
+  print(submit_and_log(websheet_name, student, stdin["client_request"], stdin["php_data"]["meta"]))
   sys.exit(0)
 

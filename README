@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `ws_history` (
   `result` mediumtext COLLATE utf8_unicode_ci NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `passed` tinyint(1) NOT NULL DEFAULT '0',
-  `authdomain` text COLLATE utf8_unicode_ci NOT NULL,
+  `meta` text COLLATE utf8_unicode_ci NOT NULL,
   PRIMARY KEY (`id`),
   KEY `user` (`user`,`problem`,`passed`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;

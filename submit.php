@@ -7,7 +7,13 @@ if (!array_key_exists('stdin', $_REQUEST)
     echo "Internal error, malformed request to submit.php";
     die;
   }
-$stdin = $_REQUEST["stdin"];
+
+$client_request = json_decode($_REQUEST["stdin"]);
+if ($client_request == FALSE) {
+  echo "Intenral error, request did not receive a json on stdin";
+  die;
+ }
+
 $problem = $_REQUEST["problem"];
 
 // only accept characters that cannot cause problems
@@ -22,7 +28,13 @@ $descriptorspec = array(
                         2 => array("pipe", "w"),  // stderr
                         );
 
-$process = proc_open("./submit.py " . $problem . " " . WS_USERNAME . " " . WS_AUTHDOMAIN, $descriptorspec, $pipes);
+$stdin = json_encode(array("client_request" => $client_request,
+                           "php_data" => array("user"=>WS_USERNAME, 
+                                               "problem"=>$problem,
+                                               "meta"=>array("authdomain"=>WS_AUTHDOMAIN, 
+                                                             "ip"=>$_SERVER['REMOTE_ADDR']))));
+
+$process = proc_open("./submit.py", $descriptorspec, $pipes);
 
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";

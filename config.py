@@ -53,14 +53,14 @@ def save_submission(student, problem, user_state, result_column, passed):
         db = connect()
         cursor = db.cursor()
         cursor.execute(
-            "insert into ws_history (user, problem, submission, result, passed, authdomain)" + 
+            "insert into ws_history (user, problem, submission, result, passed, meta)" + 
             " VALUES (%s, %s, %s, %s, %s, %s)", 
             (student, 
              problem, 
              json.dumps(user_state),
              json.dumps(result_column),
              passed,
-             authdomain))
+             json.dumps(meta)))
         db.commit()
         cursor.close()
         db.close()
