@@ -101,14 +101,14 @@ body {
 
 #submitButton {
     font-size: 110%;
-    font-family: 'Source Code Pro';
+    font-family: 'Source Code Pro', monospace;
     font-weight: bold;
     width: 500px;
     max-width: 100%;
 }
 
 code, pre, tt {
-    font-family: 'Source Code Pro';
+    font-family: 'Source Code Pro', monospace;
 }
 
 .exercise-header {

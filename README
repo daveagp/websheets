@@ -1,6 +1,19 @@
 websheets: Online version of coding handouts with blanks
 ========================================================
 
+How to use:
+
+- the user should visit ws.php
+- you can pass arguments to restrict to a certain set of exercises / a default exercise:
+e.g. http://.../websheets/ws.php?group=HelloWorld+NameAge+NextYear#NameAge
+makes three exercises shown, of which the second one is shown upon landing.
+
+How to define more exercises:
+
+- follow the examples in the "exercises" directory. They are essentially 
+key-value string pairs, written as python modules only because this makes
+less escaping necessary.
+
 Here is an abbreviated version of how to install websheets on your computer.
 
 1) Install https://github.com/cemc/safeexec (follow instructions therein)
