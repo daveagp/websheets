@@ -25,8 +25,6 @@ def submit_and_log(websheet_name, student, client_request, meta):
   
   def compile_and_run():
     nonlocal errmsg, epilogue
-    #if not re.match(re.compile("^[a-z0-9]+$"), student):
-    #    return("Internal Error (Student)", "Error: invalid student name")
 
     user_poschunks = client_request["snippets"]
 
@@ -73,20 +71,6 @@ def submit_and_log(websheet_name, student, client_request, meta):
       
       dump["reference."+dep] = depws.get_reference_solution("reference")
       
-#    studir = scratch_dir + "student/" + student + "/"
-#    if not os.path.exists(studir):
-#      os.makedirs(studir)
-
-#    for filename in dump:
-#        file = open(scratch_dir + filename, "w")
-#        file.write(dump[filename])
-#        file.close()
-
-#    compileTester = run_javac("framework/GenericTester.java "
-#                              + "reference/" + classname + ".java "
-#                              + "tester/" + classname + ".java")
-
-#print(json.dumps(dump))
     compileRun = run_java("traceprinter/ramtools/CompileToBytes", json.dumps(dump))
     compileResult = compileRun.stdout
     if (compileResult==""):
@@ -204,39 +188,8 @@ def submit_and_log(websheet_name, student, client_request, meta):
 
   return json.dumps(print_output)
 
-def bugfix_2013_11_01():
- print("<pre>")
- for i in range(1):
-  db = config.connect()
-  cursor = db.cursor()
-  cursor.execute(
-    "SELECT id, problem, submission FROM `ws_history` WHERE `result` LIKE '%Runtime Error%' AND `result` NOT LIKE '%errmsg\": \"java.%'OR `result` LIKE  '%Internal Error (Script)%' limit 1;"
-    )
-  for row in cursor: 
-    id, websheet, snippets = row
-  cursor = db.cursor()
-  snippets = json.loads(snippets)
-  snippets = [{"code": snippet, "from":{"line":1,"ch":1},"to":{"line":1,"ch":1}} for snippet in snippets]
-  client_request = {"viewing_ref": True, "snippets": snippets}
-  print(client_request)
-  result = json.loads(submit_and_log(websheet, "fakestudentthatcannotbelogged", json.dumps(client_request)))
-  del result["results"]
-  newresults = json.dumps(result)
-  cursor.execute("UPDATE ws_history SET result=%s WHERE id="+str(id)+";", (newresults,))
-  print(row)
-  print(id)
-  print(newresults)
-  db.commit()
-  cursor.close()
-  db.close()
-
- sys.exit(0)
-
 if __name__ == "__main__":
   import sys
-
-#  if sys.argv[1] == "bugfix_2013_11_01":
-#    bugfix_2013_11_01()
 
   stdin = json.loads(input()) # assume json all on one line
   student = stdin["php_data"]["user"]
