@@ -69,8 +69,8 @@ Partial file listing:
 config.json - you should fill this in
 websheet.{css,js} - create/render the partially read-only codemirror area
 index.{php,js} - browser for multiple websheets
-load.{php,py} - load a problem to show
-submit.{php,py} - submit an attempt
+load.{php,py} - (for ajax) load a problem to show
+submit.{php,py} - (for ajax) submit an attempt
 include.php - authentication used by all php files
 Websheet.py - Python model of a Websheet, command-line tools to use with them
 config.py - Python to interact with safeexec and database
