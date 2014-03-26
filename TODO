@@ -1,5 +1,3 @@
-tabbing between blanks seems to have broken
-
 when using dependencies, uncaught exceptions may translate improperly if they're not from the current file
 
 \[public]\ String \[playback()]\ 
@@ -10,6 +8,6 @@ check API
 ]\
 """ at end of input breaks
 
-sanitize secrets
-
 add ability for public remarks in tests
+
+pgup/pgdn going to end of blanks?
