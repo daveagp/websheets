@@ -48,17 +48,18 @@ that contains all the secrets that are specific to your setup. it should
 look like this:
 
 {
-        "safeexec-executable-abspath":"/absolute/path/to/.../safeexec/safeexec",
-        "java_jail-abspath":"/absolute/path/to/.../java_jail/",
-        "hybridauth-base_url":"http://your-server.../websheets/hybridauth/hybridauth/index.php",
-        "db-host": "...",
-        "db-user": "...",
-        "db-password": "...",
-        "db-database": "...",        
-        "facebook-id": "your facebook api id",
-        "facebook-secret": "your facebook api secret key",
-        "google-id":"your google api id",
-        "google-secret":"your google api secret key"
+ "safeexec-executable-abspath":"/absolute/path/to/.../safeexec/safeexec",
+ "java_jail-abspath":"/absolute/path/to/.../java_jail/",
+ "hybridauth-base_url":
+         "http://your-website.../websheets/hybridauth/hybridauth/index.php",
+ "db-host": "...",
+ "db-user": "...",
+ "db-password": "...",
+ "db-database": "...",
+ "facebook-id": "your facebook api id",
+ "facebook-secret": "your facebook api secret key",
+ "google-id":"your google api id",
+ "google-secret":"your google api secret key"
 }
 
 you can delete facebook-* if you don't want to use facebook,
