@@ -3,8 +3,8 @@ websheets: Online version of coding handouts with blanks
 
 Current mirrors:
 
-http://www.cs.princeton.edu/~cos126/websheets/ws.php
-http://cscircles.cemc.uwaterloo.ca/websheets/ws.php
+http://www.cs.princeton.edu/~cos126/websheets/index.php
+http://cscircles.cemc.uwaterloo.ca/websheets/index.php
 (note, they do not share a database)
 
 How to use:
@@ -63,3 +63,15 @@ look like this:
 
 you can delete facebook-* if you don't want to use facebook,
 and google-* if you don't want to use google
+
+Partial file listing:
+
+config.json - you should fill this in
+websheet.{css,js} - create/render the partially read-only codemirror area
+index.{php,js} - browser for multiple websheets
+load.{php,py} - load a problem to show
+submit.{php,py} - submit an attempt
+include.php - authentication used by all php files
+Websheet.py - Python model of a Websheet, command-line tools to use with them
+config.py - Python to interact with safeexec and database
+GenericTester.java - template for grader for student/reference code & comparing them
