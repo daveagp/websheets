@@ -1,6 +1,12 @@
 websheets: Online version of coding handouts with blanks
 ========================================================
 
+Current mirrors:
+
+http://www.cs.princeton.edu/~cos126/websheets/ws.php
+http://cscircles.cemc.uwaterloo.ca/websheets/ws.php
+(note, they do not share a database)
+
 How to use:
 
 - the user should visit ws.php
@@ -18,10 +24,9 @@ Here is an abbreviated version of how to install websheets on your computer.
 
 1) Install https://github.com/cemc/safeexec (follow instructions therein)
 2) Install https://github.com/daveagp/java_jail (follow instructions therein)
-3) Now clone the websheets repo, as well as its submodules
+3) Clone the websheets repo as well as its submodules
 4) Setup config.json (see below)
 5) Create the db table (see below)
-6) Edit definition of java_prefix in config.py to however you like to securely run java
 
 Here's the db table format:
 
@@ -40,16 +45,21 @@ CREATE TABLE IF NOT EXISTS `ws_history` (
 
 config.json is a json-formatted file, variously loaded by php and python,
 that contains all the secrets that are specific to your setup. it should
-look like this if you want to use Google and Facebook:
+look like this:
 
 {
+        "safeexec-executable-abspath":"/absolute/path/to/.../safeexec/safeexec",
+        "java_jail-abspath":"/absolute/path/to/.../java_jail/",
         "hybridauth-base_url":"http://your-server.../websheets/hybridauth/hybridauth/index.php",
         "db-host": "...",
         "db-user": "...",
         "db-password": "...",
-        "db-database": "...",
+        "db-database": "...",        
         "facebook-id": "your facebook api id",
         "facebook-secret": "your facebook api secret key",
         "google-id":"your google api id",
         "google-secret":"your google api secret key"
 }
+
+you can delete facebook-* if you don't want to use facebook,
+and google-* if you don't want to use google

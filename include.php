@@ -31,9 +31,12 @@ else {
   if ($config_jo == NULL) {
     $config_error = "config.json is not JSON formatted";
   }
-  else foreach (array("hybridauth-base_url", "db-password", "db-database", "db-user", "db-host") as $required) {
+  else foreach (array("safeexec-executable-abspath", "java_jail-abspath", "hybridauth-base_url", 
+                      "db-password", "db-database", "db-user", "db-host") as $required) {
       if (!array_key_exists($required, $config_jo)) {
         $config_error = "config.json does not define $required";
+        if ($required=="safeexec-executable-abspath" || $required=="java_jail-abspath")
+          $config_error .= "<br><b>You cannot submit any code.</b>";
         break;
       }
     }      

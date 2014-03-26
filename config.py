@@ -3,21 +3,30 @@ from subprocess import Popen, PIPE
 from Websheet import record
 import json
 
+# we already checked for this error in php land
+try:
+    config_jo = json.loads(open('config.json').read())
+except:
+    config_jo = {} # empty dict
+
 # if you are using safeexec, securely running java should be something like this:
-if socket.gethostname().endswith("uwaterloo.ca"):
-    jail = "/home/cscircles/java_jail/"
-    java = "/java/bin/java -cp .:javax.json-1.0.jar -Xmx128M "
-    safeexec = "/home/cscircles/dev/safeexec/safeexec"
+def compute_java_prefix():
+    jail = config_jo["java_jail-abspath"]
+    safeexec = config_jo["safeexec-executable-abspath"]    
+
+    java = "/java/bin/java -cp .:javax.json-1.0.jar -Xmx128M " # java within jail, using default java_jail config
     safeexec_args = " --chroot_dir "+ jail +" --exec_dir /cp --env_vars '' --nproc 50 --mem 500000 --nfile 30 --gid 1001 --clock 2 --exec "
-    java_prefix = safeexec + safeexec_args + java
+    return safeexec + safeexec_args + java
 
 # at princeton, they use "sandbox" instead
-elif socket.gethostname().endswith("princeton.edu"):
-    java = "/usr/bin/java -cp .:/n/fs/htdocs/cos126/java_jail/cp:/n/fs/htdocs/cos126/java_jail/cp/javax.json-1.0.jar -Xmx128M "
-    java_prefix = "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp "+java
+if socket.gethostname().endswith("princeton.edu"):
+    def compute_java_prefix():
+        java = "/usr/bin/java -cp .:/n/fs/htdocs/cos126/java_jail/cp:/n/fs/htdocs/cos126/java_jail/cp/javax.json-1.0.jar -Xmx128M "
+        return "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp "+java
 
 # in either case "java_prefix" is like the 'java' binary,
 # ready to accept the class name and cmd line args
+java_prefix = compute_java_prefix()
 
 def execute(command, the_stdin):
     proc = Popen(command.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -28,12 +37,6 @@ def execute(command, the_stdin):
     
 def run_java(command, the_stdin = ""):
     return execute(java_prefix + command, the_stdin)
-
-# we already checked for this error in php land
-try:
-    config_jo = json.loads(open('config.json').read())
-except:
-    config_jo = None
 
 # database stuff
 def connect():
@@ -46,7 +49,7 @@ def connect():
 # don't run if not configured correctly,
 # but run if configured correctly & not logged in
 def save_submission(student, problem, user_state, result_column, passed):
-        if config_jo == None: return 
+        if config_jo == []: return 
         db = connect()
         cursor = db.cursor()
         cursor.execute(
