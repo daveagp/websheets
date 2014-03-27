@@ -22,7 +22,7 @@ def record(**dict):
 class Websheet:
 
     open_delim = {r'\[', r'\hide[', r'\fake['}
-    close_delim = {']\\'} # not rawstring to make emacs happy
+    close_delim = {']\\'} # rawstring can't end in \
 
     @staticmethod
     def sized_blank(token):
@@ -35,6 +35,9 @@ class Websheet:
         if (source[:1]=="\n"):
             source = source[1:]
 
+        source = source.replace("\n\\fake[", "\\fake[")
+        # two more hacks later on to git rid of extra space before/after fake
+
         result = []
         pos = 0
         n = len(source)
@@ -44,7 +47,8 @@ class Websheet:
                           Websheet.close_delim)) # set union
         
         depth = 0
-        
+
+        #print(json.dumps(re.split('('+regex+')', source)))
         for token in re.split('('+regex+')', source):
             if token in Websheet.open_delim:
                 depth += 1
@@ -54,9 +58,7 @@ class Websheet:
                 type = "close"
             else:
                 type = ""
-                # if token consists only of newlines, reduce length by 1
-                if token.count("\n")==len(token): token = token[1:]
-
+                
             result.append(record(depth=depth, token=token, type=type))
         
             if depth < 0:
@@ -86,25 +88,24 @@ class Websheet:
         for field in optional_fields:
             setattr(self, field, field_dict[field] if field in field_dict else optional_fields[field])
 
-        # avoid things getting screwed up. used to be that ]\ at end of line consumed following \n
-        import re
-        self.source_code = re.sub(r"(^|(?<=[^\n]))\]\\\n", r"]\\ \n", self.source_code)
-
         # remove "public class" if there
         lines = self.source_code.split("\n")
         while lines[:1] == [""]: lines = lines[1:]
         while lines[-1:] == [""]: lines = lines[:-1]
+
+        # unindent
+        spc = 0
+        while (lines[0].startswith(" "*(spc+1))): spc += 1
+
         if "public class" in lines[0]:
             lines = lines[1:-1]
-            spc = 0
-            while (lines[0].startswith(" "*(spc+1))): spc += 1
-            # allow "public class {\n\n   blah"
             if spc == 0: 
-                while (lines[1].startswith(" "*(spc+1))): spc += 1
+                while (lines[0].startswith(" "*(spc+1))): spc += 1
             
-            for i in range(len(lines)):
-                if (lines[i].startswith(" "*spc)): lines[i] = lines[i][spc:]
-            self.source_code = "\n".join(lines) + "\n"
+        for i in range(len(lines)):
+            if (lines[i].startswith(" "*spc)): lines[i] = lines[i][spc:]
+        self.source_code = "\n".join(lines) + "\n"
+
         
         parsed = Websheet.parse_websheet_source(self.source_code)
 
@@ -122,6 +123,7 @@ class Websheet:
     def iterate_token_list(self, with_delimiters = False):
         stack = []
         input_counter = 0
+        fakelag = False
         for item in self.token_list:
             info = {}
             if item.type=="open":
@@ -140,13 +142,13 @@ class Websheet:
                         if (item.token[:1] != ' '): item.token = ' ' + item.token
                         if (item.token[-1:] != ' '): item.token += ' '
 
-                # avoid extraneous space around user-facing read-only tokens
-                if stack == [] or stack == [r"\fake["]:
-                    if item.token=='\n\n':
-                        item.token='\n'
-                    else:
-                        if item.token.startswith("\n"): item.token = item.token[1:]
-                        if item.token.endswith("\n"): item.token = item.token[:-1]
+                # another hack to avoid fake space
+                if stack == [r"\fake["]:
+                    fakelag = True
+
+                if stack == [] and fakelag:
+                    fakelag = False
+                    if item.token.startswith("\n"): item.token = item.token[1:]
 
             if with_delimiters or item.type=="":
                 yield (item, stack, info)      
@@ -210,7 +212,6 @@ class Websheet:
                         item.token, chunk)
 
                     if not valid[0]:
-                        import re
                         match = re.search(re.compile(r"^Error at line (\d+), column (\d+):\n(.*)$"), valid[1])
                         if match is None: # error at end of chunk
                             if "\n" in chunk:
@@ -284,7 +285,7 @@ class Websheet:
                 if "\n" in item.token: 
                     r.append(item.token)
                 else:
-                    r.append(" "+item.token+" ")
+                    r.append(item.token)
 
         return r
         
@@ -299,8 +300,8 @@ class Websheet:
         r = [""]
 
         if self.show_class_decl:
-            r[0] = "public class "+self.classname+" {\n";
-        
+            r[0] = "public class "+self.classname+" {\n"
+
         for (item, stack, info) in self.iterate_token_list():
             token = item.token
             if stack == [] or stack == [r"\fake["]:
@@ -312,14 +313,21 @@ class Websheet:
                 r[-1] += Websheet.sized_blank(token)
 
         if self.show_class_decl:
-            for i in range(len(r)):
-                if i % 2 == 0: r[i] = r[i].replace("\n", "\n   ")
-                if i % 2 == 1 and r[i] != "" and i < len(r)-1 and r[i][-1] == "\n": r[i+1] = "   "+r[i+1]
-            if len(r) % 2 == 0: r.extend("")
-            r[-1] += "\n}"
+            for i in range(len(r)): # indent 
+                if i % 2 == 0:
+                    r[i] = r[i].replace("\n", "\n   ")
+                    if (r[i].endswith("\n   ")): r[i] = r[i][:-3]
+            if len(r) % 2 == 0: r += ["\n}\n"]
+            else: r[-1] += "}\n"
+
+        # second pass : trim excess newlines from fixed text adjacent to multi-line blanks
+        for i in range(0, len(r), 2):
+            if r[i].startswith("\n") and (i==0 or "\n" in r[i-1]):
+                r[i] = r[i][1:]
+            if r[i].endswith("\n") and (i==len(r)-1 or "\n" in r[i+1]):
+                r[i] = r[i][:-1]
 
         return r
-
 
     def make_tester(self):        
         return (

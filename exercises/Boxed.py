@@ -20,7 +20,7 @@ the <b>length</b> of a String <code>stringVar</code>, use <code>stringVar.length
 </ul>
 """
 source_code = r"""
-public static \[String]\ repeat(\[String S, int times]\) {
+public static\[String]\repeat(\[String S, int times]\) {
 \[
    String result = "";
    for (int i=0; i<times; i++)
@@ -29,7 +29,7 @@ public static \[String]\ repeat(\[String S, int times]\) {
 ]\
 }
 
-public static \[void]\ boxedPrint(\[String S]\) {
+public static\[void]\boxedPrint(\[String S]\) {
 \[
    StdOut.println(repeat("*", S.length()+2));
    StdOut.println("*"+S+"*");

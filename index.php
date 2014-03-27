@@ -11,7 +11,7 @@ include_once('include.php');
    <script type="text/javascript" src="CodeMirror/mode/clike/clike.js"></script>
    <script type="text/javascript" src="CodeMirror/addon/selection/mark-selection.js"></script>
    <script type="text/javascript" src="CodeMirror/addon/edit/matchbrackets.js"></script>
-   <script type="text/javascript" src="websheet.js?2"></script>
+   <script type="text/javascript" src="websheet.js?3"></script>
 <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
       tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
@@ -27,7 +27,7 @@ include_once('include.php');
   
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
 
-   <script type="text/javascript" src="index.js?3"></script>
+   <script type="text/javascript" src="index.js?4"></script>
     <?php if (!WS_LOGGED_IN) {
     echo "<script type='text/javascript'>$(function(){alert('None of your work will be saved until you log in (see links at top).');});</script>";
   } ?>

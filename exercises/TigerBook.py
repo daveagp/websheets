@@ -20,7 +20,7 @@ to complete one part to get credit for the next.)
 
 source_code = r"""
 public class TigerBook { 
-\[ 
+\[
 /************************************************************************* 
  Reference solution for Spring 2013 COS 126 Programming Exam 2: TigerBook
 
@@ -57,8 +57,7 @@ public class TigerBook {
         // return the right Person
         return users.get(id);
     }
-]\ 
-\hide[
+]\\hide[
     public static void exampleClientMain(String[] args) {
         TigerBook tb = new TigerBook(); 
 

@@ -4,8 +4,7 @@ public static void squareSwap(String top, String bottom,
   String left, String right) {
   String[] args = new String[0];
 ]\
-\fake[
-public static void main(String[] args) {
+\fake[public static void main(String[] args) {
    // the grader will pre-define 4 variables with color names
    String top = ...; // e.g. "red" or "blue", etc
    String bottom = ...;

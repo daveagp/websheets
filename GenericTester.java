@@ -150,23 +150,36 @@ public abstract class GenericTester {
             this.apparentName = apparentName;
         }
         protected void describe() {
-            String tmp = "";
-            if (saveAs == null) {
-                graderOut.print("Calling ");
+            if (HTMLdescription != null) {
+                graderOut.print(HTMLdescription);
+                HTMLdescription = null;
             }
             else {
-                graderOut.print("Defining ");
-                tmp = saveAs + " = ";
+                String tmp = "";
+                if (saveAs == null) {
+                    graderOut.print("Calling ");
+                }
+                else {
+                    graderOut.print("Defining ");
+                    tmp = saveAs + " = ";
+                }
+                tmp += apparentName + "(";
+                if (args.length == 0) tmp += ")";
+                else {
+                    tmp += repr(args[0]);
+                    for (int i=1; i<args.length; i++)
+                        tmp += ", " + repr(args[i]);
+                    tmp += ")";
+                }
+                graderOut.println(code(tmp));
             }
-            tmp += apparentName + "(";
-            if (args.length == 0) tmp += ")";
-            else {
-                tmp += repr(args[0]);
-                for (int i=1; i<args.length; i++)
-                    tmp += ", " + repr(args[i]);
-                tmp += ")";
+            if (testStdinURL != null) {
+                String[] urlSplit = testStdinURL.split("/");
+                graderOut.println("<code> &lt; <a target=\"_blank\" href=\""+testStdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>");
+                testStdin = new In(testStdinURL).readAll();
+                testStdinURL = null;
+                suppressStdinDescription = true;
             }
-            graderOut.println(code(tmp));
 	    describeStdin();
         }
 	protected void describeStdin() {
@@ -279,6 +292,7 @@ public abstract class GenericTester {
             boolean showHellip = testStdin == null;
             graderOut.println("<div class='testcase-desc'>");
             describe();
+            
             if (showHellip) graderOut.println("&hellip;");
             graderOut.println("</div>");
             if (thisName != null) {
@@ -352,6 +366,7 @@ public abstract class GenericTester {
 
     public String testStdin = null;
     public String testStdinURL = null;
+    public String HTMLdescription = null;
     public String saveAs = null;
     public boolean suppressStdinDescription = false;
     public boolean expectException = false;
@@ -587,7 +602,9 @@ public abstract class GenericTester {
             }
             else {
                 e.printStackTrace();
-                throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + ((ref != null && ref.stdout != null) ? pre(ref.stdout) : ""));
+                if (e instanceof InvocationTargetException)
+                    ((InvocationTargetException)e).getTargetException().printStackTrace();
+                throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + ((ref != null && ref.stdout != null) ? pre(ref.stdout) : ""));                
             }
         }
 	if (currStdin != null)
@@ -725,19 +742,27 @@ public abstract class GenericTester {
 	    argStrings[i] = argObjs[i].toString();
         new BasicTestCase(realNameOfMain, new Object[] {argStrings}, "main") {
             protected void describe() {
-		graderOut.print("Testing "); // can't be saved as an object
-                String tmp = "java " + fakeNameOfClass;
-                for (String a : argStrings) tmp += " " + a;
-		tmp = code(tmp);
-		if (testStdinURL != null) {
-		    String[] urlSplit = testStdinURL.split("/");
-		    tmp += "<code> &lt; <a target=\"_blank\" href=\""+testStdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>";
-		    testStdin = new In(testStdinURL).readAll();
-		    testStdinURL = null;
-		    suppressStdinDescription = true;
-		}
-                graderOut.println(tmp);
-		describeStdin();
+
+                if (HTMLdescription != null) {
+                    graderOut.print(HTMLdescription);
+                    HTMLdescription = null;
+                }
+                else {
+                    graderOut.print("Testing "); // can't be saved as an object
+                    String tmp = "java " + fakeNameOfClass;
+                    for (String a : argStrings) tmp += " " + a;
+                    tmp = code(tmp);
+                    graderOut.println(tmp);
+                }
+
+                if (testStdinURL != null) {
+                    String[] urlSplit = testStdinURL.split("/");
+                    graderOut.println("<code> &lt; <a target=\"_blank\" href=\""+testStdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>");
+                    testStdin = new In(testStdinURL).readAll();
+                    testStdinURL = null;
+                    suppressStdinDescription = true;
+                }
+                describeStdin();
             }}
             .execute();
     }

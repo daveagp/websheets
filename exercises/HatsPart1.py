@@ -78,7 +78,7 @@ Requires StdIn and StdOut
         // print the count with the given format
         StdOut.println("Number of derangements: " + count);
     }
-]\ 
+]\
 """
 
 tests = r"""

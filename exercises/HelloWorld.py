@@ -1,3 +1,5 @@
+# extra junk to make comment really at top
+
 source_code = r"""
 /*
  * Name: Alan Turing
@@ -7,9 +9,7 @@ source_code = r"""
  * A program with an existential greeting
  */
 \fake[
-
 public class HelloWorld {
-
 ]\
    public static void main(String[] args) {
 \[
@@ -17,7 +17,6 @@ public class HelloWorld {
 ]\
    }
 \fake[
-
 }
 ]\
 """

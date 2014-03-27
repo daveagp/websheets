@@ -19,7 +19,8 @@ This websheet is intended as a practice exam. However, in a real exam,
 We recommend doing this practice in a timed environment; give yourself 90 minutes.
 """
 
-source_code = r"""\[
+source_code = r"""
+\[
 /***********************************************************************
 Christopher Moretti
 cmoretti
@@ -84,7 +85,7 @@ Requires StdIn, StdOut
         // compute and print average with the given format
         StdOut.println("Average max cycle length: " + (double) sum / count);
     }
-]\ 
+]\
 """
 
 tests = r"""

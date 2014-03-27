@@ -82,7 +82,7 @@ source_code = r"""\[
             StdOut.println(name + " " + overall);
         }
     }
-]\ 
+]\
 """
 
 tests = r"""

@@ -2,14 +2,11 @@ source_code = r"""
 public static void main(String[] args) {
    // the grader will pre-define an array of color names
 \fake[
-
-   String[] colors = ...; // e.g. new String[] {"red", "blue", "green"};
-]\
+   String[] colors = ...; // e.g. new String[] {"red", "blue", "green"};]\
 \hide[
    String[] colors = new String[args.length];
    for (int i=0; i<args.length; i++) colors[i] = args[i];
 ]\
-
    int n = colors.length; // for convenience
 
    System.out.println("Before n-swapping:");

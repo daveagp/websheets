@@ -81,6 +81,7 @@ function websheet(textarea_id, fragments, initial_snippets) {
 
   var line = 0;
   var ch = 0;
+
   for (var i=0; i<fragments.length; i++) {
     var oldline = line;
     var oldch = ch;

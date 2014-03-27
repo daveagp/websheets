@@ -50,8 +50,7 @@ public void changePassword(String newpass) {
    else
       password = newpass;
 }
-]\ 
-
+]\
 """
 
 tests = r"""

@@ -88,7 +88,7 @@ public class BinaryInteger {
    public String toString() {
        return s;
    }
-]\ 
+]\
 }
 """
 tests = r"""

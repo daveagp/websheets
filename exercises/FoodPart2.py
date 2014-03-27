@@ -62,7 +62,7 @@ source_code = r"""
             StdOut.println("Rank " + (i+1) + ": " + nextRanked);
         }
     }
-]\ 
+]\
 """
 
 description = r"""

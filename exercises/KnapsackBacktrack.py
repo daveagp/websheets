@@ -25,8 +25,7 @@ public static void printBest(int[] itemWeights, int capacity) {
             canMake[j][i] = true;
       }
    }
-]\
-   
+]\   
    // find biggest weight <= capacity that can be made
    int optWeight = 0;
    for (int j=0; j<=capacity; j++)
