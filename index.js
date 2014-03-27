@@ -127,7 +127,7 @@ $(function() {
 		testWS.setUserAreas(lastload.initial_snippets);
 	    });
 		$("#answerButton").click( function(eventObject) {
-		if (num_submissions < 0 && !$("#page").hasClass("ever-passed")) {
+		if (num_submissions < 4 && !$("#page").hasClass("ever-passed")) {
 		    alert("You have to make 4 attempts or complete the problem before you can view the reference solution. " +
 			  "You have made " + num_submissions + " attempts so far.");
 		}
