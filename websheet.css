@@ -37,7 +37,7 @@
     border-top: 1px solid #DDD;
     }
 
-.pass-test pre { /* for long outputs */
+pre { /* for long outputs */
    max-height: 18em;
    overflow-y: auto;
 }

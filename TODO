@@ -1,4 +1,8 @@
-when using dependencies, uncaught exceptions may translate improperly if they're not from the current file
+when printing outputs, use formatting to distinguish 
+identical from nonidentical lines
+
+when using dependencies, uncaught exceptions may translate
+improperly if they're not from the current file
 
 check API
 
