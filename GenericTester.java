@@ -100,7 +100,8 @@ public abstract class GenericTester {
 
     private static Pattern RTRIMLINE = Pattern.compile(" +\n");
     private static Pattern RTRIMEND = Pattern.compile(" +$");
-    
+
+    // remove all trailing whitespaces
     public static String rtrimLines(String S) {
         String tmp = RTRIMLINE.matcher(S).replaceAll("\n");
         return RTRIMEND.matcher(tmp).replaceAll("");
@@ -431,10 +432,50 @@ public abstract class GenericTester {
 		return "Your program printed this output:" + pre(studentO)
 		    + " which is almost correct but <i>an extra newline character was printed at the end</i>.";
 	    
-	    return "Your program printed this output:" + pre(studentO)
-		+ " but it was supposed to print this output:" + pre(referenceO);
+            //	    return "Your program printed this output:" + pre(studentO)
+            //+ " but it was supposed to print this output:" + pre(referenceO);
+            return describeStringDifference(studentO, referenceO);
 	}
     }	    
+
+    public static String describeStringDifference(String stu, String ref) {
+        String[] stulines = stu.split("\n", -1);
+        String[] reflines = ref.split("\n", -1);
+        int samelines = 0;
+        while (samelines < Math.min(stulines.length, reflines.length)
+               && rtrim(stulines[samelines]).equals(rtrim(reflines[samelines])))
+            samelines++;
+        final int samelines2 = samelines; // woo java 8!
+        final StringBuilder sb = new StringBuilder();
+
+        class DescriptionLoop {
+            void handle(String[] lines) {
+                if (lines.length == 1) { 
+                    if (lines[0].equals(""))
+                        sb.append("<pre><i>(no output)</i></pre>");
+                    else
+                        sb.append("<pre>"+esc(lines[0])+"</pre>");
+                    return;
+                }
+                sb.append("<pre><span class='before-diff-line'>");
+                for (int i=0; i<lines.length; i++) {
+                    if (i==samelines2) sb.append("</span><span class='diff-line'>");
+                    sb.append(esc(lines[i]));
+                    if (i==samelines2) sb.append("</span><span class='after-diff-line'>");
+                    if (i != lines.length-1 || lines.length == 1) 
+                        sb.append("<br>"); // wasn't student output for i==length-1, but add it to fix pre appearance
+                }
+                sb.append("</span></pre>");
+            }
+        };
+        DescriptionLoop dl = new DescriptionLoop();
+
+        sb.append("Your program printed this output:");
+        dl.handle(stulines);
+        sb.append("But it was supposed to print this output (first difference in red):");
+        dl.handle(reflines);
+        return sb.toString();
+    }
     
     abstract class Capturer {
         String stdout;
@@ -559,7 +600,7 @@ public abstract class GenericTester {
                         throw new FailTestException
                             ("Wrong side-effect, your code changed element "+code(j)+" of arg "+code(i)+" from " + code(repr(oj))+" to "+code(repr(sj))
                              + ", was expected to change to " + code(repr(rj)));
-                    if (!refChanged && stuChanged)
+                   if (!refChanged && stuChanged)
                         throw new FailTestException
                             ("Unexpected side-effect, your code changed element "+code(j)+" of arg "+code(i)+" from " + code(repr(oj))+" to "+code(repr(sj)));
                 }
@@ -660,7 +701,7 @@ public abstract class GenericTester {
             
         }
         if (ref.stdout.equals("") && !stu.stdout.equals("")) {
-            graderOut.println("Found this printed output (not required):" + pre(stu.stdout));
+            throw new FailTestException("Found this printed output when none was expected:" + pre(stu.stdout));
         }
         if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
             && ((Method)referenceM).getReturnType() != referenceC

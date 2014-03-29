@@ -23,7 +23,7 @@ include_once('include.php');
 
    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
    <link rel="stylesheet" href="CodeMirror/theme/neat.css">
-   <link rel="stylesheet" href="websheet.css?1">
+   <link rel="stylesheet" href="websheet.css?2">
   
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
 

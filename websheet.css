@@ -13,6 +13,14 @@
   overflow-x: auto;
   box-sizing: border-box;
 }
+.before-diff-line {
+  color: #0A0;
+}
+
+.diff-line {
+  color: red;
+  font-weight: bold;
+}
 
 #description {
 }
