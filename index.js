@@ -131,6 +131,9 @@ $(function() {
 	$("#resetButton").click( function(eventObject) {
 		set_viewing_ref(false);
 		testWS.setUserAreas(lastload.initial_snippets);
+                var lc = testWS.cm.lineCount();
+                for (var i=0; i<lc; i++)
+                    testWS.cm.indentLine(i);
 	    });
 		$("#answerButton").click( function(eventObject) {
 		if (num_submissions < 4 && !$("#page").hasClass("ever-passed")) {
