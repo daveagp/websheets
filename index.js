@@ -33,6 +33,12 @@ loadProblem = function(slug) {
 	       resetup(data);
 	       if (data.user_code != false)
 		   testWS.setUserAreas(data.user_code);
+               else {
+                   testWS.setUserAreas(data.initial_snippets);
+	           var lc = testWS.cm.lineCount();
+	           for (var i=0; i<lc; i++)
+		     testWS.cm.indentLine(i);
+               }
 	       if (data.ever_passed != false)
 		   $('#page').addClass("ever-passed");
 	       num_submissions = data.num_submissions;

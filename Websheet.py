@@ -21,7 +21,9 @@ def record(**dict):
 
 class Websheet:
 
-    open_delim = {r'\[', r'\hide[', r'\fake['}
+    # \[default should always be right after \[...]\
+
+    open_delim = {r'\[', r'\hide[', r'\fake[', r'\default['}
     close_delim = {']\\'} # rawstring can't end in \
 
     @staticmethod
@@ -34,9 +36,6 @@ class Websheet:
         # makes the source files prettier
         if (source[:1]=="\n"):
             source = source[1:]
-
-        source = source.replace("\n\\fake[", "\\fake[")
-        # two more hacks later on to git rid of extra space before/after fake
 
         result = []
         pos = 0
@@ -123,7 +122,6 @@ class Websheet:
     def iterate_token_list(self, with_delimiters = False):
         stack = []
         input_counter = 0
-        fakelag = False
         for item in self.token_list:
             info = {}
             if item.type=="open":
@@ -141,14 +139,6 @@ class Websheet:
                     else:
                         if (item.token[:1] != ' '): item.token = ' ' + item.token
                         if (item.token[-1:] != ' '): item.token += ' '
-
-                # another hack to avoid fake space
-                if stack == [r"\fake["]:
-                    fakelag = True
-
-                if stack == [] and fakelag:
-                    fakelag = False
-                    if item.token.startswith("\n"): item.token = item.token[1:]
 
             if with_delimiters or item.type=="":
                 yield (item, stack, info)      
@@ -272,7 +262,7 @@ class Websheet:
                 if stack[0] in {r"\[", r"\hide["}:
                     r.extend([before_ref, item.token, after_ref])
                 else:
-                    assert stack[0]== r"\fake["
+                    assert stack[0] == r"\fake[" or stack[0] == r"\default["
 
         r.extend("\n}")
         
@@ -294,6 +284,8 @@ class Websheet:
         for (item, stack, info) in self.iterate_token_list():
             if stack == [r"\["]:
                 r.append(Websheet.sized_blank(item.token))
+            if stack == [r"\default["]:
+                r[-1] = item.token
         return r
         
     def get_json_template(self):

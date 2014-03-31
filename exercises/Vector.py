@@ -8,8 +8,9 @@ but we will never allow the client to directly access the array in which we stor
 we don't want the client to be able to change it.
 """
 
-source_code = r"""public class Vector {
-
+source_code = r"""
+public class Vector {
+   
    private double[] data;       // array of vector's components
    private \[int N]\;             // length of the vector
 
@@ -20,15 +21,19 @@ source_code = r"""public class Vector {
    }
 
    // create a vector from an array
-   public Vector(double[] data) {
-    \[N = data.length;]\ 
+   public Vector(double[] d) {
+     \[N = data.length;]\ // initialize the length
 
       // make defensive copy so that client can't alter our copy of data[]
-      // data = data; <-- this isn't it! has two problems.
 \[
       this.data = new double[N];
       for (int i = 0; i < N; i++)
          this.data[i] = data[i];
+]\
+\default[
+      double[] data = d; //<-- this isn't it!
+
+
 ]\
    }
 
