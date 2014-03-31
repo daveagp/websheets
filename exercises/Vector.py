@@ -11,8 +11,8 @@ we don't want the client to be able to change it.
 source_code = r"""
 public class Vector {
    
+   private\[int N]\;              // length of the vector
    private double[] data;       // array of vector's components
-   private \[int N]\;             // length of the vector
 
    // create the zero vector of length N
    public Vector(int N) {
@@ -22,15 +22,14 @@ public class Vector {
 
    // create a vector from an array
    public Vector(double[] d) {
-     \[N = data.length;]\ // initialize the length
+     \[N = d.length;]\ // initialize the length
 
       // make defensive copy so that client can't alter our copy of data[]
 \[
-      this.data = new double[N];
+      this.data = new double[N]; // using "this" on these lines is optional
       for (int i = 0; i < N; i++)
-         this.data[i] = data[i];
-]\
-\default[
+         this.data[i] = d[i];
+]\\default[
       double[] data = d; //<-- this isn't it!
 
 
