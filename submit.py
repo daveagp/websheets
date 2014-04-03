@@ -41,9 +41,9 @@ def submit_and_log(websheet_name, student, client_request, meta):
     def translate_line(ss_lineno):
         ss_lineno = int(ss_lineno)
         if ss_lineno in ss_to_ui_linemap:
-            return str(ss_to_ui_linemap[ss_lineno])
+          return str(ss_to_ui_linemap[ss_lineno])
         else:
-            return "???("+str(ss_lineno)+")"
+          return "???("+str(ss_lineno)+")" + "<!--" + json.dumps(ss_to_ui_linemap) + "-->"
         
     reference_solution = websheet.get_reference_solution("reference")
 
@@ -95,7 +95,10 @@ def submit_and_log(websheet_name, student, client_request, meta):
         #result += str(errorObj['row']) + ':'
         result += "<pre>\n"
         #remove the safeexec bits
-        result += cgi.escape(errorObj["errmsg"])
+        result += cgi.escape(errorObj["errmsg"]
+                             .replace("stdlibpack.", "")
+                             .replace("student.", "")
+                             )
         result += "</pre>"
         return ("Syntax Error", result)
 

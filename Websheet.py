@@ -235,7 +235,7 @@ class Websheet:
                             linemap[generatedLine] = pos['from']['line']
                             
                     r.append(chunk)
-                    ui_lines += chunk.count("\n")
+                    ui_lines += max(0, chunk.count("\n")-2) # probably not always accurate!
                     ss_lines += chunk.count("\n")
                     
                 elif stack[0]==r"\hide[":

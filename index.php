@@ -23,13 +23,18 @@ include_once('include.php');
 
    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
    <link rel="stylesheet" href="CodeMirror/theme/neat.css">
-   <link rel="stylesheet" href="websheet.css?3">
+   <link rel="stylesheet" href="websheet.css?7">
   
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700' rel='stylesheet' type='text/css'>
 
    <script type="text/javascript" src="index.js?5"></script>
     <?php if (!WS_LOGGED_IN) {
-    echo "<script type='text/javascript'>$(function(){alert('None of your work will be saved until you log in (see links at top).');});</script>";
+    echo "<script type='text/javascript'>$(function(){
+  window.setTimeout(
+     function(){alert('None of your work will be saved until you log in (see links at top).');},
+     1000
+   );
+   });</script>";
   } ?>
 
 </head>

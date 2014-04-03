@@ -1,5 +1,4 @@
 .CodeMirror {
-  font-family: 'Source Code Pro', monospace;
   font-size: 16px;
   line-height: 22px;
   border: 1px solid #eee;
@@ -21,6 +20,7 @@
   color: red;
   font-weight: bold;
 }
+
 
 #description {
 }
@@ -109,13 +109,13 @@ body {
 
 #submitButton {
     font-size: 110%;
-    font-family: 'Source Code Pro', monospace;
     font-weight: bold;
     width: 500px;
     max-width: 100%;
+
 }
 
-code, pre, tt {
+code, pre, tt, #submitButton, .CodeMirror {
     font-family: 'Source Code Pro', monospace;
 }
 
