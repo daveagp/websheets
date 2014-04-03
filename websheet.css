@@ -131,11 +131,15 @@ p, pre {
     margin: 5px 0px;
 }
 
-#results div.testcase-desc {
+#results div.testcase-desc,
+#results div.no-bottom-line
+ {
     border-bottom: none;
 }
 
-#results div.pass-test {
+#results div.pass-test,
+#results div.no-top-line
+ {
     border-top: none;
 }
 

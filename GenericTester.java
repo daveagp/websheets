@@ -480,16 +480,40 @@ public abstract class GenericTester {
     abstract class Capturer {
         String stdout;
         boolean crashed;
+        boolean notdone = false;
+        Set<Thread> oldThreadSet;
 
         Capturer() {
             startStdoutCapture();
+            oldThreadSet = Thread.getAllStackTraces().keySet();
         }
         void end() {
             stdout = endStdoutCapture();
         }
+        boolean threadsLeftOver() {
+            for (Thread t : Thread.getAllStackTraces().keySet())
+                if (!oldThreadSet.contains(t)) return true;
+            return false;
+        }
 
         Object retval; // not used by class initializer; used by invoke and construct
 
+        abstract void run_command() throws IllegalAccessException, InvocationTargetException,
+                                           InstantiationException, ClassNotFoundException;
+
+        void runUserCode() throws IllegalAccessException, InvocationTargetException,
+                                  InstantiationException, ClassNotFoundException {
+            try {
+                run_command();
+                crashed = false;
+            }
+            finally {
+                if (threadsLeftOver())
+                    notdone = true;
+                else
+                    end();
+            }
+        }
     }
 
     class InvokeCapturer extends Capturer {
@@ -501,17 +525,11 @@ public abstract class GenericTester {
             this.m=m; this.dis=dis; this.args=args;
             crashed = true;
         }
-        void runUserCode() throws IllegalAccessException, InvocationTargetException {
-            try {
-                retval = m.invoke(dis, args);
-                crashed = false;
-            } 
-            finally {
-                end();
-            }
+        void run_command() throws IllegalAccessException, InvocationTargetException {
+            retval = m.invoke(dis, args);
         }
     }
-
+    
     class ConstructCapturer extends Capturer {
         Constructor c;
         Object[] args;
@@ -520,14 +538,8 @@ public abstract class GenericTester {
             this.c=c; this.args=args;
             crashed = true;
         }
-        void runUserCode() throws IllegalAccessException, InvocationTargetException,
-        InstantiationException {
-            try {
-                retval = c.newInstance(args);
-                crashed = false;
-            } finally {
-                end();
-            }
+        void run_command() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+            retval = c.newInstance(args);
         }
     }
 
@@ -539,15 +551,8 @@ public abstract class GenericTester {
             this.className = className;
             crashed = true;
         }
-        void runUserCode() throws ClassNotFoundException {
-            try {                
-                //System.err.println("[["+className+"[[");
-                foundClass = Class.forName(className);
-                //System.err.println("]]"+className+"]]");
-                crashed = false;
-            } finally {
-                end();
-            }
+        void run_command() throws IllegalAccessException, ClassNotFoundException {
+            foundClass = Class.forName(className);
         }
     }
 
@@ -636,6 +641,9 @@ public abstract class GenericTester {
             }
             if (expectException) throw new RuntimeException("Internal error: bad exception flag");
         }
+        catch (ClassNotFoundException e) {
+            throw new RuntimeException("Internal error: CNFE");
+        }
         catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
 
             if (e instanceof InvocationTargetException && expectException) {
@@ -660,6 +668,16 @@ public abstract class GenericTester {
                 ((ConstructCapturer)stu).runUserCode();
             }
             if (expectException) throw new FailTestException("Was supposed to throw a " + referenceException.getClass().getSimpleName() + " but did not.");
+            if (stu.notdone) {
+                graderOut.println("<div class='no-bottom-line'>Some new threads were spawned. Waiting until they all finish&hellip;</div>");
+                while (stu.threadsLeftOver()) 
+                    Thread.yield();
+                graderOut.println("<div class='no-top-line'>&hellip;all terminated ok.</div>");
+                stu.end();
+            }
+        }
+        catch (ClassNotFoundException e) {
+            throw new RuntimeException("Internal error: CNFE");
         }
         catch (IllegalAccessException e) {
             throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(stu.stdout));
@@ -693,7 +711,7 @@ public abstract class GenericTester {
                                             (stu == null || stu.stdout == null || stu.stdout.equals("") ? "" : "<br>Partial printed output:" + pre(stu.stdout)));
             }
         }
-        
+
         if (ref.stdout.length() > 0) {
             String reason = describeOutputDifference(stu.stdout, ref.stdout);
             if (reason != null)
@@ -828,6 +846,9 @@ public abstract class GenericTester {
                 graderOut.println("<div>Warning: your class printed the output "+pre(stu.stdout)+" before any method was called.</div>");
             }
             return new Class[]{ref.foundClass, stu.foundClass};
+        }
+        catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            throw new RuntimeException("Internal error: IAE|ITE|IE");
         }
         catch (ClassNotFoundException e) {
             throw new RuntimeException("Internal error: class not found " + e);
