@@ -50,7 +50,14 @@ public class MonkeyChain {
 """
 
 tests = r"""
-testMain();
+//testMain();
+saveAs = "mc";
+testConstructor();
+testOn("mc", "threeKongs");
+testOn("mc", "printAll");
+quietOnPass = true;
+HTMLdescription = "Calling <tt>mc.printAll()</tt> <b>again</b> to see if list was destroyed.";
+testOn("mc", "printAll");
 """
 
 classname = "MonkeyChain"

@@ -117,6 +117,9 @@ public abstract class GenericTester {
         }
     }
     
+    private static class TooMuchOutputException extends RuntimeException {
+    }
+    
     static BasicTestCase currentlyExecutingTestCase;
 
     public static boolean quietOnPass = false;
@@ -344,7 +347,12 @@ public abstract class GenericTester {
     private ByteArrayOutputStream baos;
 
     protected void startStdoutCapture() {
-        baos = new ByteArrayOutputStream();
+        baos = new ByteArrayOutputStream() {
+                public void write(byte[] b, int off, int len) {
+                    super.write(b, off, len);
+                    if (size() > 10000) throw new TooMuchOutputException();
+                }
+            };
         System.setOut(new PrintStream(baos));
 	StdOut.resync();
     }
@@ -687,6 +695,11 @@ public abstract class GenericTester {
         }
         catch (InvocationTargetException e) {
             studentException = e.getTargetException();
+            
+            if (studentException instanceof TooMuchOutputException) {
+                graderOut.println("<div>Printed too much output:" + pre(stu.stdout) + "</div>");
+                throw new FailTestException("Did not pass due to output overflow.");
+            }
             
             if (referenceException != null && referenceException.getClass() == studentException.getClass()) {
                 // passed!
