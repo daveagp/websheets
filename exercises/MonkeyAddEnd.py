@@ -29,7 +29,11 @@ public void threeKongs() {
    first.next.next = new Node("DK Jr.");
 }
 
-public void printAll() {
+// a working copy of this method from MonkeyTraverse will be included
+// it prints all Strings in the linked list, from first to last
+public void printAll() // ... method body not shown
+\hide[
+{
    Node current = first; // start at beginning
 
    // if current isn't past the last node,
@@ -39,11 +43,13 @@ public void printAll() {
       current = current.next;
    }
 }
-
-// loops like printAll(), but stops *just before* 
-// the end, then adds the new node
+]\
+// add a new node, containing this name, at the end of the list
 public void addEnd(String newName) {
    Node newLast = new Node(newName);
+
+   // loop like printAll(), but stops *just before* 
+   // the end, then adds the new node
 \[
    if (first == null) {
       first = newLast;

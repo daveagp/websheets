@@ -40,6 +40,7 @@ public class MonkeyChain {
 ]\
         }
     }
+
     public static void main(String[] args) {
        MonkeyChain mc = new MonkeyChain();
        mc.threeKongs();
