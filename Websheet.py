@@ -79,7 +79,7 @@ class Websheet:
 
         # optional fields AND default values
         optional_fields = {"tester_preamble": None, "show_class_decl": True,
-                           "epilogue": None, "dependencies": []}
+                           "epilogue": None, "dependencies": [], "imports": []}
 
         for field in mandatory_fields:
             setattr(self, field, field_dict[field])
@@ -159,6 +159,12 @@ class Websheet:
 
         r.extend('\n' if package is None else 'package '+package+';\n')
         r.extend('import stdlibpack.*;\n')
+        
+        for i in self.imports:
+            r.extend('import '+i+'\n')
+            ss_lines += 1
+            ui_lines += 1
+
         r.extend('public class '+self.classname+" {\n")
         ss_lines += 3
 
@@ -252,6 +258,9 @@ class Websheet:
 
         r.extend('\n' if package is None else 'package '+package+';\n')
         r.extend('import stdlibpack.*;\n')
+        for i in self.imports:
+            r.extend('import '+i+'\n')
+
         r.extend('public class '+self.classname+" {\n")
 
         for (item, stack, info) in self.iterate_token_list():
@@ -292,7 +301,7 @@ class Websheet:
         r = [""]
 
         if self.show_class_decl:
-            r[0] = "public class "+self.classname+" {\n"
+            r[0] += "public class "+self.classname+" {\n"
 
         for (item, stack, info) in self.iterate_token_list():
             token = item.token
@@ -311,6 +320,9 @@ class Websheet:
                     if (r[i].endswith("\n   ")): r[i] = r[i][:-3]
             if len(r) % 2 == 0: r += ["\n}\n"]
             else: r[-1] += "}\n"
+
+        for i in self.imports:
+            r[0] = 'import '+i+'\n' + r[0]
 
         # second pass : trim excess newlines from fixed text adjacent to multi-line blanks
         for i in range(0, len(r), 2):

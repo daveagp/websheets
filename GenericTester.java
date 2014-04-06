@@ -32,6 +32,7 @@ public abstract class GenericTester {
     public static String pre(String S) {return pre(S, "");}
 
     public static String code(String S, String attr) {
+        if (S==null) return "[NULL]";
         return "<code "+attr+">" + esc(S) + "</code>";
     }
     public static String code(String S) {return code(S, "");}
@@ -118,6 +119,12 @@ public abstract class GenericTester {
     }
     
     private static class TooMuchOutputException extends RuntimeException {
+    }
+    
+    public static class FailException extends RuntimeException {
+        public FailException(String msg) {
+            super(msg);
+        }
     }
     
     static BasicTestCase currentlyExecutingTestCase;
@@ -346,11 +353,18 @@ public abstract class GenericTester {
     private PrintStream orig_stdout = System.out;
     private ByteArrayOutputStream baos;
 
+    static int maxOutputBytes = 10000;
+    public void setMaxOutputBytes(int limit) {
+        maxOutputBytes = limit;
+    }
+
+    public static boolean dontRunReference = false;
+
     protected void startStdoutCapture() {
         baos = new ByteArrayOutputStream() {
                 public void write(byte[] b, int off, int len) {
                     super.write(b, off, len);
-                    if (size() > 10000) throw new TooMuchOutputException();
+                    if (size() > maxOutputBytes) throw new TooMuchOutputException();
                 }
             };
         System.setOut(new PrintStream(baos));
@@ -638,6 +652,7 @@ public abstract class GenericTester {
 	if (currStdin != null)
 	    StdIn.setString(currStdin);
         try {
+            if (dontRunReference) ; else {
             if (methods) {
                 //if (thisName != null) System.out.println(thisName+" "+referenceObjects.get(thisName));
                 ref = new InvokeCapturer((Method)referenceM, thisName==null?null:referenceObjects.get(thisName), argsPassedToRef);
@@ -647,7 +662,13 @@ public abstract class GenericTester {
                 ref = new ConstructCapturer((Constructor)referenceM, argsPassedToRef);
                 ((ConstructCapturer)ref).runUserCode();
             }
+            }
             if (expectException) throw new RuntimeException("Internal error: bad exception flag");
+            if (!dontRunReference && ref.notdone) {
+                while (ref.threadsLeftOver()) 
+                    Thread.yield();
+                ref.end();
+            }
         }
         catch (ClassNotFoundException e) {
             throw new RuntimeException("Internal error: CNFE");
@@ -694,11 +715,19 @@ public abstract class GenericTester {
             throw new FailTestException("Error: " + className + " must not be abstract.");
         }
         catch (InvocationTargetException e) {
+            if (stu.notdone) {
+                stu.end(); // crashed, so leftover threads may not be worth waiting for
+                graderOut.println("<div class='no-top-line no-bottom-line'>Warning: leftover threads after crash may cause extra output below.</div>");
+            }
             studentException = e.getTargetException();
             
             if (studentException instanceof TooMuchOutputException) {
                 graderOut.println("<div>Printed too much output:" + pre(stu.stdout) + "</div>");
                 throw new FailTestException("Did not pass due to output overflow.");
+            }
+            if (studentException instanceof FailException) {
+                System.out.println("<div>Your program printed this output: " + pre(stu.stdout) + "</div>");
+                throw new FailTestException("Failed: "+code(studentException.getMessage()));
             }
             
             if (referenceException != null && referenceException.getClass() == studentException.getClass()) {
@@ -725,14 +754,17 @@ public abstract class GenericTester {
             }
         }
 
-        if (ref.stdout.length() > 0) {
+        if (!dontRunReference && ref.stdout.length() > 0) {
             String reason = describeOutputDifference(stu.stdout, ref.stdout);
             if (reason != null)
                 throw new FailTestException(reason);
             
         }
-        if (ref.stdout.equals("") && !stu.stdout.equals("")) {
+        if (!dontRunReference && ref.stdout.equals("") && !stu.stdout.equals("")) {
             throw new FailTestException("Found this printed output when none was expected:" + pre(stu.stdout));
+        }
+        if (dontRunReference && stu.stdout.length() > 0) {
+            graderOut.println("<div class='output'>Printed this output:"+pre(stu.stdout)+"</div>");
         }
         if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
             && ((Method)referenceM).getReturnType() != referenceC
@@ -750,7 +782,7 @@ public abstract class GenericTester {
         String mutationCommentary = checkForArgMutations(args, argsPassedToRef, argsPassedToStu);
         
         String goodStuff = "";
-        if (!ref.stdout.equals("")) {
+        if (!dontRunReference && !ref.stdout.equals("")) {
             goodStuff += "Printed correct output " + pre(stu.stdout) + "\n";
         }
         if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE

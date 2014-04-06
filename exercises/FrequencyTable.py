@@ -97,6 +97,7 @@ testOn("ft", "count", "goose");
 testOn("ft", "count", "horse");
 testStdin = "in this test the api is tested by the words in the sentence";
 testMain();
+setMaxOutputBytes(500000);
 testStdinURL = "http://introcs.cs.princeton.edu/java/44st/mobydick.txt";
 testMain();
 """
