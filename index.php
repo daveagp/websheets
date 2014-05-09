@@ -56,8 +56,10 @@ if (WS_LOGGED_IN) {
   }
  ?>
    <p>This is an experimental system. <a href="mailto:dp6@cs.princeton.edu">Contact us</a>
-    if you find bugs or have feedback. Visit the <a href="https://github.com/daveagp/websheets">source code</a> on GitHub.</p>
-   Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
+    if you find bugs or have feedback. 
+    <a href="bytopic.php">See all problems by topic.</a>
+    Visit the <a href="https://github.com/daveagp/websheets">source code</a> on GitHub.
+   <p>Select a problem: <select name="selectSheet" id="selectSheet" onChange="loadProblem($('#selectSheet').val())">
    </select>
    <script type='text/javascript'>
    var sheets = 

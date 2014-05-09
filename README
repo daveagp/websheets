@@ -1,28 +1,21 @@
 websheets: Online version of coding handouts with blanks
 ========================================================
+Created originally by David Pritchard (daveagp@gmail.com) in 2013.
+Released under the GNU Affero General Public License.
+CodeMirror plugin and "exercises" content subdirectory licensed separately.
 
-Current mirrors:
+MIRRORS
 
-http://www.cs.princeton.edu/~cos126/websheets/index.php
-http://cscircles.cemc.uwaterloo.ca/websheets/index.php
+http://www.cs.princeton.edu/~cos126/websheets/index.php (Java 7)
+http://cscircles.cemc.uwaterloo.ca/websheets/index.php (Java 8)
 (note, they do not share a database)
 
-To see the exercises arranged by topic:
-http://www.cs.princeton.edu/courses/archive/spring14/cos126/precepts.php
-(see Websheets column and practice exams)
+Note, you can link to a particular exercise with
+.../index.php#NameAge
+or a group of exercises with 
+.../index.php?group=HelloWorld+NameAge+NextYear#NameAge
 
-How to use:
-
-- the user should visit ws.php
-- you can pass arguments to restrict to a certain set of exercises / a default exercise:
-e.g. http://.../websheets/index.php?group=HelloWorld+NameAge+NextYear#NameAge
-makes three exercises shown, of which the second one is shown upon landing.
-
-How to define more exercises:
-
-- follow the examples in the "exercises" directory. They are essentially 
-key-value string pairs, written as python modules only because this makes
-less escaping necessary.
+INSTALLATION
 
 Here is an abbreviated version of how to install websheets on your computer.
 
@@ -30,25 +23,13 @@ Here is an abbreviated version of how to install websheets on your computer.
 2) Install https://github.com/daveagp/java_jail (follow instructions therein)
 3) Clone the websheets repo as well as its submodules
 4) Setup config.json (see below)
-5) Create the db table (see below)
+5) Create the db table (optional. see below)
+6) Make more exercises (optional. see below)
 
-Here's the db table format:
-
-CREATE TABLE IF NOT EXISTS `ws_history` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `problem` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `submission` varchar(5000) COLLATE utf8_unicode_ci NOT NULL,
-  `result` mediumtext COLLATE utf8_unicode_ci NOT NULL,
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `passed` tinyint(1) NOT NULL DEFAULT '0',
-  `meta` text COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user` (`user`,`problem`,`passed`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
-
-config.json is a json-formatted file, variously loaded by php and python,
-that contains all the secrets that are specific to your setup. it should
+==Step 4==
+config.json is a json-formatted file, variously loaded by php and 
+python, that contains all the secrets that are specific to your setup. 
+It should
 look like this:
 
 {
@@ -69,7 +50,39 @@ look like this:
 you can delete facebook-* if you don't want to use facebook,
 and google-* if you don't want to use google
 
-Partial file listing:
+==Step 5==
+Here's the db table format:
+
+CREATE TABLE IF NOT EXISTS `ws_history` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `problem` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
+  `submission` varchar(5000) COLLATE utf8_unicode_ci NOT NULL,
+  `result` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `passed` tinyint(1) NOT NULL DEFAULT '0',
+  `meta` text COLLATE utf8_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user` (`user`,`problem`,`passed`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+
+==Step 6==
+To define more exercises, follow the examples in the "exercises" directory. 
+They are key-value string pairs, written as python modules only because this 
+makes less escaping necessary.
+
+Note that, as of writing (May 2014), there is no proper documentation on
+how to define exercises. Also, certain aspects, especially spacing issues
+around "default", "fake" or "hidden" code, are very ungainly. Cleaning this
+interface up is ongoing work.
+
+THANKS
+
+Thanks to the COS 126 staff at Princeton for offering feedback when using
+this tool from Fall 2013 to Spring 2014: 
+Donna Gabai, Maia Ginsburg, Bob Sedgewick and Doug Clark.
+
+FILES LISTING
 
 config.json - you should fill this in
 websheet.{css,js} - create/render the partially read-only codemirror area
