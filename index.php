@@ -66,8 +66,9 @@ if (WS_LOGGED_IN) {
   <?php
        if (array_key_exists("group", $_REQUEST))
 	 echo json_encode(explode(" ", $_REQUEST["group"]));
-       else
-	 echo passthru("./Websheet.py list") 
+       else {
+	 echo passthru("./Websheet.py list");
+       }
 	   ?> ;
        var hasGroup = <?php echo array_key_exists("group", $_REQUEST) ? 'true':'false'; ?>;
        var hasStart = <?php echo array_key_exists("start", $_REQUEST) ? 'true':'false'; ?>;
@@ -91,7 +92,11 @@ if (WS_LOGGED_IN) {
       var ex = window.location.hash.substring(1);
     }
     else {
-      var ex = sheets[0];
+      var ex = <?php 
+        if (array_key_exists("group", $_REQUEST))
+          echo "sheets[0];";
+        else
+          echo "\"Distance\""; ?>
     }
     $('#selectSheet').val(ex);
     loadProblem(ex);
