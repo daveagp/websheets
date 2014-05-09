@@ -48,12 +48,14 @@ public void reverse() {
 }
 
 // delete the kth item from the list, where the first is k=1
+// throw RuntimeException if list is empty or index is invalid (k < 1)
 public void deleteKth(int k) {
-\[
    // deleting from an empty list or from index less than 1 never makes sense
-   if (first == null || k < 1)
+   if (\[first == null || k < 1]\)
       throw new RuntimeException("Invalid index!");
-
+   
+   // now insert the item
+\[
    if (k == 1) {
       // this is the only case where first changes
       first = first.next;

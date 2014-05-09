@@ -24,6 +24,32 @@ source_code = r"""
 ]\\default[   ; // more variables? 
 ]\
 
+   // a class that adds a number to total
+   static class AdderRunnable implements Runnable {
+      int increment;
+      AdderRunnable(int increment) {this.increment = increment;}
+      public void run() {
+\[
+         // do nothing here
+]\\default[
+;// maybe do something here?
+]\
+         // introduce some delays 
+         nap(15); 
+\[
+         lock.lock();
+]\\default[
+;// maybe do something here?
+]\
+         total += increment; 
+\[
+         lock.unlock();
+]\\default[
+;// maybe do something here?
+]\
+      }
+   };        
+
    public static void main(String[] args) {
       total = 0;        
 
@@ -31,32 +57,6 @@ source_code = r"""
         
       // keep track of all the things we execute
       ExecutorService pool = Executors.newCachedThreadPool();
-        
-      // a local class that adds a number to total
-      class AdderRunnable implements Runnable {
-         int increment;
-         AdderRunnable(int increment) {this.increment = increment;}
-         public void run() {
-\[
-            // do nothing here
-]\\default[
-;// maybe do something here?
-]\
-            // introduce some delays 
-            nap(15); 
-\[
-            lock.lock();
-]\\default[
-;// maybe do something here?
-]\
-            total += increment; 
-\[
-            lock.unlock();
-]\\default[
-;// maybe do something here?
-]\
-         }
-      };
         
       for (int i=1; i<=n; i++)
          pool.execute(new AdderRunnable(i));

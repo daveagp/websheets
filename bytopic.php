@@ -50,7 +50,7 @@ $categories = <<<EOT
  ["Practice Final Exams",
   ["BinaryInteger", "Person", "TigerBook", "MiniPro", "MiniPro2"]],
  ["Threads",
-  ["SumParallel", "FTPLimiter"]]
+  ["SumParallel", "FTPLimiter", "FJSort"]]
 ]
 EOT;
 

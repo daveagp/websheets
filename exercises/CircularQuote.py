@@ -9,7 +9,7 @@ public class CircularQuote {
       private String word;
       private Card next;
 
-      public Card(String word) {
+      private Card(String word) {
          this.word = word;
          this.next = null;
       }
