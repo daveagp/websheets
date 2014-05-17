@@ -7,10 +7,11 @@ import json
 try:
     config_jo = json.loads(open('config.json').read())
 except:
-    config_jo = {} # empty dict
+    config_jo = {}
 
 # if you are using safeexec, securely running java should be something like this:
 def compute_java_prefix():
+    if (config_jo == {}): return "error: config.json doesn't exist"
     jail = config_jo["java_jail-abspath"]
     safeexec = config_jo["safeexec-executable-abspath"]    
 
