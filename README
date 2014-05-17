@@ -27,16 +27,22 @@ Next, in some folder accessible to your web server, run
 
 git clone --recursive https://github.com/daveagp/websheets
 
-You should be able to see the frontend at 
+You should be able to see the frontend, and an exercise, at 
  http://your.website/url/to/websheets/index.php
-but submitting anything will give you some errors.
+although it will warn you of configuration problems, and
+submitting anything will give you some errors.
 
-4) Setup config.json (see below)
+Next, copy ws-config.example.json to ws-config.json.
+
+Set the bare minimum options: the location of 
+
+To set up ws-config.json,
+4) Setup ws-config.json (see below)
 5) Create the db table (optional. see below)
 6) Make more exercises (optional. see below)
 
 ==Step 4==
-config.json is a json-formatted file, variously loaded by php and 
+ws-config.json is a json-formatted file, variously loaded by php and 
 python, that contains all the secrets that are specific to your setup. 
 It should
 look like this:
@@ -93,7 +99,7 @@ Donna Gabai, Maia Ginsburg, Bob Sedgewick and Doug Clark.
 
 FILES LISTING
 
-config.json - you should fill this in
+ws-config.json - you should fill this in
 websheet.{css,js} - create/render the partially read-only codemirror area
 index.{php,js} - browser for multiple websheets
 load.{php,py} - (for ajax) load a problem to show

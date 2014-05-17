@@ -1,0 +1,17 @@
+{
+ "safeexec-executable-abspath":"/absolute/path/to/.../safeexec/safeexec",
+ "java_jail-abspath":"/absolute/path/to/.../java_jail/",
+
+ "db-host": "...",
+ "db-user": "...",
+ "db-password": "...",
+ "db-database": "...",
+
+ "hybridauth-base_url":
+         "http://your-website.../websheets/hybridauth/hybridauth/index.php",
+
+ "facebook-id": "your facebook api id",
+ "facebook-secret": "your facebook api secret key",
+ "google-id":"your google api id",
+ "google-secret":"your google api secret key"
+}

@@ -2,7 +2,7 @@
 
   /*
 
-requires: config.json
+requires: ws-config.json
 
 authenticates user and defines several constants:
 
@@ -20,22 +20,22 @@ WS_CONFIG_ERROR : string (error message, or empty string if config ok)
 ?auth=XXX will try to log in with authentication domain XXX
   */
 
-  // try to load the config.json file and see if it includes required fields
+  // try to load the ws-config.json file and see if it includes required fields
 $config_error = ''; // no news is good news
-$data = file_get_contents("config.json");
+$data = file_get_contents("ws-config.json");
 if ($data == FALSE) {
-  $config_error = "Couldn't find config.json";
+  $config_error = "Couldn't find ws-config.json";
   $config_error .= "<br><b>You cannot submit any code.</b>";
 }
 else {
   $config_jo = json_decode($data, TRUE); // associative array
   if ($config_jo == NULL) {
-    $config_error = "config.json is not JSON formatted";
+    $config_error = "ws-config.json is not JSON formatted";
   }
   else foreach (array("safeexec-executable-abspath", "java_jail-abspath", "hybridauth-base_url", 
                       "db-password", "db-database", "db-user", "db-host") as $required) {
       if (!array_key_exists($required, $config_jo)) {
-        $config_error = "config.json does not define $required";
+        $config_error = "ws-config.json does not define $required";
         if ($required=="safeexec-executable-abspath" || $required=="java_jail-abspath")
           $config_error .= "<br><b>You cannot submit any code.</b>";
         break;
@@ -51,7 +51,7 @@ else {
   $ha_config["base_url"] = $config_jo["hybridauth-base_url"];
   $ha_config["providers"] = array();
 
-  // configure Facebook if details exist in config.json
+  // configure Facebook if details exist in ws-config.json
   if (array_key_exists("facebook-id", $config_jo) 
       && array_key_exists("facebook-secret", $config_jo)) {
     $ha_config["providers"]["Facebook"] = 
@@ -64,7 +64,7 @@ else {
             );
   }    
 
-  // configure Google if details exist in config.json
+  // configure Google if details exist in ws-config.json
   if (array_key_exists("google-id", $config_jo) 
       && array_key_exists("google-secret", $config_jo)) {
     $ha_config["providers"]["Google"] = 
