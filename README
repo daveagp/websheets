@@ -15,7 +15,7 @@ Note, you can link to a particular exercise with
 or a group of exercises with 
 .../index.php?group=HelloWorld+NameAge+NextYear#NameAge
 
-INSTALLATION
+BASIC INSTALLATION
 
 Install these on your server first:
  https://github.com/cemc/safeexec
@@ -29,44 +29,51 @@ git clone --recursive https://github.com/daveagp/websheets
 
 You should be able to see the frontend, and an exercise, at 
  http://your.website/url/to/websheets/index.php
-although it will warn you of configuration problems, and
-submitting anything will give you some errors.
+although it will warn you of configuration problems.
 
-Next, copy ws-config.example.json to ws-config.json.
+Next, copy ws-config.example.json to ws-config.json. 
+Reloading that page, it won't warn you, but submitting will
+cause errors.
 
-Set the bare minimum options: the location of 
+Set up the first 2 otions in ws-config.json. Now you can submit code!
 
-To set up ws-config.json,
-4) Setup ws-config.json (see below)
-5) Create the db table (optional. see below)
-6) Make more exercises (optional. see below)
+ADDITIONAL SETUP
 
-==Step 4==
-ws-config.json is a json-formatted file, variously loaded by php and 
-python, that contains all the secrets that are specific to your setup. 
-It should
-look like this:
+There are some optional things you can do once the basics are working:
+1. Setup the db. This is necessary if you want to log past submissions or
+   use logins (see below). Set the appropriate options in ws-config.json
+   and create a table like "DB TECHNICAL DETAILS" below.
 
-{
- "safeexec-executable-abspath":"/absolute/path/to/.../safeexec/safeexec",
- "java_jail-abspath":"/absolute/path/to/.../java_jail/",
- "hybridauth-base_url":
-         "http://your-website.../websheets/hybridauth/hybridauth/index.php",
- "db-host": "...",
- "db-user": "...",
- "db-password": "...",
- "db-database": "...",
- "facebook-id": "your facebook api id",
- "facebook-secret": "your facebook api secret key",
- "google-id":"your google api id",
- "google-secret":"your google api secret key"
-}
+2. Setup or change login mechanisms if you want the websheets site to
+   remember each user's latest submission and what they've solved. 
+   Prequisite: you've created and setup a DB (step 1.)
+   If you want to use facebook and/or google, get API keys for them 
+   and change the listed options in ws-config.json. Delete the options
+   you don't want to use. 
 
-you can delete facebook-* if you don't want to use facebook,
-and google-* if you don't want to use google
+   For authentication we use "hybridauth" which we use as a unified wrapper 
+   for user email authentication (they are remembered by email address). 
+   With some work you can set up a custom authentication for your school
+   if they have a PHP authentication system; follow the Princeton example
+   in include.php. You should also be able to use other hybridauth providers
+   with a little work.
 
-==Step 5==
-Here's the db table format:
+3. Create more problems! The bad news is that the documentation for this
+   does not yet exist and some spacing issues are not yet worked out. But for
+   the non-faint of heart, follow the examples in the "exercises" directory. 
+   They are key-value string pairs, written as Python modules because it 
+   makes less escaping necessary and because we use Python as a system
+   to glue everything together.
+
+THANKS
+
+Thanks to the COS 126 staff at Princeton for offering feedback when using
+this tool from Fall 2013 to Spring 2014: 
+Donna Gabai, Maia Ginsburg, Bob Sedgewick and Doug Clark.
+
+DB TECHNICAL DETAILS
+
+Here's the table format used currently for saving past submissions:
 
 CREATE TABLE IF NOT EXISTS `ws_history` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -81,25 +88,14 @@ CREATE TABLE IF NOT EXISTS `ws_history` (
   KEY `user` (`user`,`problem`,`passed`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 
-==Step 6==
-To define more exercises, follow the examples in the "exercises" directory. 
-They are key-value string pairs, written as python modules only because this 
-makes less escaping necessary.
-
-Note that, as of writing (May 2014), there is no proper documentation on
-how to define exercises. Also, certain aspects, especially spacing issues
-around "default", "fake" or "hidden" code, are very ungainly. Cleaning this
-interface up is ongoing work.
-
-THANKS
-
-Thanks to the COS 126 staff at Princeton for offering feedback when using
-this tool from Fall 2013 to Spring 2014: 
-Donna Gabai, Maia Ginsburg, Bob Sedgewick and Doug Clark.
+WARNNING: If you use a database, you'll be putting a DB password in ws-config.json.
+Please check that
+ http://your.website/url/to/websheets/ws-config.json
+is inaccessible; .htaccess tries to do this, but you should confirm it works.
 
 FILES LISTING
 
-ws-config.json - you should fill this in
+ws-config.example.json - copy this to ws-config.json and fill it in
 websheet.{css,js} - create/render the partially read-only codemirror area
 index.{php,js} - browser for multiple websheets
 load.{php,py} - (for ajax) load a problem to show
