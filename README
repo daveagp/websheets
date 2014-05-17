@@ -1,16 +1,16 @@
 websheets: Online version of coding handouts with blanks
 ========================================================
 Created originally by David Pritchard (daveagp@gmail.com) in 2013.
-Released under the GNU Affero General Public License.
-CodeMirror plugin and "exercises" content subdirectory licensed separately.
+Released under the GNU Affero General Public License (but see
+other licenses for subdirectories/subrepositories).
 
-MIRRORS (as of writing)
+MIRRORS
 
-http://www.cs.princeton.edu/~cos126/websheets/index.php (Java 7)
-http://cscircles.cemc.uwaterloo.ca/websheets/index.php (Java 8)
-(note, they do not share a database)
+Right now there are two mirrors:
+ http://www.cs.princeton.edu/~cos126/websheets/index.php (Java 7)
+ http://cscircles.cemc.uwaterloo.ca/websheets/index.php (Java 8)
 
-Note, you can link to a particular exercise with
+Note that you can link to a particular exercise with
 .../index.php#NameAge
 or a group of exercises with 
 .../index.php?group=HelloWorld+NameAge+NextYear#NameAge
