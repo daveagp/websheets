@@ -7,7 +7,7 @@ include_once('include.php');
       type="image/png" 
       href="favicon.png">
    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-   <script type="text/javascript" src="CodeMirror/lib/codemirror.js"></script>
+   <script type="text/javascript" src="codemirror-4c06fc.js"></script>
    <script type="text/javascript" src="CodeMirror/mode/clike/clike.js"></script>
    <script type="text/javascript" src="CodeMirror/addon/selection/mark-selection.js"></script>
    <script type="text/javascript" src="CodeMirror/addon/edit/matchbrackets.js"></script>

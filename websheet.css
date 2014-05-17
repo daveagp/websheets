@@ -12,6 +12,9 @@
   overflow-x: auto;
   box-sizing: border-box;
 }
+div.CodeMirror-cursors {
+  z-index: 3;
+}
 .before-diff-line {
   color: #0A0;
 }
