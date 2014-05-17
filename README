@@ -4,7 +4,7 @@ Created originally by David Pritchard (daveagp@gmail.com) in 2013.
 Released under the GNU Affero General Public License.
 CodeMirror plugin and "exercises" content subdirectory licensed separately.
 
-MIRRORS
+MIRRORS (as of writing)
 
 http://www.cs.princeton.edu/~cos126/websheets/index.php (Java 7)
 http://cscircles.cemc.uwaterloo.ca/websheets/index.php (Java 8)
@@ -17,11 +17,20 @@ or a group of exercises with
 
 INSTALLATION
 
-Here is an abbreviated version of how to install websheets on your computer.
+Install these on your server first:
+ https://github.com/cemc/safeexec
+ https://github.com/daveagp/java_jail 
+This requires root access. See the instructions therein for details. It is best to
+install these in locations that are not served to users by your web server.
 
-1) Install https://github.com/cemc/safeexec (follow instructions therein)
-2) Install https://github.com/daveagp/java_jail (follow instructions therein)
-3) Clone the websheets repo as well as its submodules
+Next, in some folder accessible to your web server, run
+
+git clone --recursive https://github.com/daveagp/websheets
+
+You should be able to see the frontend at 
+ http://your.website/url/to/websheets/index.php
+but submitting anything will give you some errors.
+
 4) Setup config.json (see below)
 5) Create the db table (optional. see below)
 6) Make more exercises (optional. see below)

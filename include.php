@@ -25,6 +25,7 @@ $config_error = ''; // no news is good news
 $data = file_get_contents("config.json");
 if ($data == FALSE) {
   $config_error = "Couldn't find config.json";
+  $config_error .= "<br><b>You cannot submit any code.</b>";
 }
 else {
   $config_jo = json_decode($data, TRUE); // associative array
@@ -147,6 +148,12 @@ if (!defined('WS_LOGGED_IN')) {
   define('WS_AUTHDOMAIN', "n/a"); 
 }
 
-if (strlen($config_error) > 0)
-  $config_error = "<div><i>$config_error<br>You will not be able to log in, load, or save.</i></div>";
-define('WS_CONFIG_ERROR', $config_error);
+if (strlen($config_error) > 0) {
+  define('WS_CONFIG_ERROR_DIV',
+         "<div><i>$config_error<br>You will not be able to log in, load, or save.</i>
+  <script type='text/javascript'>alert('Configuration problem! See status at top of page.');</script>
+</div>");
+ }
+ else {
+   define('WS_CONFIG_ERROR_DIV', '');
+ }

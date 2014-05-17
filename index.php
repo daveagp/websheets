@@ -41,7 +41,10 @@ include_once('include.php');
 <body>
 <div id="page">
   <div class="menu-bar noprint">
-    <?php echo WS_CONFIG_ERROR;
+    <?php 
+if (WS_CONFIG_ERROR_DIV) {
+  echo WS_CONFIG_ERROR_DIV;
+ }
 if (WS_LOGGED_IN) {
    echo "<p>Logged in as <b>" . WS_USERNAME . " (logged in through ". WS_AUTHDOMAIN. ")</b>. " .
    "Click to ";
