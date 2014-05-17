@@ -7,11 +7,11 @@ import json
 try:
     config_jo = json.loads(open('ws-config.json').read())
 except:
-    config_jo = {}
+    config_jo = []
 
 # if you are using safeexec, securely running java should be something like this:
 def compute_java_prefix():
-    if (config_jo == {}): return "error: ws-config.json doesn't exist"
+    if (config_jo == []): return "error: ws-config.json doesn't exist"
     jail = config_jo["java_jail-abspath"]
     safeexec = config_jo["safeexec-executable-abspath"]    
 
@@ -41,6 +41,7 @@ def run_java(command, the_stdin = ""):
 
 # database stuff
 def connect():
+    if config_jo == []: return 
     import mysql.connector
     return mysql.connector.connect(host=config_jo["db-host"],
                                    user=config_jo["db-user"],
