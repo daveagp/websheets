@@ -6,8 +6,10 @@ import json
 # we already checked for this error in php land
 try:
     config_jo = json.loads(open('ws-config.json').read())
+    db_enabled = "db-enabled" in config_jo and config_jo["db-enabled"] == True
 except:
     config_jo = []
+    db_enabled = False
 
 # if you are using safeexec, securely running java should be something like this:
 def compute_java_prefix():
@@ -41,7 +43,7 @@ def run_java(command, the_stdin = ""):
 
 # database stuff
 def connect():
-    if config_jo == []: return 
+    if not db_enabled: return 
     import mysql.connector
     return mysql.connector.connect(host=config_jo["db-host"],
                                    user=config_jo["db-user"],
@@ -51,7 +53,7 @@ def connect():
 # don't run if not configured correctly,
 # but run if configured correctly & not logged in
 def save_submission(student, problem, user_state, result_column, passed):
-        if config_jo == []: return 
+        if not db_enabled: return
         db = connect()
         cursor = db.cursor()
         cursor.execute(

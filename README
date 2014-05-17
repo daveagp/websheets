@@ -40,6 +40,7 @@ Set up the first 2 otions in ws-config.json. Now you can submit code!
 ADDITIONAL SETUP
 
 There are some optional things you can do once the basics are working:
+
 1. Setup the db. This is necessary if you want to log past submissions or
    use logins (see below). Set the appropriate options in ws-config.json
    and create a table like "DB TECHNICAL DETAILS" below.
@@ -57,6 +58,10 @@ There are some optional things you can do once the basics are working:
    if they have a PHP authentication system; follow the Princeton example
    in include.php. You should also be able to use other hybridauth providers
    with a little work.
+
+   You need a google "Client ID for web applications" and "Client secret"
+   or a facebook "App ID" and "App Secret" See the hybridauth documentation
+   for more details.
 
 3. Create more problems! The bad news is that the documentation for this
    does not yet exist and some spacing issues are not yet worked out. But for

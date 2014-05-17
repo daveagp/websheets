@@ -2,6 +2,7 @@
  "safeexec-executable-abspath":"/absolute/path/to/.../safeexec/safeexec",
  "java_jail-abspath":"/absolute/path/to/.../java_jail/",
 
+ "db-enabled": False,
  "db-host": "...",
  "db-user": "...",
  "db-password": "...",

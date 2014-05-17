@@ -8,6 +8,8 @@ if __name__ == "__main__":
   classname = websheet.classname
 
   import config, json
+
+  if not config.db_enabled: student="anonymous"
 #  websheet = Websheet.from_filesystem(classname)
   print(json.dumps({"template_code":websheet.get_json_template(),
                     "description":websheet.description,
