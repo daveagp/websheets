@@ -47,7 +47,7 @@ There are some optional things you can do once the basics are working:
 
 2. Setup or change login mechanisms if you want the websheets site to
    remember each user's latest submission and what they've solved. 
-   Prequisite: you've created and setup a DB (step 1.)
+   Pre-requisite: you've created and setup a DB (step 1.)
    If you want to use facebook and/or google, get API keys for them 
    and change the listed options in ws-config.json. Delete the options
    you don't want to use. 
