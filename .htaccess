@@ -1,5 +1,6 @@
 # the most import thing is to hide ws-config.json 
 # since it might have a db password
+# instead, we'll only allow certain extensions
 
 <Files *>
 Order Deny,Allow

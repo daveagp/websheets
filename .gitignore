@@ -1,3 +1,3 @@
 *.py[cod]
 *~
-ws-config.json
+*ws-config.json*
