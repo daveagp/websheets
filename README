@@ -41,6 +41,9 @@ ADDITIONAL SETUP
 
 There are some optional things you can do once the basics are working:
 
+0. To download updates, you need two commands to get the subrepos:
+   git pull; git submodule update
+
 1. Setup the db. This is necessary if you want to log past submissions or
    use logins (see below). Set the appropriate options in ws-config.json
    and create a table like "DB TECHNICAL DETAILS" below.
