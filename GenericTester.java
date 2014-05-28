@@ -528,9 +528,18 @@ public abstract class GenericTester {
         };
         DescriptionLoop dl = new DescriptionLoop();
 
-        sb.append("Your program printed this output:");
+        boolean stured = samelines < stulines.length - 1
+            || samelines == stulines.length - 1 && !rtrim(stulines[stulines.length-1]).equals("");
+        boolean refred = samelines < reflines.length - 1
+            || samelines == reflines.length - 1 && !rtrim(reflines[reflines.length-1]).equals("");
+        
+        sb.append("Your program printed this output" + 
+                  (stured ? " (first difference in red)" : "")
+                  + ":");
         dl.handle(stulines);
-        sb.append("But it was supposed to print this output (first difference in red):");
+        sb.append("It was supposed to print this output" + 
+                  ((samelines < reflines.length) ? " (first difference in red)" : "")
+                  + ":");
         dl.handle(reflines);
         return sb.toString();
     }
