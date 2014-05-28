@@ -88,21 +88,17 @@ if (WS_LOGGED_IN) {
    <textarea id="code" name="code"></textarea>
    <script type='text/javascript'>
     // facebook auth adds a weird hash
-      if (hasStart) {
-        var ex = sheets[start];
-      }
-    else if (window.location.hash && window.location.hash != '#_=_') {
-      var ex = window.location.hash.substring(1);
-    }
-    else {
-      var ex = <?php 
-        if (array_key_exists("group", $_REQUEST))
-          echo "sheets[0];";
-        else
-          echo "\"Distance\""; ?>
-    }
-    $('#selectSheet').val(ex);
-    loadProblem(ex);
+         if (window.location.hash && window.location.hash != '#_=_') {
+           var ex = window.location.hash.substring(1);
+         }
+         else if (hasStart) {
+           var ex = sheets[start];
+         }
+         else {
+           var ex = <?php echo array_key_exists("group", $_REQUEST) ? "sheets[0];":'"Distance"'; ?>;
+         }
+$('#selectSheet').val(ex);
+loadProblem(ex);
    </script>
    <button class="noprint" id="submitButton" onClick="checkSolution()">Submit code</button>
    <p class="noprint">Results will appear below.</p>
