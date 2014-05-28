@@ -40,7 +40,6 @@ public static void main(String[] args) {
 """
 
 tests = """
-oneRealPerLine = true;
 testMain(-1, -1);
 testMain(0, -2);
 testMain(0, 2);

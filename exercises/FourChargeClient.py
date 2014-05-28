@@ -55,7 +55,6 @@ should print out
 """
 
 tests = r"""
-oneRealPerLine = true;
 testMain("0.1");
 testMain("0.2");
 testMain("1");

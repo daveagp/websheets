@@ -52,7 +52,6 @@ the search endpoints differ by 10<sup>-8</sup> or less.
 """
 
 tests = r"""
-oneRealPerLine = true;
 testMain(126);
 testMain(2.718281828459045);
 testMain(23423.348);

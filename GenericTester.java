@@ -1,6 +1,6 @@
 package framework;
 import java.util.*;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 import java.lang.reflect.*;
 import java.io.*;
 import stdlibpack.*;
@@ -47,6 +47,7 @@ public abstract class GenericTester {
         return false;
     }
 
+    // student first then reference, where possible
     public boolean smartEquals(Object a, Object b) {
         if ((a == null) != (b == null))
             return false;
@@ -66,6 +67,11 @@ public abstract class GenericTester {
                 if (!smartEquals(Array.get(a, i), Array.get(b, i)))
                     return false;
             return true;
+        }
+        if (a.getClass() == Double.class) {
+            return equalsApprox((Double)a, (Double)b);
+        } else if (a.getClass() == Float.class) {
+            return equalsApprox((Float)a, (Float)b);
         }
         return a.equals(b);
     }
@@ -99,18 +105,21 @@ public abstract class GenericTester {
         else return O.toString();
     }
 
-    private static Pattern RTRIMLINE = Pattern.compile(" +\n");
     private static Pattern RTRIMEND = Pattern.compile(" +$");
-
-    // remove all trailing whitespaces
-    public static String rtrimLines(String S) {
-        String tmp = RTRIMLINE.matcher(S).replaceAll("\n");
-        return RTRIMEND.matcher(tmp).replaceAll("");
-    }
 
     public static String rtrim(String S) {
         return RTRIMEND.matcher(S).replaceAll("");
     }
+
+    /*
+    private static Pattern RTRIMLINE = Pattern.compile(" +\n");
+
+    // remove all trailing whitespaces from every line
+    public static String rtrimLines(String S) {
+        String tmp = RTRIMLINE.matcher(S).replaceAll("\n");
+        return RTRIMEND.matcher(tmp).replaceAll("");
+    }
+    */
 
     private static class FailTestException extends RuntimeException {
         FailTestException(String msg) {
@@ -383,9 +392,15 @@ public abstract class GenericTester {
         }
     }
 
-    // if true, any reference line comprised of a real number
-    // allows 1E-4 relative/absolute error in student output
-    public boolean oneRealPerLine = false;
+    // ignore trailing space characters on every line
+    public boolean ignoreTrailingSpaces = true;
+
+    // see equalsApprox methods for more info
+    public boolean ignoreRealFormatting = true;
+
+    // accept replacements for double tokens that are pretty close
+    // only has any meaning if ignoreRealFormatting is true
+    public double realTolerance = 1E-4;
 
     public String testStdin = null;
     public String testStdinURL = null;
@@ -406,67 +421,88 @@ public abstract class GenericTester {
         return new NamedObject(name);
     }
 
-    protected String describeOutputDifference(String studentO, String referenceO) {
-        // get rid 
-        String studentOTrim = rtrimLines(studentO);
-        String referenceOTrim = rtrimLines(referenceO);
+    // same within relative error 1E-4? 
+    // Except: if reference is 0, allow absolute error 1E-4
+    // student first, reference second
+    public boolean equalsApprox(double s, double r) { 
+        if (r == 0)
+            return Math.abs(s) <= realTolerance;        
+        return Math.abs(s-r) <= realTolerance * Math.max(Math.abs(s), Math.abs(r));
+    }
 
-	if (oneRealPerLine) {
-	    String[] stulines = studentO.split("\n");
-	    String[] reflines = referenceO.split("\n");
-	    String desc = "Your output:" + pre(studentO) + "Correct output:" + pre(referenceO);
-	    if (reflines.length > stulines.length)
- 		return "Printed too few lines of output. " + desc;
-	    if (reflines.length < stulines.length) 
- 		return "Printed too many lines of output. " + desc;
-	    for (int i=0; i<reflines.length; i++) {		
-		double r, s;
-		try {
-		    r = Double.parseDouble(reflines[i]);
-                    if (reflines[i].indexOf(".") < 0) throw new Exception();
-		    try {
-			s = Double.parseDouble(rtrim(stulines[i]));
-		    }
-		    catch (Exception e) {
-			return "Line "+(i+1)+" of your output is not a number. " + desc;
-		    }
-		    if (Math.abs(s-r) > 1E-4 * Math.max(1, Math.abs(r)))
-			return "Line "+(i+1)+" of your output doesn't match ours. " + desc;
-		}
-		catch (Exception e) {
-		    // reference line not a double
-		    if (!rtrim(stulines[i]).equals(rtrim(reflines[i])))
-			return "Line "+(i+1)+" of your output doesn't match ours. " + desc;
+    // pattern from regular expression for real number literals
+    // note that this requires a period inside the number!
+    // so it is not "all double literals" but rather
+    // "things a sane problem could print for a double"
+    // except, it doesn't catch NaN, infinity, octal, etc
+    public static final Pattern REAL_NUMBER = 
+        Pattern.compile("[+-]?(\\d+\\.\\d*|\\.\\d+)"+
+                        "([eE][+-]?\\d+)?");
 
-		}
-	    }
-	    return null;
-	}
-	else {
-	    if (referenceOTrim.equals(studentOTrim))
-		return null;
+    // split string at "real number" literals
+    // return alternating array of non-number text and number tokens
+    // note that some strings like "2.2.2" are sort of ambiguous
+    public static String[] splitAtReals(String a) {
+        ArrayList<String> result = new ArrayList<String>();
+        int lastend = 0;
+        Matcher m = REAL_NUMBER.matcher(a);
+        while (m.find()) {
+            result.add(a.substring(lastend, m.start()));
+            result.add(m.group());
+            lastend = m.end();
+        }
+        result.add(a.substring(lastend));
+        return result.toArray(new String[result.size()]);
+    }
 
-	    if (referenceOTrim.equals(studentOTrim+"\n"))
-		return "Your program printed this output:" + pre(studentO)
-		    + " which is almost correct but <i>a newline character is missing at the end</i>.";
-	    
-	    if (studentOTrim.equals(referenceOTrim+"\n"))
-		return "Your program printed this output:" + pre(studentO)
-		    + " which is almost correct but <i>an extra newline character was printed at the end</i>.";
-	    
-            //	    return "Your program printed this output:" + pre(studentO)
-            //+ " but it was supposed to print this output:" + pre(referenceO);
-            return describeStringDifference(studentO, referenceO);
-	}
-    }	    
+    // are these equal, discounting errors and formatting of doubles?
+    // student first, reference second (real comparison is asymmetric)
+    // does not normalize for trailing whitespace.
+    // accepts multi-line strings (\n treated like any other character)
+    public boolean equalsApprox(String sline, String rline) {
+        if (!ignoreRealFormatting) return sline.equals(rline);
+        String[] ssegments = splitAtReals(sline);
+        String[] rsegments = splitAtReals(rline);
+        if (rsegments.length != ssegments.length) return false;
+        for (int i=0; i<rsegments.length; i++)
+            if (i%2 == 0 && !rsegments[i].equals(ssegments[i])
+                ||
+                i%2 != 0 && !equalsApprox(Double.parseDouble(rsegments[i]), 
+                                          Double.parseDouble(ssegments[i]))) 
+                return false;
+        return true;        
+    }
 
-    public static String describeStringDifference(String stu, String ref) {
+    public String rtrimConditional(String S) {
+        return ignoreTrailingSpaces ? rtrim(S) : S;
+    }
+
+    // are they different? return null if not, html description if so
+    public String describeOutputDifference(String stu, String ref) {
         String[] stulines = stu.split("\n", -1);
         String[] reflines = ref.split("\n", -1);
         int samelines = 0;
         while (samelines < Math.min(stulines.length, reflines.length)
-               && rtrim(stulines[samelines]).equals(rtrim(reflines[samelines])))
+               && equalsApprox(rtrimConditional(stulines[samelines]),
+                               rtrimConditional(reflines[samelines])))
             samelines++;
+
+        // were they the same?
+        if (samelines == stulines.length && samelines == reflines.length)
+            return null; // yup!
+
+        // two special cases
+        if (samelines == stulines.length - 1 && samelines == reflines.length
+            && rtrimConditional(stulines[stulines.length - 1]).equals(""))
+            return "Your program printed this output:" + pre(stu)
+                + " which is almost correct but <i>an extra newline character was printed at the end</i>.";
+
+        if (samelines == reflines.length - 1 && samelines == stulines.length
+            && rtrimConditional(reflines[reflines.length - 1]).equals(""))
+            return "Your program printed this output:" + pre(stu)
+                + " which is almost correct but <i>a newline character is missing at the end</i>.";
+        
+        // general case
         final int samelines2 = samelines; // woo java 8!
         final StringBuilder sb = new StringBuilder();
 
@@ -615,8 +651,8 @@ public abstract class GenericTester {
                     Object oj = Array.get(orig[i], j);
                     Object rj = Array.get(ref[i], j);
                     Object sj = Array.get(stu[i], j);
-                    boolean correct = smartEquals(rj, sj);
-                    boolean refChanged = !smartEquals(rj, oj);
+                    boolean correct = smartEquals(sj, rj);
+                    boolean refChanged = !smartEquals(oj, rj);
                     boolean stuChanged = !smartEquals(sj, oj);
                     if (refChanged && correct)
                         commentary += "<p>Changed element "+code(j)+" of arg "+code(i)+" from " + code(repr(oj)) + " to "+code(repr(rj))+" as expected.";
@@ -769,7 +805,7 @@ public abstract class GenericTester {
         if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
             && ((Method)referenceM).getReturnType() != referenceC
             && (!((Method)referenceM).getReturnType().getName().startsWith("reference."))) {
-            if (!smartEquals(ref.retval, stu.retval)) {
+            if (!smartEquals(stu.retval, ref.retval)) {
                 throw new FailTestException("Expected return value " + code(repr(ref.retval)) + " but instead your code returned " + code(repr(stu.retval)));
             }
         }

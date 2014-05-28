@@ -29,7 +29,6 @@ public static void main(String[] args) {
 }"""
 
 tests = r"""
-oneRealPerLine = true;
 testStdin = "2.0 8";
 testMain();
 testStdin = "1.1 3";

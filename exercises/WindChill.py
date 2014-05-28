@@ -11,7 +11,6 @@ Use <code>Math.pow</code> to compute the exponent.
 """
 
 tests = r"""
-oneRealPerLine = true;
 testMain("32.0", "15.0");
 testMain("-40", "6.2");
 testMain("79.5", "27.62");
