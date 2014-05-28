@@ -97,7 +97,7 @@ var auth = function(provider) {
   var url = '?auth='+provider;
   if (window.hasGroup)
     url += '&group=' + sheets.join('+');    
-  url += '&start=' + sheets.indexOf($('#selectSheet').val());
+  url += '&start=' + $('#selectSheet').val();
   window.location.href = url;
 }
 
@@ -127,21 +127,45 @@ var auth = function(provider) {
 	$("#answerButton").html(viewing_ref ? "Go back to my solution" : "View reference solution");
     }
 
+// stuff to do after page is loaded
 $(function() {
-	$("#resetButton").click( function(eventObject) {
-		set_viewing_ref(false);
-		testWS.setUserAreas(lastload.initial_snippets);
-                var lc = testWS.cm.lineCount();
-                for (var i=0; i<lc; i++)
-                    testWS.cm.indentLine(i);
-	    });
-		$("#answerButton").click( function(eventObject) {
-		if (num_submissions < 4 && !$("#page").hasClass("ever-passed")) {
-		    alert("You have to make 4 attempts or complete the problem before you can view the reference solution. " +
-			  "You have made " + num_submissions + " attempts so far.");
-		}
-		else {
-		    set_viewing_ref(!viewing_ref);
-		}
-	    });
-    });
+  $("#resetButton").click( function(eventObject) {
+    set_viewing_ref(false);
+    testWS.setUserAreas(lastload.initial_snippets);
+    var lc = testWS.cm.lineCount();
+    for (var i=0; i<lc; i++)
+      testWS.cm.indentLine(i);
+  });
+  
+  $("#answerButton").click( function(eventObject) {
+    if (num_submissions < 4 && !$("#page").hasClass("ever-passed")) {
+      alert("You have to make 4 attempts or complete the problem before you can view the reference solution. " +
+	    "You have made " + num_submissions + " attempts so far.");
+    }
+    else {
+      set_viewing_ref(!viewing_ref);
+    }
+  });
+       
+  // use variables "sheets" and "GET" defined by the php script 
+  // that included this js to initialize the list of sheets
+  // and the first exercise to show
+
+  populateSheets(sheets);
+  
+  var ex = "";
+  
+  // note! return from facebook auth changes hash
+  if (window.location.hash 
+      && sheets.indexOf(window.location.hash.substring(1)) >= 0)
+    ex = window.location.hash.substring(1);
+  else if ("start" in GET && sheets.indexOf(GET["start"]) >= 0)
+    ex = GET["start"];
+  else if ("group" in GET)
+    ex = sheets[0];
+  else
+    ex = "Distance"; // a nice sample exercise
+  
+  loadProblem(ex);
+  
+});
