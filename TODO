@@ -1,14 +1,9 @@
-when printing outputs, use formatting to distinguish 
-identical from nonidentical lines
-
 when using dependencies, uncaught exceptions may translate
 improperly if they're not from the current file
 
 check API
 
 add ability for public remarks in tests
-
-pgup/pgdn going to end of blanks?
 
 add ability to have private_exercises folder
 

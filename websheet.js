@@ -15,13 +15,25 @@ function websheet(textarea_id, fragments, initial_snippets) {
       && (compare(int2.to, int1.to) < 0);
   }
 
-  function skip_space(range) {
-    var pos = range.from;
-    // skip past the first, ineditable, character
-    if (cm.getLine(pos.line).length == pos.ch) 
-      pos = {line: pos.line+1, ch: 0};
-    else
-      pos.ch++;
+  function goto(range, backward) {
+    var pos = backward ? range.from : range.to;
+    //console.log(pos);
+    // back past the last, ineditable, character
+    if (!backward) {
+      if (pos.ch == 0) 
+        pos = {line: pos.line-1, ch: cm.getLine(pos.line-1).length};
+      else
+        pos.ch--;
+    }
+    else {
+      if (pos.ch == cm.getLine(pos.line).length) 
+        pos = {line: pos.line+1, ch:0};
+      else
+        pos.ch++;
+    }
+    //console.log(pos);
+    if (!backward) return pos;
+
     // skip past any spaces that immediately follow
     // but not out of the editable range
     var theline = cm.getLine(pos.line);
@@ -40,13 +52,14 @@ function websheet(textarea_id, fragments, initial_snippets) {
     var first = null;
     var tgt = null;
     for (var i=(reverse ? editable.length-1 : 0); i>=0 && i<editable.length; i += (reverse ? -1 : 1)) {
-      var ustart = skip_space(editable[i].find());
+      var ustart = goto(editable[i].find(), reverse);
       if (compare(ustart, pos) == (reverse ? -1 : 1)) {
         cm.setCursor(ustart);
         return;
       }
     }
-    cm.setCursor(skip_space(editable[reverse ? editable.length-1 : 0].find()));
+    cm.setCursor(goto(editable[reverse ? editable.length-1 : 0].find(),
+                     reverse));
   }
 
   var keyMap = {PageDown: function() {next_blank(false); return true;},
@@ -254,6 +267,17 @@ function websheet(textarea_id, fragments, initial_snippets) {
     }
     latest_change = -1; // don't correct it twice
   });
+
+  // auto-indent when typing 1st char of line
+  cm.on("change", function(instance, changeObj) {
+    if (cm.getDoc().getSelection().length == 0) {
+      var lo = cm.getCursor("start").line;
+      if (cm.getLine(lo).trim().length == 1) {
+        cm.indentLine(lo, "smart");
+      }
+    }
+  }
+       );
   
   cm.on("renderLine", function(cm, line, elt) {
     var ln = cm.getLineNumber(line);
