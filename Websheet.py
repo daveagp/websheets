@@ -32,6 +32,7 @@ class Websheet:
     Websheet source is converted internally into a list of chunks.
     Each chunk has
     type: plain, blank, fake, or hide
+    
     """
 
     @staticmethod
