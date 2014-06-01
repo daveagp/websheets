@@ -2,7 +2,7 @@
 
 """
 Note: this is a relatively cheap and dirty solution that assumes
-that the delimeters never occur in comments or quotes
+that the delimiters never occur in comments or quotes
 in the source code. While this approach should be practical,
 a more full solution could be done by extending java_parse.
 """
@@ -21,14 +21,18 @@ def record(**dict):
 
 class Websheet:
 
-    # \[default should always be right after \[...]\
-
-    open_delim = {r'\[', r'\hide[', r'\fake[', r'\default['}
+    open_delim = {r'\[', r'\hide[', r'\fake['}
     close_delim = {']\\'} # rawstring can't end in \
 
     @staticmethod
     def sized_blank(token):
         return "\n"*max(2, token.count("\n")) if "\n" in token else " "*max(2, len(token))
+
+    """
+    Websheet source is converted internally into a list of chunks.
+    Each chunk has
+    type: plain, blank, fake, or hide
+    """
 
     @staticmethod
     def parse_websheet_source(source):
