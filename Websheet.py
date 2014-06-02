@@ -19,10 +19,18 @@ def record(**dict):
     such that foo.bar == 'baz', foo.jim == 5 """
     return type('', (), dict)
 
-class Websheet:
+ChunkType = record(plain=1, blank=2, fake=3, hide=4)
 
-    open_delim = {r'\[', r'\hide[', r'\fake['}
-    close_delim = {']\\'} # rawstring can't end in \
+class Chunk:
+    def __init__(self, text, type, attr=None):
+        self.text = text
+        self.type = type
+        if attr is None: attr={}
+        self.attr = attr 
+    def __repr__(self):
+        return repr([self.text, self.type, self.attr])
+
+class Websheet:
 
     @staticmethod
     def sized_blank(token):
@@ -32,49 +40,96 @@ class Websheet:
     Websheet source is converted internally into a list of chunks.
     Each chunk has
     type: plain, blank, fake, or hide
-    
+    text: string. starts and ends with space if inline, \n if multiline
+                  except for plain type, first and last character must be same
+    attr: dict of additional properties (like "show" for blank)
     """
 
     @staticmethod
-    def parse_websheet_source(source):
-        # allowing source to start with a newline 
-        # makes the source files prettier
-        if (source[:1]=="\n"):
-            source = source[1:]
+    def chunkify(source):
 
+        # normalize so starts, ends with newline if not already present
+        if (source[:1]!="\n"):
+            source = "\n"+source
+        if (source[-1:]!="\n"):
+            source = source+"\n"
+
+        open_delim = {r'\[', r'\hide[', r'\fake['}
+        close_delim = {']\\'} # rawstring can't end in \
+        delim = open_delim | close_delim
+
+        typemap = {r"\[":ChunkType.blank,
+                   r"\hide[":ChunkType.hide,
+                   r"\fake[":ChunkType.fake}
+
+        # normalize by collapsing whitespace around syntactically correct
+        # delimiters for multi-line regions
+        for d in delim | {r"\show:"}:
+            source = re.sub("\n[ \t]*"+re.escape(d)+"[ \t]*\n",
+                            "\n"+d.replace("\\", "\\\\")+"\n",
+                            source)
+
+        delim_expr = '|'.join(re.escape(d) for d in delim)
+
+        delim_iter = re.finditer(delim_expr, source)
+
+        last_close_end = 0
         result = []
-        pos = 0
-        n = len(source)
         
-        regex = '|'.join(re.escape(delim) for delim in 
-                         (Websheet.open_delim | 
-                          Websheet.close_delim)) # set union
-        
-        depth = 0
+        while True:
+            match = next(delim_iter, None)
+            if match is None: break
+            if match.group(0) in close_delim:
+                return [False, "Found closing delimiter \\] not matching"+
+                        " any earlier opening delimiter"]
+            close = next(delim_iter, None)
+            if close is None:
+                return [False, "Found opening delimiter "+match.group(0)+
+                        " without a matching close delimiter \\]"]
+            if close.group(0) not in close_delim:
+                return [False, "Found opening delimiter "+match.group(0)+
+                        " followed by another opening delimiter "+close.group(0)]
 
-        #print(json.dumps(re.split('('+regex+')', source)))
-        for token in re.split('('+regex+')', source):
-            if token in Websheet.open_delim:
-                depth += 1
-                type = "open"
-            elif token in Websheet.close_delim:
-                depth -= 1
-                type = "close"
+            contained = source[match.end():close.start()]
+            interstitial = source[last_close_end:match.start()]
+
+            if "\n" in contained:
+                if (source[match.start()-1] != "\n"
+                    or source[match.end()] != "\n"):
+                    return [False, "Improper multi-line-start delimiter " +
+                            source[source.rindex("\n", 0, match.start()):
+                                   source.index("\n", match.end())]]
+                if (source[close.start()-1] != "\n"
+                    or source[close.end()] != "\n"):
+                    return [False, "Improper multi-line-end delimiter " +
+                            source[source.rindex("\n", 0, close.start()):
+                                   source.index("\n", close.end())]]
+                if interstitial != "\n":
+                    result.append(Chunk(interstitial, ChunkType.plain))
+                    
+                chunk = Chunk(contained, typemap[match.group(0)])
+
+                p = contained.find("\n\\show:\n")
+                if p != -1:
+                    chunk.text = contained[:p+1] # include \n
+                    chunk.attr["show"] = contained[p+7:] # include \n
+                result.append(chunk)
             else:
-                type = ""
-                
-            result.append(record(depth=depth, token=token, type=type))
-        
-            if depth < 0:
-                return [False, 
-                        'Error in websheet source code:'+
-                        ' too many closing delimiters']
-            if depth > 1:
-                return [False, 'Error in websheet source code:'+
-                        ' nesting not currently allowed']
-        if depth != 0:
-            return [False, 'Error in websheet source code:'+
-                    ' not enough closing delimiters']
+                if interstitial != "":
+                    result.append(Chunk(interstitial, ChunkType.plain))
+                    
+                chunk = Chunk(contained, typemap[match.group(0)])
+
+                p = contained.find("\\show:")
+                if p != -1:
+                    chunk.text = contained[:p] 
+                    chunk.attr["show"] = contained[p+6:]
+                result.append(chunk)
+            last_close_end = close.end()
+
+        interstitial = source[last_close_end:]
+        if interstitial != "\n":
+            result.append(Chunk(interstitial, ChunkType.plain))
 
         return [True, result]
 
@@ -83,70 +138,35 @@ class Websheet:
         mandatory_fields = ["classname", "source_code", "tests", "description"]
 
         # optional fields AND default values
-        optional_fields = {"tester_preamble": None, "show_class_decl": True,
+        optional_fields = {"tester_preamble": None, "add_class_decl": True,
                            "epilogue": None, "dependencies": [], "imports": []}
 
+        if re.match("^\n*public class") is not None:
+            optional_fields["add_class_decl"] = False
+        
         for field in mandatory_fields:
             setattr(self, field, field_dict[field])
 
         for field in optional_fields:
             setattr(self, field, field_dict[field] if field in field_dict else optional_fields[field])
 
-        # remove "public class" if there
-        lines = self.source_code.split("\n")
-        while lines[:1] == [""]: lines = lines[1:]
-        while lines[-1:] == [""]: lines = lines[:-1]
+        if self.add_class_decl:
+            self.source_code.replace("\n", "\n   ")
+            self.source_code = ("public class " + self.classname + "{\n" +
+                                self.source_code+"}")
 
-        # unindent
-        spc = 0
-        while (lines[0].startswith(" "*(spc+1))): spc += 1
+        chunks = Websheet.chunkify(self.source_code)
 
-        if "public class" in lines[0]:
-            lines = lines[1:-1]
-            if spc == 0: 
-                while (lines[0].startswith(" "*(spc+1))): spc += 1
-            
-        for i in range(len(lines)):
-            if (lines[i].startswith(" "*spc)): lines[i] = lines[i][spc:]
-        self.source_code = "\n".join(lines) + "\n"
-
-        
-        parsed = Websheet.parse_websheet_source(self.source_code)
-
-        if not parsed[0]:
+        if not chunks[0]:
             raise Exception("Could not parse websheet source code: " 
-                            + parsed[1])
+                            + chunks[1])
+
+        self.chunks = chunks[1]
 
         self.input_count = 0
-        for token in parsed[1]:
-            if token.type == "open" and token.token == r"\[":
-                self.input_count += 1
-                
-        self.token_list = parsed[1]
-
-    def iterate_token_list(self, with_delimiters = False):
-        stack = []
-        input_counter = 0
-        for item in self.token_list:
-            info = {}
-            if item.type=="open":
-                stack.append(item.token)
-            elif item.type=="close":
-                stack.pop()
-            else:
-                assert item.type==""
-                if stack == [r"\["]:
-                    info["blank_index"] = input_counter
-                    input_counter += 1
-                    if '\n' in item.token:
-                        if (item.token[:1] != '\n'): item.token = '\n' + item.token
-                        if (item.token[-1:] != '\n'): item.token += '\n'
-                    else:
-                        if (item.token[:1] != ' '): item.token = ' ' + item.token
-                        if (item.token[-1:] != ' '): item.token += ' '
-
-            if with_delimiters or item.type=="":
-                yield (item, stack, info)      
+        for chunk in self.chunks:
+            if chunk.type == ChunkType.blank:
+                self.input_count += 1                
 
     def make_student_solution(self, student_code, package = None):
         if self.input_count != len(student_code):
@@ -156,8 +176,6 @@ class Websheet:
         linemap = {}
         ui_lines = 1 # user interface lines
         ss_lines = 1 # student solution lines
-
-        if self.show_class_decl: ui_lines += 1
 
         last_line_with_blank = -1
         blank_count_on_line = -1
@@ -305,9 +323,6 @@ class Websheet:
     def get_json_template(self):
         r = [""]
 
-        if self.show_class_decl:
-            r[0] += "public class "+self.classname+" {\n"
-
         for (item, stack, info) in self.iterate_token_list():
             token = item.token
             if stack == [] or stack == [r"\fake["]:
@@ -317,14 +332,6 @@ class Websheet:
             elif stack == [r"\["]:
                 if len(r) % 2 == 1: r += [""]
                 r[-1] += Websheet.sized_blank(token)
-
-        if self.show_class_decl:
-            for i in range(len(r)): # indent 
-                if i % 2 == 0:
-                    r[i] = r[i].replace("\n", "\n   ")
-                    if (r[i].endswith("\n   ")): r[i] = r[i][:-3]
-            if len(r) % 2 == 0: r += ["\n}\n"]
-            else: r[-1] += "}\n"
 
         for i in self.imports:
             r[0] = 'import '+i+'\n' + r[0]
@@ -367,6 +374,22 @@ self.classname + " to = new " + self.classname + "();\n" +
     @staticmethod
     def from_filesystem(slug):
         return Websheet.from_module(getattr(__import__("exercises." + slug), slug))
+
+def basic_test():
+    c = Websheet.chunkify(
+r"""foo
+\[bar\show:moo  ]\
+  
+\fake[
+fakeeke
+]\
+man """)
+    print(repr(c))
+    if c[0]:
+        for e in c[1]:
+            print(repr(e))
+    else:
+        print(c[1])
 
 if __name__ == "__main__":
 
