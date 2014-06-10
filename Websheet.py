@@ -19,10 +19,11 @@ def record(**dict):
     such that foo.bar == 'baz', foo.jim == 5 """
     return type('', (), dict)
 
+# should be enum, but let's not require python 3.4
 ChunkType = record(plain=1, blank=2, fake=3, hide=4)
 
 class Chunk:
-    def __init__(self, text, type, attr=None):
+    def __init__(self, text, type, attr=None): # avoid aliasing
         self.text = text
         self.type = type
         if attr is None: attr={}
@@ -34,25 +35,23 @@ class Websheet:
 
     @staticmethod
     def sized_blank(token):
-        return "\n"*max(2, token.count("\n")) if "\n" in token else " "*max(2, len(token))
-
-    """
-    Websheet source is converted internally into a list of chunks.
-    Each chunk has
-    type: plain, blank, fake, or hide
-    text: string. starts and ends with space if inline, \n if multiline
-                  except for plain type, first and last character must be same
-    attr: dict of additional properties (like "show" for blank)
-    """
+        """Return blank area corresponding to this reference text"""
+        if "\n" in token: return "\n"*max(2, token.count("\n"))
+        return " "*max(2, len(token))
 
     @staticmethod
     def chunkify(source):
+        """
+        Websheet source is converted internally into a list of chunks.
+        Each chunk has
+        type: plain, blank, fake, or hide
+        text: string. starts and ends with space if inline, \n if multiline
+                      except for plain type, first and last character must
+                      be same
+        attr: dict of additional properties (like "show" for blank)
 
-        # normalize so starts, ends with newline if not already present
-        if (source[:1]!="\n"):
-            source = "\n"+source
-        if (source[-1:]!="\n"):
-            source = source+"\n"
+        Returns [False, "error string"] or [True, list of chunks]
+        """
 
         open_delim = {r'\[', r'\hide[', r'\fake['}
         close_delim = {']\\'} # rawstring can't end in \
@@ -109,22 +108,28 @@ class Websheet:
                     
                 chunk = Chunk(contained, typemap[match.group(0)])
 
+                # for plain chunks. maybe generalize later
                 p = contained.find("\n\\show:\n")
                 if p != -1:
                     chunk.text = contained[:p+1] # include \n
                     chunk.attr["show"] = contained[p+7:] # include \n
+
                 result.append(chunk)
+
             else:
                 if interstitial != "":
                     result.append(Chunk(interstitial, ChunkType.plain))
                     
                 chunk = Chunk(contained, typemap[match.group(0)])
 
+                # for plain chunks. maybe generalize later
                 p = contained.find("\\show:")
                 if p != -1:
                     chunk.text = contained[:p] 
                     chunk.attr["show"] = contained[p+6:]
+
                 result.append(chunk)
+
             last_close_end = close.end()
 
         interstitial = source[last_close_end:]
@@ -134,34 +139,50 @@ class Websheet:
         return [True, result]
 
     def __init__(self, field_dict):
+        """Constructor, accepts a string-to-string dictionary of field names,
+        values. Some are mandatory and some are optional"""
 
         mandatory_fields = ["classname", "source_code", "tests", "description"]
 
         # optional fields AND default values
-        optional_fields = {"tester_preamble": None, "add_class_decl": True,
+        optional_fields = {"tester_preamble": None, "show_class_decl": True,
                            "epilogue": None, "dependencies": [], "imports": []}
 
-        if re.match("^\n*public class") is not None:
-            optional_fields["add_class_decl"] = False
-        
         for field in mandatory_fields:
             setattr(self, field, field_dict[field])
 
         for field in optional_fields:
             setattr(self, field, field_dict[field] if field in field_dict else optional_fields[field])
 
-        if self.add_class_decl:
-            self.source_code.replace("\n", "\n   ")
-            self.source_code = ("public class " + self.classname + "{\n" +
-                                self.source_code+"}")
+        # normalize so starts, ends with newline if not already present
+        if not self.source_code.startswith("\n"):
+            self.source_code = "\n"+self.source_code
+        if not self.source_code.endswith("\n"):
+            self.source_code = self.source_code+"\n"
 
-        chunks = Websheet.chunkify(self.source_code)
+        # as a convenience, add "public class classname { ... }" if it is not there
+        if re.match("\npublic class "+self.classname) is None:
+            # indent if outer declaration will be visible
+            if self.show_class_decl:
+                self.source_code.replace("\n", "\n   ")
+            self.source_code = ("\npublic class " + self.classname + "{" +
+                                self.source_code+"}\n")
 
-        if not chunks[0]:
+        # hide class declaration if requested. note! assumes very basic structure
+        if not self.show_class_decl:
+            # hide thing at start
+            self.source_code.replace("\npublic class "+self.classname+r"\s*{\s*"+"\n",
+                                     "\n\\hide[\npublic class "+self.classname+" {\n]\\\n")
+            # hide thing at end
+            self.source_code.replace("\n\\s*}(\n|\\s)*$", "\n\\hide[\n}\n]\\\n")
+
+        chunkify_result = Websheet.chunkify(self.source_code)
+
+        if not chunkify_result[0]:
             raise Exception("Could not parse websheet source code: " 
-                            + chunks[1])
+                            + chunkify_result[1])
 
-        self.chunks = chunks[1]
+        self.chunks = chunkify_result[1]
 
         self.input_count = 0
         for chunk in self.chunks:
@@ -169,10 +190,18 @@ class Websheet:
                 self.input_count += 1                
 
     def make_student_solution(self, student_code, package = None):
+        """
+        student_code: a list of dicts, each for a blank region in the ui,
+                      with "code" (the text), "from" and "to" (like CodeMirror)
+
+        returns [False, "error string"]
+        or [True, combined code, map from student solution line#s to ui line#s]
+        """
+        
         if self.input_count != len(student_code):
             return [False, "Internal error! Wrong number of inputs"]
 
-        r = []
+        r = [] # result
         linemap = {}
         ui_lines = 1 # user interface lines
         ss_lines = 1 # student solution lines
@@ -182,97 +211,95 @@ class Websheet:
 
         r.extend('\n' if package is None else 'package '+package+';\n')
         r.extend('import stdlibpack.*;\n')
-        
+        ss_lines += 2
+
+        linemap[ss_lines] = ui_lines 
+
         for i in self.imports:
             r.extend('import '+i+'\n')
             ss_lines += 1
             ui_lines += 1
+            linemap[ss_lines] = ui_lines 
 
-        r.extend('public class '+self.classname+" {\n")
-        ss_lines += 3
+        blanks_processed = 0
 
-        for (item, stack, info) in self.iterate_token_list():
-            if len(stack)==0:
-                chunk = item.token
+        for chunk in chunks:
+            if chunk.type == ChunkType.plain:
 
-                r.append(chunk)
+                r.append(chunk.text)
                 # index java lines starting from 1
                 generatedLine = 1 + sum(map(lambda st : st.count("\n"), r))
 
-                if chunk != "" and chunk != "\n":
-                    if chunk[:1] != "\n":
-                        linemap[ss_lines] = ui_lines 
-                    for i in range(0, item.token.count("\n")):
-                        ui_lines += 1
-                        ss_lines += 1
-                        linemap[ss_lines] = ui_lines 
+                for i in range(0, chunk.text.count("\n")):
+                    ui_lines += 1
+                    ss_lines += 1
+                    linemap[ss_lines] = ui_lines 
 
-            else:
-                assert len(stack)==1
-
-                if stack==[r"\fake["]:
-                    for i in range(0, item.token.count("\n")):
-                        ui_lines += 1 
+            elif chunk.type == ChunkType.fake:
+                ui_lines += chunk.text.count("\n")
                 
-                if stack[0]==r"\[":
+            elif chunk.type == ChunkType.hide:
+                r.append(chunk.text)
+                ss_lines += chunk.text.count("\n")
+
+            elif chunk.type == ChunkType.blank:
                     
-                    i = info["blank_index"]
+                i = blanks_processed
+                blanks_processed += 1
 
-                    chunk = student_code[i]['code']
-                    pos = student_code[i] # has 'from', 'to'
+                chunk = student_code[i]['code']
+                pos = student_code[i] # has 'from', 'to'
 
-                    if ui_lines == last_line_with_blank and '\n' not in chunk:
-                        blank_count_on_line += 1
+                if ui_lines == last_line_with_blank and '\n' not in chunk:
+                    blank_count_on_line += 1
+                else:
+                    last_line_with_blank = ui_lines
+                    blank_count_on_line = 1
+
+                valid = java_syntax.is_valid_substitute(
+                    item.token, chunk.text)
+
+                # not valid substitute. report error that makes sense for ui user sees
+                if not valid[0]:
+                    match = re.search(re.compile(r"^Error at line (\d+), column (\d+):\n(.*)$"), valid[1])
+                    if match is None: # error at end of chunk
+                        ui_line = pos['to']['line']-(1 if "\n" in chunk.text else 0)
+                        if "\n" in chunk.text:
+                            user_pos = "Line "+str(ui_line)+", in editable region"
+                        else:
+                            user_pos = "Line "+str(ui_line)+", editable region " + str(blank_count_on_line)
+                        return [False, user_pos + ":\n" + valid[1]]
                     else:
-                        last_line_with_blank = ui_lines
-                        blank_count_on_line = 1
-
-                    valid = java_syntax.is_valid_substitute(
-                        item.token, chunk)
-
-                    if not valid[0]:
-                        match = re.search(re.compile(r"^Error at line (\d+), column (\d+):\n(.*)$"), valid[1])
-                        if match is None: # error at end of chunk
-                            if "\n" in chunk:
-                                user_pos = "Line "+str(pos['to']['line']-(1 if "\n" in chunk else 0))+", in editable region"
-                            else:
-                                user_pos = "Line "+str(pos['to']['line']-(1 if "\n" in chunk else 0))+", editable region " + str(blank_count_on_line)
-                            return [False, user_pos + ":\n" + valid[1]]
+                        if match.group(1)=="0":
+                            user_pos = {"line": pos['from']['line'],
+                                        "col": pos['from']['ch']+int(match.group(2))}
                         else:
-                            if match.group(1)=="0":
-                                user_pos = {"line": pos['from']['line'],
-                                            "col": pos['from']['ch']+int(match.group(2))}
-                            else:
-                                user_pos = {"line": pos['from']['line']+int(match.group(1)),
-                                            "col": int(match.group(2))}
-                                if "\n" not in chunk: user_pos["line"] += 1
-                            user_pos = "Line " + str(user_pos["line"]+1) + ", col " + str(user_pos["col"])+" (blank " + str(blank_count_on_line) + ")\n"
-                            return [False, 
-                                    user_pos + ": " + match.group(3)]
+                            user_pos = {"line": pos['from']['line']+int(match.group(1)),
+                                        "col": int(match.group(2))}
+                            if "\n" not in chunk: user_pos["line"] += 1
+                        user_pos = ("Line " + str(user_pos["line"]+1)
+                                    + ", col " + str(user_pos["col"])
+                                    +" (blank " + str(blank_count_on_line) + ")\n")
+                        return [False, 
+                                user_pos + ": " + match.group(3)]
 
-                    # now add the user code to the combined solution
-                    if pos != None:
-                        # index java lines starting from 1
-                        generatedLine = 1 + sum(map(lambda st : st.count("\n"), r))
+                # now add the user code to the combined solution
+                if pos != None:
+                    # index java lines starting from 1
+                    generatedLine = 1 + sum(map(lambda st : st.count("\n"), r))
 
-                        if "\n" in chunk:
-                            for i in range(1, chunk.count("\n")):
-                                linemap[generatedLine+i] = pos['from']['line']+i
+                    if "\n" in chunk.text:
+                        for i in range(1, chunk.text.count("\n")):
+                            linemap[generatedLine+i] = pos['from']['line']+i
 
-                        else:
-                            # just a single line
-                            linemap[generatedLine] = pos['from']['line']
-                            
-                    r.append(chunk)
-                    ui_lines += max(0, chunk.count("\n")-2) # probably not always accurate!
-                    ss_lines += chunk.count("\n")
+                    else:
+                        # just a single line
+                        linemap[generatedLine] = pos['from']['line']
+                        
+                r.append(chunk.text)
+                ui_lines += max(0, chunk.text.count("\n")-2) # probably not always accurate!
+                ss_lines += chunk.text.count("\n")
                     
-                elif stack[0]==r"\hide[":
-                    r.append(item.token)
-                    ss_lines += item.token.count("\n")
-                elif stack[0]==r"\fake[":
-                    pass
-
         r.extend("\n}")
         return [True, ''.join(r), linemap]
 
