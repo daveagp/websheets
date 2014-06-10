@@ -1,8 +1,8 @@
 description = r"""
 """
 
-imports = ["java.util.concurrent.RecursiveAction;",
-"java.util.concurrent.ForkJoinPool;"]
+imports = ["java.util.concurrent.RecursiveAction",
+"java.util.concurrent.ForkJoinPool"]
 
 source_code = r"""
    public static void main(String[] args) {

@@ -1,4 +1,4 @@
-imports = ["java.util.Set;", "java.util.TreeSet;"]
+imports = ["java.util.Set", "java.util.TreeSet"]
 description = r"""
 Define a method <tt>addReverses(Set&lt;String&gt; ss)</tt> that takes 
 a set of strings, and adds to that set the reverse of every string in the set.

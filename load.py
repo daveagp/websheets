@@ -18,4 +18,5 @@ if __name__ == "__main__":
                     "num_submissions": config.num_submissions(student, classname),
                     "reference_sol": websheet.get_reference_snippets(),
                     "initial_snippets": websheet.get_initial_snippets()
-                    }))
+                    },
+                   indent=4, separators=(',', ': '))) # pretty!

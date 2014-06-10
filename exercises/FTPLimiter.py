@@ -107,5 +107,5 @@ tests = r"""
 dontRunReference = true;
 testMain();
 """ 
-imports = ["java.util.concurrent.Semaphore;" ]
+imports = ["java.util.concurrent.Semaphore" ]
 

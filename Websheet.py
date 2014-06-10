@@ -1,6 +1,10 @@
 #!/usr/bin/python3
 
 """
+Module to:
+- convert websheet definition (key-value string pairs) to a Websheet instance
+- pull out 
+
 Note: this is a relatively cheap and dirty solution that assumes
 that the delimiters never occur in comments or quotes
 in the source code. While this approach should be practical,
@@ -13,6 +17,8 @@ import os
 import exercises
 import json
 from java_syntax import java_syntax
+
+indent_width = 3
 
 def record(**dict):
     """ e.g. foo = record(bar='baz', jim=5) creates an object foo
@@ -34,20 +40,13 @@ class Chunk:
 class Websheet:
 
     @staticmethod
-    def sized_blank(token):
-        """Return blank area corresponding to this reference text"""
-        if "\n" in token: return "\n"*max(2, token.count("\n"))
-        return " "*max(2, len(token))
-
-    @staticmethod
     def chunkify(source):
         """
         Websheet source is converted internally into a list of chunks.
         Each chunk has
         type: plain, blank, fake, or hide
-        text: string. starts and ends with space if inline, \n if multiline
-                      except for plain type, first and last character must
-                      be same
+        text: string. if non-plain and contains an \n, it must
+              start with \n, and implicitly ends with \n
         attr: dict of additional properties (like "show" for blank)
 
         Returns [False, "error string"] or [True, list of chunks]
@@ -87,7 +86,8 @@ class Websheet:
                         " without a matching close delimiter \\]"]
             if close.group(0) not in close_delim:
                 return [False, "Found opening delimiter "+match.group(0)+
-                        " followed by another opening delimiter "+close.group(0)]
+                        " followed by another opening delimiter "
+                        +close.group(0)]
 
             contained = source[match.end():close.start()]
             interstitial = source[last_close_end:match.start()]
@@ -108,11 +108,14 @@ class Websheet:
                     
                 chunk = Chunk(contained, typemap[match.group(0)])
 
-                # for plain chunks. maybe generalize later
-                p = contained.find("\n\\show:\n")
-                if p != -1:
-                    chunk.text = contained[:p+1] # include \n
-                    chunk.attr["show"] = contained[p+7:] # include \n
+                if chunk.type == ChunkType.blank:
+                    # sized blank
+                    chunk.attr["show"] = "\n"*max(2, contained.count("\n"))
+                    # maybe generalize later
+                    p = contained.find("\n\\show:\n")
+                    if p != -1:
+                        chunk.text = contained[:p+1] # include \n
+                        chunk.attr["show"] = contained[p+7:] # include \n
 
                 result.append(chunk)
 
@@ -122,23 +125,62 @@ class Websheet:
                     
                 chunk = Chunk(contained, typemap[match.group(0)])
 
-                # for plain chunks. maybe generalize later
-                p = contained.find("\\show:")
-                if p != -1:
-                    chunk.text = contained[:p] 
-                    chunk.attr["show"] = contained[p+6:]
+                if chunk.type == ChunkType.blank:
+                    # sized blank
+                    chunk.attr["show"] = " " * max(2, 2+len(contained))
+                    # maybe generalize later
+                    p = contained.find("\\show:")
+                    if p != -1:
+                        chunk.text = contained[:p] 
+                        chunk.attr["show"] = contained[p+6:]
 
                 result.append(chunk)
 
             last_close_end = close.end()
 
         interstitial = source[last_close_end:]
-        if interstitial != "\n":
-            result.append(Chunk(interstitial, ChunkType.plain))
+        #if interstitial != "\n": let's keep this for consistency?
+        result.append(Chunk(interstitial, ChunkType.plain))
+
+        # every \n ending a chunk will always be followed by a \n starting
+        # the next chunk. rendering both will leave a gap line. so we'll
+        # remove one of each pair. also do some sanity checking
+        for i in range(0, len(result)):
+            def err(msg, info = None):
+                return [False, "Failed sanity check: chunk " + str(i) + " "
+                        + msg + ":\n" + repr(result[i].text) +
+                        ("" if info is None else "\n" + repr(info)) ]
+            if len(result[i].text)<1: return err("is too short")
+            if (result[i].type != ChunkType.plain and "\n" in result[i].text):
+                if len(result[i].text)<2: return err("is too short")
+                if result[i].text[0] != '\n': return err("has bad start")
+                if result[i].text[-1] != '\n': return err("has bad end")
+            if (i > 0 and
+                ((result[i-1].text[-1] == "\n") !=
+                 (result[i].text[0] == "\n"))):
+                return err("joins incorrectly with previous chunk")
+            if "show" in result[i].attr:
+                if (("\n" in result[i].attr["show"])
+                    != ("\n" in result[i].text)):
+                    return err("has wrong show shape", result[i].attr["show"])
+                if "\n" in result[i].attr["show"]:
+                    show_text = result[i].attr["show"]
+                    if len(show_text)<2: return err("show is too short")
+                    if show_text[0] != '\n': return err("show has bad start")
+                    if show_text[-1] != '\n': return err("show has bad end")
+
+            # cool, strip the extra newline
+            if i > 0 and result[i-1].text[-1] == "\n":
+                # prefer not to strip newline from fill-in-the-blank areas
+                if result[i].type != ChunkType.blank:
+                    result[i].text = result[i].text[1:]
+                else:
+                    result[i-1].text = result[i-1].text[:-1]
 
         return [True, result]
 
     def __init__(self, field_dict):
+
         """Constructor, accepts a string-to-string dictionary of field names,
         values. Some are mandatory and some are optional"""
 
@@ -152,7 +194,9 @@ class Websheet:
             setattr(self, field, field_dict[field])
 
         for field in optional_fields:
-            setattr(self, field, field_dict[field] if field in field_dict else optional_fields[field])
+            setattr(self, field,
+                    field_dict[field] if field in field_dict
+                    else optional_fields[field])
 
         # normalize so starts, ends with newline if not already present
         if not self.source_code.startswith("\n"):
@@ -160,22 +204,35 @@ class Websheet:
         if not self.source_code.endswith("\n"):
             self.source_code = self.source_code+"\n"
 
-        # as a convenience, add "public class classname { ... }" if it is not there
-        if re.match("\npublic class "+self.classname) is None:
+        # as a convenience, add "public class classname { ... }"
+        # if it is not there
+        if re.match("\npublic class "+self.classname,
+                    self.source_code) is None:
             # indent if outer declaration will be visible
+            def indent(s):
+                needsfix = s.endswith("\n")
+                s = s.replace("\n", "\n" + (" "*indent_width))
+                if needsfix: s = s[:-indent_width]
+                return s
+
             if self.show_class_decl:
-                self.source_code.replace("\n", "\n   ")
-            self.source_code = ("\npublic class " + self.classname + "{" +
+                self.source_code = indent(self.source_code)
+            self.source_code = ("\npublic class " + self.classname + " {" +
                                 self.source_code+"}\n")
 
-        # hide class declaration if requested. note! assumes very basic structure
+        # hide class declaration if requested.
+        # note! for this to work, comments should go inside of class decl.
+        
         if not self.show_class_decl:
             # hide thing at start
-            self.source_code.replace("\npublic class "+self.classname+r"\s*{\s*"+"\n",
-                                     "\n\\hide[\npublic class "+self.classname+" {\n]\\\n")
+            self.source_code.replace(
+                "\npublic class "+self.classname+r"\s*{\s*"+"\n",
+                "\n\\hide[\npublic class "+self.classname+" {\n]\\\n")
             # hide thing at end
-            self.source_code.replace("\n\\s*}(\n|\\s)*$", "\n\\hide[\n}\n]\\\n")
-
+            self.source_code.replace(
+                "\n\\s*}(\n|\\s)*$",
+                "\n\\hide[\n}\n]\\\n")
+            
         chunkify_result = Websheet.chunkify(self.source_code)
 
         if not chunkify_result[0]:
@@ -183,6 +240,16 @@ class Websheet:
                             + chunkify_result[1])
 
         self.chunks = chunkify_result[1]
+
+        # after chunkifying, remove initial and final newlines
+        if (self.chunks[0].type == ChunkType.plain
+            and self.chunks[0].text.startswith('\n')):
+            self.chunks[0].text = self.chunks[0].text[1:]
+        else: raise Exception("Internal error removing initial newline")
+        if (self.chunks[-1].type == ChunkType.plain
+            and self.chunks[-1].text.endswith('\n')):
+            self.chunks[-1].text = self.chunks[-1].text[:-1]
+        else: raise Exception("Internal error removing final newline")
 
         self.input_count = 0
         for chunk in self.chunks:
@@ -192,9 +259,11 @@ class Websheet:
     def make_student_solution(self, student_code, package = None):
         """
         student_code: a list of dicts, each for a blank region in the ui,
-                      with "code" (the text), "from" and "to" (like CodeMirror)
+                      with "code" (the text),
+                      (deprecated) and "from" and "to" (like CodeMirror)
 
-        returns [False, "error string"]
+        returns [False, "error string"] -- usually error means student
+          did some syntactically bad thing like unmatched parens within a blank
         or [True, combined code, map from student solution line#s to ui line#s]
         """
         
@@ -223,13 +292,9 @@ class Websheet:
 
         blanks_processed = 0
 
-        for chunk in chunks:
+        for chunk in self.chunks:
             if chunk.type == ChunkType.plain:
-
                 r.append(chunk.text)
-                # index java lines starting from 1
-                generatedLine = 1 + sum(map(lambda st : st.count("\n"), r))
-
                 for i in range(0, chunk.text.count("\n")):
                     ui_lines += 1
                     ss_lines += 1
@@ -247,128 +312,120 @@ class Websheet:
                 i = blanks_processed
                 blanks_processed += 1
 
-                chunk = student_code[i]['code']
-                pos = student_code[i] # has 'from', 'to'
+                user_text = student_code[i]['code']
+                if (len(user_text)) < 2:
+                    return ["False", "Internal error: User chunk " + str(i)
+                            + " too short: " + user_text]
+                if "\n" in user_text:
+                    if "\n" not in chunk.text:
+                        return ["False", "Internal error: User chunk " + str(i)
+                                + " shouldn't be multiline: " + user_text]
+                    if user_text[0] != '\n':
+                        return ["False", "Internal error: User chunk " + str(i)
+                                + " multiline but doesn't start with newline"] 
+                    if user_text[-1] != '\n':
+                        return ["False", "Internal error: User chunk " + str(i)
+                                + " multiline but doesn't end with newline"]
+                    user_text = user_text[:-1] # strip trailing newline
 
-                if ui_lines == last_line_with_blank and '\n' not in chunk:
+                if ui_lines == last_line_with_blank and '\n' not in chunk.text:
                     blank_count_on_line += 1
                 else:
                     last_line_with_blank = ui_lines
                     blank_count_on_line = 1
 
                 valid = java_syntax.is_valid_substitute(
-                    item.token, chunk.text)
+                    chunk.text, user_text)
 
-                # not valid substitute. report error that makes sense for ui user sees
                 if not valid[0]:
-                    match = re.search(re.compile(r"^Error at line (\d+), column (\d+):\n(.*)$"), valid[1])
+                    # not valid substitute.
+                    # report error that makes sense for ui user sees
+                    match = re.search(
+                        re.compile(
+                        r"^Error at line (\d+), column (\d+):\n(.*)$"),
+                        valid[1])
+
                     if match is None: # error at end of chunk
-                        ui_line = pos['to']['line']-(1 if "\n" in chunk.text else 0)
-                        if "\n" in chunk.text:
-                            user_pos = "Line "+str(ui_line)+", in editable region"
-                        else:
-                            user_pos = "Line "+str(ui_line)+", editable region " + str(blank_count_on_line)
+                        user_pos = ui_lines
+                        user_pos += user_text.count("\n")
+                        user_pos = "Line "+str(user_pos)
+                        if "\n" in user_text:
+                            user_pos += (", editable region "
+                                         + str(blank_count_on_line))
                         return [False, user_pos + ":\n" + valid[1]]
-                    else:
-                        if match.group(1)=="0":
-                            user_pos = {"line": pos['from']['line'],
-                                        "col": pos['from']['ch']+int(match.group(2))}
-                        else:
-                            user_pos = {"line": pos['from']['line']+int(match.group(1)),
-                                        "col": int(match.group(2))}
-                            if "\n" not in chunk: user_pos["line"] += 1
-                        user_pos = ("Line " + str(user_pos["line"]+1)
-                                    + ", col " + str(user_pos["col"])
-                                    +" (blank " + str(blank_count_on_line) + ")\n")
-                        return [False, 
-                                user_pos + ": " + match.group(3)]
+                    else: # error within chunk
+                        user_line = ui_lines + int(match.group(1))
+                        return [False, "Line "+str(user_line)
+                                + ": " + match.group(3)]
 
-                # now add the user code to the combined solution
-                if pos != None:
-                    # index java lines starting from 1
-                    generatedLine = 1 + sum(map(lambda st : st.count("\n"), r))
-
-                    if "\n" in chunk.text:
-                        for i in range(1, chunk.text.count("\n")):
-                            linemap[generatedLine+i] = pos['from']['line']+i
-
-                    else:
-                        # just a single line
-                        linemap[generatedLine] = pos['from']['line']
-                        
-                r.append(chunk.text)
-                ui_lines += max(0, chunk.text.count("\n")-2) # probably not always accurate!
-                ss_lines += chunk.text.count("\n")
-                    
-        r.extend("\n}")
+                r.append(user_text)
+                for i in range(0, user_text.count("\n")):
+                    ui_lines += 1
+                    ss_lines += 1
+                    linemap[ss_lines] = ui_lines 
+                
         return [True, ''.join(r), linemap]
 
-    def get_reference_solution(self, package = None, before_ref="", after_ref=""):
+    def get_reference_solution(self, package = None):
+        """
+        Get the reference solution for use in grading. Note that the UI
+        exposes this in a different way, using get_reference_snippets
+        and then make_student_solution.
+        """
         r = []
 
-        r.extend('\n' if package is None else 'package '+package+';\n')
-        r.extend('import stdlibpack.*;\n')
-        for i in self.imports:
-            r.extend('import '+i+'\n')
+        r += ['\n' if package is None else 'package '+package+';\n']
+        r += ['import stdlibpack.*;\n']
+        r += ["import "+x+";\n" for x in self.imports]
 
-        r.extend('public class '+self.classname+" {\n")
-
-        for (item, stack, info) in self.iterate_token_list():
-            if len(stack)==0:
-                r.append(item.token)
-            else:
-                assert len(stack)==1
-                if stack[0] in {r"\[", r"\hide["}:
-                    r.extend([before_ref, item.token, after_ref])
-                else:
-                    assert stack[0] == r"\fake[" or stack[0] == r"\default["
-
-        r.extend("\n}")
+        for chunk in self.chunks:
+            if chunk.type in {ChunkType.plain,
+                              ChunkType.blank, ChunkType.hide}:
+                r.append(chunk.text)
         
         return ''.join(r)
 
     def get_reference_snippets(self):
-        r = []
-        for (item, stack, info) in self.iterate_token_list():
-            if stack == [r"\["]:
-                if "\n" in item.token: 
-                    r.append(item.token)
-                else:
-                    r.append(item.token)
-
-        return r
+        """
+        Get snippets of reference solution in a format that
+        they can be displayed in the UI
+        """
+        def normalize(text):
+            if "\n" in text: return text
+            if not text.startswith(" "): text = " " + text
+            if not text.endswith(" "): text = text + " "
+            return text
+            
+        return [normalize(chunk.text) for chunk in self.chunks
+                if chunk.type == ChunkType.blank]
         
     def get_initial_snippets(self):
-        r = []
-        for (item, stack, info) in self.iterate_token_list():
-            if stack == [r"\["]:
-                r.append(Websheet.sized_blank(item.token))
-            if stack == [r"\default["]:
-                r[-1] = item.token
-        return r
-        
+        """
+        Get contents of blank areas as they would appear to someone
+        opening a problem for the first time.
+        """
+        return [chunk.attr["show"] for chunk in self.chunks
+                if chunk.type == ChunkType.blank]
+         
     def get_json_template(self):
-        r = [""]
+        """
+        Return an odd-length alternating list of strings:
+        the first (0th), third, etc are read-only,
+        the other positions are editable areas for the student.
+        Note that each editable area either starts and ends with a space,
+        or starts and ends with a newline, and that the last character of
+        each string equals the first character of the next.
+        This will be used by the UI.
+        """
 
-        for (item, stack, info) in self.iterate_token_list():
-            token = item.token
-            if stack == [] or stack == [r"\fake["]:
-                if token != "": 
-                    if len(r) % 2 == 0: r += [""]
-                    r[-1] += token
-            elif stack == [r"\["]:
-                if len(r) % 2 == 1: r += [""]
-                r[-1] += Websheet.sized_blank(token)
+        r = ["\n".join("import "+x+";" for x in self.imports)]
 
-        for i in self.imports:
-            r[0] = 'import '+i+'\n' + r[0]
-
-        # second pass : trim excess newlines from fixed text adjacent to multi-line blanks
-        for i in range(0, len(r), 2):
-            if r[i].startswith("\n") and (i==0 or "\n" in r[i-1]):
-                r[i] = r[i][1:]
-            if r[i].endswith("\n") and (i==len(r)-1 or "\n" in r[i+1]):
-                r[i] = r[i][:-1]
+        for chunk in self.chunks:
+            if chunk.type == ChunkType.plain:
+                r[-1] += chunk.text
+            elif chunk.type == ChunkType.blank:
+                r += [chunk.attr["show"]]
+                r += [""]
 
         return r
 
@@ -402,22 +459,6 @@ self.classname + " to = new " + self.classname + "();\n" +
     def from_filesystem(slug):
         return Websheet.from_module(getattr(__import__("exercises." + slug), slug))
 
-def basic_test():
-    c = Websheet.chunkify(
-r"""foo
-\[bar\show:moo  ]\
-  
-\fake[
-fakeeke
-]\
-man """)
-    print(repr(c))
-    if c[0]:
-        for e in c[1]:
-            print(repr(e))
-    else:
-        print(c[1])
-
 if __name__ == "__main__":
 
     # call Websheet.py json
@@ -435,7 +476,7 @@ if __name__ == "__main__":
 
         while True:  
             print("#reference for "+w.classname+"#")
-            print(w.get_reference_solution(before_ref = "<r>", after_ref = "</r>"))
+            print(w.get_reference_solution())
             stulist = []
             for i in range(w.input_count):
                 r = ""

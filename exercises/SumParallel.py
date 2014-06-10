@@ -6,8 +6,8 @@ E.g., <tt>java Example1 100</tt> should print <tt>5050</tt>.
 You will have to fix two separate problems.
 """
 
-imports = ["java.util.concurrent.*;",
-           "java.util.concurrent.locks.*;"]
+imports = ["java.util.concurrent.*",
+           "java.util.concurrent.locks.*"]
 
 source_code = r"""
    // utility function
