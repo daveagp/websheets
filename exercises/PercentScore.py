@@ -23,15 +23,8 @@ public class PercentScore {
         int total1 = Integer.parseInt(args[1]);
         int score2 = Integer.parseInt(args[2]);
         int total2 = Integer.parseInt(args[3]);
-
-        // can't do 100 * (score1 + score2) / (total1 + total2)
-        // since the division would be "integer division"
-
-        // This is one solution:
+        // avoid integer division:
         System.out.println(100.0 * (score1 + score2) / (total1 + total2));
-
-        // many other solutions are possible, e.g.
-        //               (double) (score1 + score2) * 100 / (total1 + total2)
 ]\
     }
 }
@@ -42,4 +35,14 @@ testMain("8", "10", "15", "17");
 testMain("10", "10", "5", "5");
 testMain(randgen.nextInt(130)+"", "130", randgen.nextInt(70)+"", "70");
 testMain(randgen.nextInt(10)+"", 10+randgen.nextInt(12)+"", randgen.nextInt(70)+"", 70+randgen.nextInt(5)+"");
+"""
+
+epilogue = r"""
+If you used <i>integer division</i> like this,
+<pre>100 * (score1 + score2) / (total1 + total2)</pre>
+Java interprets this as dividing an integer by an integer,
+and will give you an integer answer, which is not correct.
+<p>The reference solution shows one correct approach, or you can <i>typecast</i> to a floating-point number before dividing,
+like this:
+<pre>(double) (score1 + score2) / (total1 + total2) * 100</pre>
 """

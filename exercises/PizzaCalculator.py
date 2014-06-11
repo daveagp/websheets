@@ -27,6 +27,7 @@ public class PizzaCalculator {
 """
 
 tests = r"""
+testMain("10");
 testMain("10.0");
 testMain("100.0");
 testMain("30.48");

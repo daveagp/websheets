@@ -19,30 +19,40 @@ loadProblem = function(slug) {
   $("#page").removeClass("ever-passed");
   $("#results").html("");
   $('#container').hide();
+  $('#errcontainer').hide();
   $('#selectSheet')[0].disabled = true;
   $('#selectSheet').val(slug);
   $.ajax("load.php",
-   {data: {problem: slug},
-	   dataType: "json",
-	   success: function(data) 
-	   {
-	       lastload = data;
-	       $('.exercise-header').html("Exercise Description: <code>" + slug + "</code>");
-	       $('#container').show();
-	       $('#selectSheet')[0].disabled = false;
-	       resetup(data);
-	       if (data.user_code != false)
-		   testWS.setUserAreas(data.user_code);
-               else {
-                   testWS.setUserAreas(data.initial_snippets);
-	           var lc = testWS.cm.lineCount();
-	           for (var i=0; i<lc; i++)
-		     testWS.cm.indentLine(i);
-               }
-	       if (data.ever_passed != false)
-		   $('#page').addClass("ever-passed");
-	       num_submissions = data.num_submissions;
-	   }});
+         {data: {problem: slug},
+	  dataType: "json",
+	  success: function(data) 
+          {
+            lastload = data;
+	    $('.exercise-header').html("Exercise Description: <code>" + slug + "</code>");
+	    $('#container').show();
+	    $('#selectSheet')[0].disabled = false;
+	    resetup(data);
+	    if (data.user_code != false)
+	      testWS.setUserAreas(data.user_code);
+            else {
+              testWS.setUserAreas(data.initial_snippets);
+	      var lc = testWS.cm.lineCount();
+	      for (var i=0; i<lc; i++)
+		testWS.cm.indentLine(i);
+            }
+	    if (data.ever_passed != false)
+	      $('#page').addClass("ever-passed");
+	    num_submissions = data.num_submissions;
+	  },
+          error: function(jqXHR, textStatus, errorThrown) {
+            if (textStatus == "parsererror") {
+              var info = jqXHR.responseText;
+              $("#errcontainer").html("Error..."+info);
+              $("#errcontainer").show();
+	      $('#selectSheet')[0].disabled = false;
+            }
+          }
+         });
 };
 
 checkSolution = function() {
@@ -73,6 +83,7 @@ checkSolution = function() {
 		 $('#page').addClass("ever-passed");
 	     }
 	     var results = data.results;
+             if (data.epilogue) results += "<br><p><i>Epilogue</i><p>" + data.epilogue + "</p>";
              $("#results").html(results);
              var line = results.match(/[Ll]ine (\d)+(?!\d)/);
              if (line != null && line.length > 0) {

@@ -1,7 +1,7 @@
 description = r"""
-Given two command-line arguments &mdash; <code>t</code>, representing the temperature 
+Your program will be given two command-line arguments: <code>t</code>, representing the temperature 
 (in Fahrenheit), and <code>v</code>, representing the wind speed 
-(in miles per hour) &mdash; print the wind chill <code>w</code> using the 
+(in miles per hour). It should print the wind chill <code>w</code> using the 
 following formula:
 <div style='text-align: center; margin-top: 0.5em'>
 <img src='exercises/WindChill.png'>

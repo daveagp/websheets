@@ -1,5 +1,3 @@
-# extra junk to make comment really at top
-
 source_code = r"""
 /*
  * Name: Alan Turing
@@ -8,20 +6,14 @@ source_code = r"""
  *
  * A program with an existential greeting
  */
-\fake[
 public class HelloWorld {
-]\
    public static void main(String[] args) {
 \[
       System.out.println("Hello, World");
 ]\
    }
-\fake[
 }
-]\
 """
-
-show_class_decl = False
 
 tests = r"""
    testMain();
@@ -33,4 +25,3 @@ Write a program that prints out
 Hello, World
 </pre>
 """
-

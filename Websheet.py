@@ -1,14 +1,15 @@
 #!/usr/bin/python3
 
 """
-Module to:
+Class to:
 - convert websheet definition (key-value string pairs) to a Websheet instance
-- pull out 
+- pull out components: read-only and read-write parts, reference solutions
+- splice together read-write inputs to make a compilable student solution
 
-Note: this is a relatively cheap and dirty solution that assumes
+Note: the parser is a relatively cheap and dirty solution that assumes
 that the delimiters never occur in comments or quotes
 in the source code. While this approach should be practical,
-a more full solution could be done by extending java_parse.
+a more full solution could be done by extending the java_syntax module.
 """
 
 import re
@@ -180,15 +181,20 @@ class Websheet:
         return [True, result]
 
     def __init__(self, field_dict):
-
-        """Constructor, accepts a string-to-string dictionary of field names,
-        values. Some are mandatory and some are optional"""
+        """
+        Constructor, accepts a string-to-string dictionary of field names,
+        values. Some are mandatory and some are optional; optional ones
+        will appear anyway as fields, but just with default values.
+        """
 
         mandatory_fields = ["classname", "source_code", "tests", "description"]
 
         # optional fields AND default values
         optional_fields = {"tester_preamble": None, "show_class_decl": True,
-                           "epilogue": None, "dependencies": [], "imports": []}
+                           "epilogue": None, "dependencies": [], "imports": [],
+                           "lang": "Java"}
+        if "lang" in field_dict:
+            optional_fields["show_class_decl"] = False
 
         for field in mandatory_fields:
             setattr(self, field, field_dict[field])
@@ -198,16 +204,21 @@ class Websheet:
                     field_dict[field] if field in field_dict
                     else optional_fields[field])
 
+        for field in field_dict:
+            if (not field.startswith("_") and
+                field not in mandatory_fields and
+                field not in optional_fields): 
+                raise Exception("Unknown field" + field)
+
         # normalize so starts, ends with newline if not already present
         if not self.source_code.startswith("\n"):
             self.source_code = "\n"+self.source_code
         if not self.source_code.endswith("\n"):
             self.source_code = self.source_code+"\n"
 
-        # as a convenience, add "public class classname { ... }"
-        # if it is not there
-        if re.match("\npublic class "+self.classname,
-                    self.source_code) is None:
+        # as a convenience, add public class classname { ... } if not there
+        if (self.lang == "Java" and
+            "public class "+self.classname not in self.source_code):
             # indent if outer declaration will be visible
             def indent(s):
                 needsfix = s.endswith("\n")
@@ -225,13 +236,16 @@ class Websheet:
         
         if not self.show_class_decl:
             # hide thing at start
-            self.source_code.replace(
-                "\npublic class "+self.classname+r"\s*{\s*"+"\n",
-                "\n\\hide[\npublic class "+self.classname+" {\n]\\\n")
+            self.source_code = re.sub( 
+                "^public class "+self.classname+r" *\{ *$",
+                r"\hide["+"\n"+"public class "+self.classname+" {\n"+"]\\\\",
+                self.source_code,
+                flags=re.MULTILINE)
             # hide thing at end
-            self.source_code.replace(
-                "\n\\s*}(\n|\\s)*$",
-                "\n\\hide[\n}\n]\\\n")
+            self.source_code = re.sub(
+                "\n}\s*$",
+                "\n" + r"\hide[" + "\n" + "}" + "\n" + "]\\\\" + "\n",
+                self.source_code)
             
         chunkify_result = Websheet.chunkify(self.source_code)
 
@@ -241,20 +255,16 @@ class Websheet:
 
         self.chunks = chunkify_result[1]
 
-        # after chunkifying, remove initial and final newlines
+        # after chunkifying, remove initial newline. final is removed in UI
         if (self.chunks[0].type == ChunkType.plain
             and self.chunks[0].text.startswith('\n')):
             self.chunks[0].text = self.chunks[0].text[1:]
-        else: raise Exception("Internal error removing initial newline")
-        if (self.chunks[-1].type == ChunkType.plain
-            and self.chunks[-1].text.endswith('\n')):
-            self.chunks[-1].text = self.chunks[-1].text[:-1]
-        else: raise Exception("Internal error removing final newline")
-
+        # fail silently. SquareSwap is an example of this
+        
         self.input_count = 0
         for chunk in self.chunks:
             if chunk.type == ChunkType.blank:
-                self.input_count += 1                
+                self.input_count += 1
 
     def make_student_solution(self, student_code, package = None):
         """
@@ -326,7 +336,6 @@ class Websheet:
                     if user_text[-1] != '\n':
                         return ["False", "Internal error: User chunk " + str(i)
                                 + " multiline but doesn't end with newline"]
-                    user_text = user_text[:-1] # strip trailing newline
 
                 if ui_lines == last_line_with_blank and '\n' not in chunk.text:
                     blank_count_on_line += 1
@@ -421,12 +430,14 @@ class Websheet:
         r = ["\n".join("import "+x+";" for x in self.imports)]
 
         for chunk in self.chunks:
-            if chunk.type == ChunkType.plain:
+            if chunk.type in {ChunkType.plain, ChunkType.fake}:
                 r[-1] += chunk.text
             elif chunk.type == ChunkType.blank:
                 r += [chunk.attr["show"]]
                 r += [""]
 
+        # remove trailing newlines from last read-only region
+        while r[-1].endswith("\n"): r[-1] = r[-1][:-1]
         return r
 
     def make_tester(self):        
