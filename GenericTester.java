@@ -7,6 +7,7 @@ import stdlibpack.*;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
+import javax.json.*;
 
 public abstract class GenericTester {
 
@@ -195,8 +196,10 @@ public abstract class GenericTester {
             }
             if (testStdinURL != null) {
                 String[] urlSplit = testStdinURL.split("/");
-                graderOut.println("<code> &lt; <a target=\"_blank\" href=\""+testStdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>");
-                testStdin = new In(testStdinURL).readAll();
+                graderOut.println("<code> &lt; <a target=\"_blank\" href=\""+testStdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>");                
+                //testStdin = new In(testStdinURL).readAll();
+                testStdin = testerStdin.getJsonObject("fetched_urls").
+                    getString(testStdinURL);
                 testStdinURL = null;
                 suppressStdinDescription = true;
             }
@@ -204,7 +207,7 @@ public abstract class GenericTester {
         }
 	protected void describeStdin() {
 	    if (testStdin != null && !suppressStdinDescription) {
-		graderOut.println("with standard input"+pre(testStdin));
+		graderOut.println(" with standard input"+pre(testStdin));
 	    }
 	}
 
@@ -901,13 +904,15 @@ public abstract class GenericTester {
                     String tmp = "java " + fakeNameOfClass;
                     for (String a : argStrings) tmp += " " + a;
                     tmp = code(tmp);
-                    graderOut.println(tmp);
+                    graderOut.print(tmp);
                 }
 
                 if (testStdinURL != null) {
                     String[] urlSplit = testStdinURL.split("/");
                     graderOut.println("<code> &lt; <a target=\"_blank\" href=\""+testStdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>");
-                    testStdin = new In(testStdinURL).readAll();
+                    //testStdin = new In(testStdinURL).readAll();
+                    testStdin = testerStdin.getJsonObject("fetched_urls").
+                        getString(testStdinURL);
                     testStdinURL = null;
                     suppressStdinDescription = true;
                 }
@@ -944,9 +949,17 @@ public abstract class GenericTester {
             throw new RuntimeException("Internal error: class not found " + e);
         }
     }
+
+    JsonObject testerStdin;
     
     protected void genericMain(String[] args) {
         studentName = args[0];
+
+        JsonReader jr = Json.createReader(System.in);
+        testerStdin = jr.readObject();
+        jr.close();
+
+        //System.out.println(testerStdin.toString());
 
         // quit with code -1 after 5 seconds
         Timer timer = new Timer();

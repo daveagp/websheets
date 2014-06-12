@@ -1,12 +1,7 @@
 source_code = r"""
 public static void main(String[] args) {
    // the grader will pre-define an array of color names
-\fake[
-   String[] colors = ...; // e.g. new String[] {"red", "blue", "green"};]\
-\hide[
-   String[] colors = new String[args.length];
-   for (int i=0; i<args.length; i++) colors[i] = args[i];
-]\
+   String[] colors = \fake[...; // e.g. new String[] {"red", "blue", "green"};]\ \hide[args.clone();]\ 
    int n = colors.length; // for convenience
 
    System.out.println("Before n-swapping:");
@@ -44,9 +39,9 @@ tests = r"""
 """
 
 description = r"""
-This is an extension of the <b>SquareSwap</b> websheet.
+This is an extension of the <a href='?group=SquareSwap'>SquareSwap</a> websheet.
 Given an array <code>colors</code> of <code>n</code> strings,
-move each string one position later in the array, except you
+move each string one position later in the array; and, you
 must move the one at the end to the start.
 """
 

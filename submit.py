@@ -102,7 +102,14 @@ def submit_and_log(websheet_name, student, client_request, meta):
         result += "</pre>"
         return ("Syntax Error", result)
 
-#    print(compileResult)
+    #print(compileResult)
+
+    # prefetch all urls, pass them to the grader on stdin
+    compileObj["stdin"] = json.dumps({
+      "fetched_urls":websheet.prefetch_urls(True)
+      })
+
+    compileResult = json.dumps(compileObj)
     
     runUser = run_java("traceprinter/ramtools/RAMRun tester." + classname + " " +student, compileResult)
     #runUser = run_java("tester." + classname + " " + student)

@@ -120,20 +120,28 @@ class Websheet:
 
                 result.append(chunk)
 
-            else:
+            else: # inline case
                 if interstitial != "":
                     result.append(Chunk(interstitial, ChunkType.plain))
                     
                 chunk = Chunk(contained, typemap[match.group(0)])
 
                 if chunk.type == ChunkType.blank:
-                    # sized blank
-                    chunk.attr["show"] = " " * max(2, 2+len(contained))
+                    def normalize(text):
+                        if "\n" in text: return text
+                        if not text.startswith(" "): text = " " + text
+                        if not text.endswith(" "): text = text + " "
+                        return text
+            
                     # maybe generalize later
                     p = contained.find("\\show:")
                     if p != -1:
-                        chunk.text = contained[:p] 
-                        chunk.attr["show"] = contained[p+6:]
+                        chunk.text = normalize(contained[:p]) 
+                        chunk.attr["show"] = normalize(contained[p+6:])
+                    else:
+                        chunk.text = normalize(contained)
+                        # sized blank
+                        chunk.attr["show"] = " " * len(chunk.text)
 
                 result.append(chunk)
 
@@ -399,13 +407,7 @@ class Websheet:
         Get snippets of reference solution in a format that
         they can be displayed in the UI
         """
-        def normalize(text):
-            if "\n" in text: return text
-            if not text.startswith(" "): text = " " + text
-            if not text.endswith(" "): text = text + " "
-            return text
-            
-        return [normalize(chunk.text) for chunk in self.chunks
+        return [chunk.text for chunk in self.chunks
                 if chunk.type == ChunkType.blank]
         
     def get_initial_snippets(self):
@@ -440,6 +442,23 @@ class Websheet:
         while r[-1].endswith("\n"): r[-1] = r[-1][:-1]
         return r
 
+    def prefetch_urls(self, stringify = False):
+        """
+        Go through the "tests" field. Look for anything of the form
+        testStdinURL = "...";
+        and prefetch their data from the web. Return a dict whose keys
+        are those urls and whose values are their contents (bytes objects)
+        If stringify is True, the bytes objects are converted into strings
+        (containing only unicode code points 0-255)
+        """
+        result = {} # empty dict
+        for match in re.finditer(r'testStdinURL *= *"(.*)";', self.tests):
+            from urllib.request import urlopen
+            url = match.group(1)
+            result[url] = urlopen(url).read()
+            if stringify: result[url] = "".join(chr(e) for e in result[url])
+        return result
+            
     def make_tester(self):        
         return (
 "package tester;\n" +
