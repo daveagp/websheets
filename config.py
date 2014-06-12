@@ -24,8 +24,8 @@ def compute_java_prefix():
 # at princeton, they use "sandbox" instead
 if socket.gethostname().endswith("princeton.edu"):
     def compute_java_prefix():
-        java = "/usr/bin/java -cp .:/n/fs/htdocs/cos126/java_jail/cp:/n/fs/htdocs/cos126/java_jail/cp/javax.json-1.0.jar -Xmx512M "
-        return "sandbox -M -i /n/fs/htdocs/cos126/java_jail/cp "+java
+        java = "/usr/bin/java -cp .:/n/fs/htdocs/class/courses/cos126/java_jail/cp:/n/fs/htdocs/class/courses/cos126/java_jail/cp/javax.json-1.0.jar -Xmx512M "
+        return "sandbox -M -i /n/fs/htdocs/class/courses/cos126/java_jail/cp "+java
 
 # in either case "java_prefix" is like the 'java' binary,
 # ready to accept the class name and cmd line args
@@ -34,7 +34,10 @@ java_prefix = compute_java_prefix()
 def execute(command, the_stdin):
     proc = Popen(command.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
     result = proc.communicate(input = the_stdin.encode("UTF-8"))
-    return record(stdout = result[0].decode("UTF-8"),
+    return record(command = command,
+                  pwd = os.getcwd(),
+                  stdin = the_stdin,
+                  stdout = result[0].decode("UTF-8"),
                   stderr = result[1].decode("UTF-8"),
                   returncode = proc.returncode)
     
