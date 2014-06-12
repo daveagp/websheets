@@ -11,6 +11,21 @@ import javax.json.*;
 
 public abstract class GenericTester {
 
+    public static String classToString(Class<?> clazz) {
+        if (clazz.isArray()) return classToString(clazz.getComponentType())+"[]";
+        if (clazz.isPrimitive()) return clazz.toString();
+        return clazz.getSimpleName();
+    }
+
+    public static String classListToString(Class<?>[] classes) {
+        String result = "(";
+        for (int i=0; i<classes.length; i++) {
+            if (i > 0) result += ",";
+            result += classToString(classes[i]);
+        }
+        return result+")";
+    }
+
     public static PrintStream graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
 
     public static PrintStream orig_graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
@@ -235,10 +250,7 @@ public abstract class GenericTester {
                     }
 
                     notfound = false;
-                    String argTypes = Arrays.toString(m.getParameterTypes());
-                    argTypes = "(" + argTypes.substring(1, argTypes.length()-1) + ")";
-                    argTypes = argTypes.replace("class ", "");
-                    argTypes = argTypes.replace("java.lang.", "");
+                    String argTypes = classListToString(m.getParameterTypes());
                     try {
                         Method referenceM = m;
                         Class[] stuParamTypes = m.getParameterTypes();
@@ -255,7 +267,7 @@ public abstract class GenericTester {
                             {
      expectedReturn = setup(expectedReturn.getSimpleName())[1];                                                }    
                         if (! studentM.getReturnType().equals(expectedReturn)) {
-                            throw new FailTestException("Your method " + code(methodName +argTypes) + " should have return type " + code(referenceM.getReturnType().getName()));
+                            throw new FailTestException("Your method " + code(methodName +argTypes) + " should have return type " + code(classToString(referenceM.getReturnType())));
                         }
                         if (referenceM.getModifiers() != studentM.getModifiers()) {
                             throw new FailTestException("Incorrect declaration for " + code(methodName + "("+argTypes+")") + "; check use of " + code("public") + " and " + code("static") + " or other modifiers");
@@ -287,8 +299,7 @@ public abstract class GenericTester {
                     if (!formalParms[i].isAssignableFrom(args[i].getClass())) continue tryMethods;
                 }
                 notfound = false;
-                String argTypes = Arrays.toString(m.getParameterTypes());                
-                argTypes = "(" + argTypes.substring(1, argTypes.length()-1) + ")";
+                String argTypes = classListToString(m.getParameterTypes());
                 try {
                     Constructor referenceM = m;
                     Constructor studentM = stuClass.getConstructor(m.getParameterTypes());
