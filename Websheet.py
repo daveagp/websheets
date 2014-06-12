@@ -17,7 +17,15 @@ from java_syntax import java_syntax
 def record(**dict):
     """ e.g. foo = record(bar='baz', jim=5) creates an object foo
     such that foo.bar == 'baz', foo.jim == 5 """
-    return type('', (), dict)
+    result = type('', (), dict)
+    def __toString():
+       tos = "("
+       for x in dir(result):
+           if x[0] != "_": 
+               tos += x + ":" + repr(getattr(result, x))+","
+       return tos + ")"
+    result._toString = __toString
+    return result
 
 class Websheet:
 

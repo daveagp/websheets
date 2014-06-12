@@ -76,7 +76,7 @@ def submit_and_log(websheet_name, student, client_request, meta):
     if (compileResult==""):
       return ("Internal Error (Compiling)", "<pre>\n" + 
               cgi.escape(compileRun.stderr) +
-              "</pre>")
+              "</pre>"+"<!--"+compileRun._toString()+"-->")
     
     compileObj = json.loads(compileResult)
 
@@ -170,7 +170,7 @@ def submit_and_log(websheet_name, student, client_request, meta):
     results = '<pre>' + cgi.escape(traceback.format_exc()) + '</pre>'
 
   if category.startswith("Internal Error"):
-    results = "<b><p>Internal Error; please report to course staff!</p></b>" + results
+    results = "<b><p>"+category+"; please report to course staff!</p></b>" + results
 
   import copy
     
