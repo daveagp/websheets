@@ -76,6 +76,10 @@ class Websheet:
                             "\n"+d.replace("\\", "\\\\")+"\n",
                             source)
 
+        # replace ]\ at end of line, if not the only thing on line,
+        # with ]\_ (space). This is so RHS of inline joins never start with \n
+        source = re.sub(r"(.)\]\\$", r"\1]\ ", source, flags=re.MULTILINE)
+
         delim_expr = '|'.join(re.escape(d) for d in delim)
 
         delim_iter = re.finditer(delim_expr, source)

@@ -5,7 +5,11 @@ public static void printBest(int[] itemWeights, int capacity) {
    // canMake[j][i]: can we make weight exactly j, using a subset of the
    //                items 0, 1, ..., i-1?
    boolean[][] canMake = new boolean[capacity+1][numItems+1];
-   /*** hidden code here correctly fills out canMake for you ***/
+
+   /****************************************************************/
+   /*** hidden code here correctly fills out canMake[][] for you ***/
+   /****************************************************************/
+
 \hide[
    canMake = new boolean[capacity+1][numItems+1];
 
@@ -78,7 +82,7 @@ public static void main(String[] args) {
 
 description = r"""
 This is a continuation of the problem 
-<b>Knapsack</b> (read it first). 
+<a href="?group=Knapsack">Knapsack</a> (read it first). 
 Like in that problem, you will 
 write a static method that takes two arguments,
 <tt>int[] itemWeights, int capacity</tt> representing item weights
@@ -87,7 +91,7 @@ But this time, we ask you to <i>find</i> and print the best solution, rather
 than just the weight of it. 
 
 <p>
-To help accomplish this, we pre-compute an array <tt>canMake</tt>,
+To help accomplish this, we pre-compute an array <tt>canMake[][]</tt>,
  a <tt>boolean[capacity+1][numItems+1]</tt> so that <tt>canMake[j][i]</tt>
  is true if and only if we can make weight exactly <tt>j</tt> using
  a subset of the items indexed <tt>0, 1, &hellip; i-1</tt>.
@@ -103,4 +107,5 @@ testMain();
 test("printBest", new int[]{1, 2, 4, 8, 16, 32, 64, 128}, 126);
 test("printBest", new int[]{7, 45, 21, 34, 99, 55}, 126);
 test("printBest", new int[]{621}, 126);
+test("printBest", new int[]{468, 246, 852, 456, 234, 567, 234, 159, 345, 258, 987, 333, 852, 234, 531, 963, 999, 642, 258, 741, 951, 456, 543, 357, 234, 456, 159, 876, 345, 234, 741}, 15000);
 """

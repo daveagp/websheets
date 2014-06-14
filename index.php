@@ -103,6 +103,7 @@ EOT;
    </button>
    <p class="noprint">Results will appear below.</p>
    <div class="noprint" id="results"></div>
+   <div class="noprint" id="after-results" style="display:none"></div>
   </div> <!-- container -->
   <div id="errcontainer" style="display:none">
   </div>

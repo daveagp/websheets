@@ -18,6 +18,7 @@ loadProblem = function(slug) {
   $("#page").removeClass("passed");
   $("#page").removeClass("ever-passed");
   $("#results").html("");
+  $("#after-results").hide();
   $('#container').hide();
   $('#errcontainer').hide();
   $('#selectSheet')[0].disabled = true;
@@ -83,7 +84,10 @@ checkSolution = function() {
 		 $('#page').addClass("ever-passed");
 	     }
 	     var results = data.results;
-             if (data.epilogue) results += "<br><p><i>Epilogue</i><p>" + data.epilogue + "</p>";
+             if (data.epilogue) {
+               $("#after-results").html("<div id='epilogue'>Epilogue</div>" + data.epilogue);
+               $("#after-results").show();
+             }
              $("#results").html(results);
              var line = results.match(/[Ll]ine (\d)+(?!\d)/);
              if (line != null && line.length > 0) {

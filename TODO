@@ -1,4 +1,4 @@
-should we allow a block comment blank?
+allow blank at top for header
 
 when using dependencies, uncaught exceptions may translate
 improperly if they're not from the current file

@@ -1,10 +1,10 @@
 source_code = r"""
 public static void printRuler(int n) {
-// return if we're in the base case. 
+   // return if we're in the base case. 
 \[
    if (n == 0) return;
 ]\
-// otherwise, make two recursive calls, with a length-n line in between
+   // otherwise, make two recursive calls, with a length-n line in between
    printRuler(\[n-1]\);
 \[
    for (int i=0; i<n; i++)

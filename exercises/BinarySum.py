@@ -11,7 +11,8 @@ takes a nonnegative integer <code>n</code> and
 
 source_code = r"""
 // sum of the binary digits of n
-\[public static int binaryDigitSum(int n) {
+\[
+public static int binaryDigitSum(int n) {
    if (n==0) return 0;
 
    if (n%2 == 1) // is n odd?
