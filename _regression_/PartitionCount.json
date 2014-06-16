@@ -1,0 +1,85 @@
+{
+    "combined_with_daveagp": [
+        true,
+        "package combined.daveagp;\nimport stdlibpack.*;\npublic class PartitionCount {\n   public static long bundleWays(int n, int k) {\n      long[][] dp = new long[n+1][k+1];\n      dp[0][0] = 1;\n      for (int i=1; i<=n; i++)\n         for (int j=1; j<=k; j++)\n            dp[i][j] = j*dp[i-1][j]+dp[i-1][j-1];\n      return dp[n][k];\n\n\n\n\n\n\n\n   }\n   \n   public static void main(String[] args) {\n      for (int n=0; n<=5; n++) {\n         for (int k=0; k<=n; k++)\n            StdOut.printf(\"{%d %d} = %-3d  \", n, k, bundleWays(n, k));\n         StdOut.println();\n      }\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26
+        }
+    ],
+    "initial_snippets": [
+        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    ],
+    "json_template": [
+        "public class PartitionCount {\n   public static long bundleWays(int n, int k) {",
+        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "   }\n   \n   public static void main(String[] args) {\n      for (int n=0; n<=5; n++) {\n         for (int k=0; k<=n; k++)\n            StdOut.printf(\"{%d %d} = %-3d  \", n, k, bundleWays(n, k));\n         StdOut.println();\n      }\n   }\n}"
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 16, editable region 1:\nmust not be empty"
+    ],
+    "daveagp": [
+        "\n      long[][] dp = new long[n+1][k+1];\n      dp[0][0] = 1;\n      for (int i=1; i<=n; i++)\n         for (int j=1; j<=k; j++)\n            dp[i][j] = j*dp[i-1][j]+dp[i-1][j-1];\n      return dp[n][k];\n\n\n\n\n\n\n\n"
+    ],
+    "reference_snippets": [
+        "\n      long[][] dp = new long[n+1][k+1];\n      \n      // base cases are automatically set to zero, except this one:\n      dp[0][0] = 1;\n   \n      // compute numbers from bottom-up\n      for (int i=1; i<=n; i++) {\n         for (int j=1; j<=k; j++) {\n            dp[i][j] = j*dp[i-1][j] + dp[i-1][j-1];\n         }\n      }\n   \n      return dp[n][k];\n"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class PartitionCount {\n   public static long bundleWays(int n, int k) {\n      long[][] dp = new long[n+1][k+1];\n      \n      // base cases are automatically set to zero, except this one:\n      dp[0][0] = 1;\n   \n      // compute numbers from bottom-up\n      for (int i=1; i<=n; i++) {\n         for (int j=1; j<=k; j++) {\n            dp[i][j] = j*dp[i-1][j] + dp[i-1][j-1];\n         }\n      }\n   \n      return dp[n][k];\n   }\n   \n   public static void main(String[] args) {\n      for (int n=0; n<=5; n++) {\n         for (int k=0; k<=n; k++)\n            StdOut.printf(\"{%d %d} = %-3d  \", n, k, bundleWays(n, k));\n         StdOut.println();\n      }\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26
+        }
+    ],
+    "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class PartitionCount {\n   public static long bundleWays(int n, int k) {\n      long[][] dp = new long[n+1][k+1];\n      \n      // base cases are automatically set to zero, except this one:\n      dp[0][0] = 1;\n   \n      // compute numbers from bottom-up\n      for (int i=1; i<=n; i++) {\n         for (int j=1; j<=k; j++) {\n            dp[i][j] = j*dp[i-1][j] + dp[i-1][j-1];\n         }\n      }\n   \n      return dp[n][k];\n   }\n   \n   public static void main(String[] args) {\n      for (int n=0; n<=5; n++) {\n         for (int k=0; k<=n; k++)\n            StdOut.printf(\"{%d %d} = %-3d  \", n, k, bundleWays(n, k));\n         StdOut.println();\n      }\n   }\n}\n"
+}

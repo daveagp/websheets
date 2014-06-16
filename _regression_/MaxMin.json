@@ -1,0 +1,86 @@
+{
+    "combined_with_daveagp": [
+        true,
+        "package combined.daveagp;\nimport stdlibpack.*;\npublic class MaxMin {\n   public static void main(String[] args) {\n    \n      // first value read initializes min and max\n      int max = StdIn.readInt() ;\n      int min = max ;\n    \n      // read in the data, keep track of min and max\n      while ( !StdIn.isEmpty()  ) {\n         int value = StdIn.readInt();\n         min = Math.min(value, min);\n         max = Math.max(value, max);\n      }\n    \n      // output\n      StdOut.println(\"max = \" + max + \"   min = \" + min);\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19
+        }
+    ],
+    "initial_snippets": [
+        "                 ",
+        "     ",
+        "                  ",
+        "\n\n\n"
+    ],
+    "json_template": [
+        "public class MaxMin {\n   public static void main(String[] args) {\n    \n      // first value read initializes min and max\n      int max =",
+        "                 ",
+        ";\n      int min =",
+        "     ",
+        ";\n    \n      // read in the data, keep track of min and max\n      while (",
+        "                  ",
+        ") {\n         int value = StdIn.readInt();",
+        "\n\n\n",
+        "      }\n    \n      // output\n      StdOut.println(\"max = \" + max + \"   min = \" + min);\n   }\n}"
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 5:\nmust not be empty"
+    ],
+    "daveagp": [
+        " StdIn.readInt() ",
+        " max ",
+        " !StdIn.isEmpty()  ",
+        "\n         min = Math.min(value, min);\n         max = Math.max(value, max);\n"
+    ],
+    "reference_snippets": [
+        " StdIn.readInt() ",
+        " max ",
+        " !StdIn.isEmpty() ",
+        "\n         min = Math.min(min, value);\n         max = Math.max(max, value);\n"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class MaxMin {\n   public static void main(String[] args) {\n    \n      // first value read initializes min and max\n      int max = StdIn.readInt() ;\n      int min = max ;\n    \n      // read in the data, keep track of min and max\n      while ( !StdIn.isEmpty() ) {\n         int value = StdIn.readInt();\n         min = Math.min(min, value);\n         max = Math.max(max, value);\n      }\n    \n      // output\n      StdOut.println(\"max = \" + max + \"   min = \" + min);\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19
+        }
+    ],
+    "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class MaxMin {\n   public static void main(String[] args) {\n    \n      // first value read initializes min and max\n      int max = StdIn.readInt() ;\n      int min = max ;\n    \n      // read in the data, keep track of min and max\n      while ( !StdIn.isEmpty() ) {\n         int value = StdIn.readInt();\n         min = Math.min(min, value);\n         max = Math.max(max, value);\n      }\n    \n      // output\n      StdOut.println(\"max = \" + max + \"   min = \" + min);\n   }\n}\n"
+}

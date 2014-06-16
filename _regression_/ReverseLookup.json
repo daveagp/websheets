@@ -1,0 +1,84 @@
+{
+    "combined_with_daveagp": [
+        true,
+        "package combined.daveagp;\nimport stdlibpack.*;\npublic class ReverseLookup {\n   \n   \n   public static ST<String, Integer> invert(ST<Integer, String> st) {\n      ST<String, Integer> result = new ST<String, Integer>();\n      for (int x : st) {\n         if (result.contains(st.get(x))) throw new RuntimeException();\n         result.put(st.get(x), x);\n      }\n      return result;\n   }  \n   \n   // test client. Reads alternating strings and ints from stdin, loads them\n   // into an ST<Integer, String>, inverts it and prints the result\n   public static void main(String[] args) {\n      ST<Integer, String> orig = new ST<Integer, String>();\n      while (!StdIn.isEmpty()) {\n         orig.put(StdIn.readInt(), StdIn.readString());\n      }\n      ST<String, Integer> inverted = invert(orig);\n      for (String s : inverted) {\n         StdOut.println(s+\" \"+inverted.get(s));\n      }\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26
+        }
+    ],
+    "initial_snippets": [
+        "\n\n\n\n\n\n\n\n\n\n\n"
+    ],
+    "json_template": [
+        "public class ReverseLookup {",
+        "\n\n\n\n\n\n\n\n\n\n\n",
+        "   // test client. Reads alternating strings and ints from stdin, loads them\n   // into an ST<Integer, String>, inverts it and prints the result\n   public static void main(String[] args) {\n      ST<Integer, String> orig = new ST<Integer, String>();\n      while (!StdIn.isEmpty()) {\n         orig.put(StdIn.readInt(), StdIn.readString());\n      }\n      ST<String, Integer> inverted = invert(orig);\n      for (String s : inverted) {\n         StdOut.println(s+\" \"+inverted.get(s));\n      }\n   }\n}"
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 12, editable region 1:\nmust not be empty"
+    ],
+    "daveagp": [
+        "\n   \n   \n   public static ST<String, Integer> invert(ST<Integer, String> st) {\n      ST<String, Integer> result = new ST<String, Integer>();\n      for (int x : st) {\n         if (result.contains(st.get(x))) throw new RuntimeException();\n         result.put(st.get(x), x);\n      }\n      return result;\n   }  \n   \n"
+    ],
+    "reference_snippets": [
+        "\n   public static ST<String, Integer> invert(ST<Integer, String> st) {\n      ST<String, Integer> result = new ST<String, Integer>();\n      for (int i : st) {\n         String S = st.get(i);\n         if (result.get(S) != null)\n            throw new RuntimeException(\"Not invertible!\");\n         result.put(S, i);\n      }\n      return result;\n   }\n"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class ReverseLookup {\n   public static ST<String, Integer> invert(ST<Integer, String> st) {\n      ST<String, Integer> result = new ST<String, Integer>();\n      for (int i : st) {\n         String S = st.get(i);\n         if (result.get(S) != null)\n            throw new RuntimeException(\"Not invertible!\");\n         result.put(S, i);\n      }\n      return result;\n   }\n   // test client. Reads alternating strings and ints from stdin, loads them\n   // into an ST<Integer, String>, inverts it and prints the result\n   public static void main(String[] args) {\n      ST<Integer, String> orig = new ST<Integer, String>();\n      while (!StdIn.isEmpty()) {\n         orig.put(StdIn.readInt(), StdIn.readString());\n      }\n      ST<String, Integer> inverted = invert(orig);\n      for (String s : inverted) {\n         StdOut.println(s+\" \"+inverted.get(s));\n      }\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25
+        }
+    ],
+    "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class ReverseLookup {\n   public static ST<String, Integer> invert(ST<Integer, String> st) {\n      ST<String, Integer> result = new ST<String, Integer>();\n      for (int i : st) {\n         String S = st.get(i);\n         if (result.get(S) != null)\n            throw new RuntimeException(\"Not invertible!\");\n         result.put(S, i);\n      }\n      return result;\n   }\n   // test client. Reads alternating strings and ints from stdin, loads them\n   // into an ST<Integer, String>, inverts it and prints the result\n   public static void main(String[] args) {\n      ST<Integer, String> orig = new ST<Integer, String>();\n      while (!StdIn.isEmpty()) {\n         orig.put(StdIn.readInt(), StdIn.readString());\n      }\n      ST<String, Integer> inverted = invert(orig);\n      for (String s : inverted) {\n         StdOut.println(s+\" \"+inverted.get(s));\n      }\n   }\n}\n"
+}

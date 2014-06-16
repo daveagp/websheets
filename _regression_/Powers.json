@@ -1,0 +1,69 @@
+{
+    "combined_with_daveagp": [
+        true,
+        "package combined.daveagp;\nimport stdlibpack.*;\npublic class Powers {\n   public static void main(String[] args) {\n      double k = StdIn.readDouble();\n      int N = StdIn.readInt();\n\n      for (                   int i=1; i<=N; i++  ) {\n         double power = Math.pow(k, i)*1.00001; // not very efficient :(\n\n         // you must define a variable called power somewhere\n         StdOut.printf(\"%.5g\\n\", power); // print to 5 decimal places\n      }\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14
+        }
+    ],
+    "initial_snippets": [
+        "\n\n\n",
+        "                    ",
+        "\n\n"
+    ],
+    "json_template": [
+        "public class Powers {\n   public static void main(String[] args) {",
+        "\n\n\n",
+        "      for (",
+        "                    ",
+        ") {",
+        "\n\n",
+        "         // you must define a variable called power somewhere\n         StdOut.printf(\"%.5g\\n\", power); // print to 5 decimal places\n      }\n   }\n}"
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 5, editable region 1:\nmust not be empty"
+    ],
+    "daveagp": [
+        "\n      double k = StdIn.readDouble();\n      int N = StdIn.readInt();\n\n",
+        "                   int i=1; i<=N; i++  ",
+        "\n         double power = Math.pow(k, i)*1.00001; // not very efficient :(\n\n"
+    ],
+    "reference_snippets": [
+        "\n      double k = StdIn.readDouble();\n      int N = StdIn.readInt();\n",
+        " int i=1; i<=N; i++ ",
+        "\n         double power = Math.pow(k, i); // not very efficient :(\n"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class Powers {\n   public static void main(String[] args) {\n      double k = StdIn.readDouble();\n      int N = StdIn.readInt();\n      for ( int i=1; i<=N; i++ ) {\n         double power = Math.pow(k, i); // not very efficient :(\n         // you must define a variable called power somewhere\n         StdOut.printf(\"%.5g\\n\", power); // print to 5 decimal places\n      }\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12
+        }
+    ],
+    "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class Powers {\n   public static void main(String[] args) {\n      double k = StdIn.readDouble();\n      int N = StdIn.readInt();\n      for ( int i=1; i<=N; i++ ) {\n         double power = Math.pow(k, i); // not very efficient :(\n         // you must define a variable called power somewhere\n         StdOut.printf(\"%.5g\\n\", power); // print to 5 decimal places\n      }\n   }\n}\n"
+}

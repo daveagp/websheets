@@ -1,0 +1,63 @@
+{
+    "combined_with_daveagp": [
+        true,
+        "package combined.daveagp;\nimport stdlibpack.*;\n\npublic class SquareSwap {\npublic static void squareSwap(String top, String bottom,\n  String left, String right) {\n  String[] args = new String[0];\n\n   System.out.println(\"Before rotation, top = \" + top + \", bottom = \" + bottom\n               + \", left = \" + left + \", right = \" + right + \".\");\n   // Now, write code to swap the variable values correctly,\n   // to reflect a clockwise 90-degree rotation being performed.\n   // The code you add doesn't need to print anything.\n   String tmp = top;\n   top = left;\n   left = bottom;\n   bottom = right;\n   right = tmp;\n   System.out.println(\"After rotation, top = \" + top + \", bottom = \" + bottom\n               + \", left = \" + left + \", right = \" + right + \".\");\n}\n}\n",
+        {
+            "3": 1,
+            "9": 8,
+            "10": 9,
+            "11": 10,
+            "12": 11,
+            "13": 12,
+            "14": 13,
+            "15": 14,
+            "16": 15,
+            "17": 16,
+            "18": 17,
+            "19": 18,
+            "20": 19,
+            "21": 20,
+            "22": 21
+        }
+    ],
+    "initial_snippets": [
+        "\n\n\n\n\n\n"
+    ],
+    "json_template": [
+        "public static void main(String[] args) {\n   // the grader will pre-define 4 variables with color names\n   String top = ...; // e.g. \"red\" or \"blue\", etc\n   String bottom = ...;\n   String left = ...;\n   String right = ...;\n\n   System.out.println(\"Before rotation, top = \" + top + \", bottom = \" + bottom\n               + \", left = \" + left + \", right = \" + right + \".\");\n   // Now, write code to swap the variable values correctly,\n   // to reflect a clockwise 90-degree rotation being performed.\n   // The code you add doesn't need to print anything.",
+        "\n\n\n\n\n\n",
+        "   System.out.println(\"After rotation, top = \" + top + \", bottom = \" + bottom\n               + \", left = \" + left + \", right = \" + right + \".\");\n}"
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 18, editable region 1:\nmust not be empty"
+    ],
+    "daveagp": [
+        "\n   String tmp = top;\n   top = left;\n   left = bottom;\n   bottom = right;\n   right = tmp;\n"
+    ],
+    "reference_snippets": [
+        "\nString tmp = top; // save old value in new temp variable\ntop = left;       // write over old value\nleft = bottom;    // write over old value\nbottom = right;   // write over old value\nright = tmp;      // complete the swap using saved value\n"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\n\npublic class SquareSwap {\npublic static void squareSwap(String top, String bottom,\n  String left, String right) {\n  String[] args = new String[0];\n\n   System.out.println(\"Before rotation, top = \" + top + \", bottom = \" + bottom\n               + \", left = \" + left + \", right = \" + right + \".\");\n   // Now, write code to swap the variable values correctly,\n   // to reflect a clockwise 90-degree rotation being performed.\n   // The code you add doesn't need to print anything.\nString tmp = top; // save old value in new temp variable\ntop = left;       // write over old value\nleft = bottom;    // write over old value\nbottom = right;   // write over old value\nright = tmp;      // complete the swap using saved value\n   System.out.println(\"After rotation, top = \" + top + \", bottom = \" + bottom\n               + \", left = \" + left + \", right = \" + right + \".\");\n}\n}\n",
+        {
+            "3": 1,
+            "9": 8,
+            "10": 9,
+            "11": 10,
+            "12": 11,
+            "13": 12,
+            "14": 13,
+            "15": 14,
+            "16": 15,
+            "17": 16,
+            "18": 17,
+            "19": 18,
+            "20": 19,
+            "21": 20,
+            "22": 21
+        }
+    ],
+    "reference_solution": "package reference;\nimport stdlibpack.*;\n\npublic class SquareSwap {\npublic static void squareSwap(String top, String bottom,\n  String left, String right) {\n  String[] args = new String[0];\n\n   System.out.println(\"Before rotation, top = \" + top + \", bottom = \" + bottom\n               + \", left = \" + left + \", right = \" + right + \".\");\n   // Now, write code to swap the variable values correctly,\n   // to reflect a clockwise 90-degree rotation being performed.\n   // The code you add doesn't need to print anything.\nString tmp = top; // save old value in new temp variable\ntop = left;       // write over old value\nleft = bottom;    // write over old value\nbottom = right;   // write over old value\nright = tmp;      // complete the swap using saved value\n   System.out.println(\"After rotation, top = \" + top + \", bottom = \" + bottom\n               + \", left = \" + left + \", right = \" + right + \".\");\n}\n}\n"
+}

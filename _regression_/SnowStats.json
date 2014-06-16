@@ -1,0 +1,64 @@
+{
+    "combined_with_daveagp": [
+        false,
+        "Line 32, editable region 1:\nmust not be empty"
+    ],
+    "initial_snippets": [
+        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    ],
+    "json_template": [
+        "public class SnowStats {",
+        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "}"
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 32, editable region 1:\nmust not be empty"
+    ],
+    "daveagp": [
+        "\n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n   \n"
+    ],
+    "reference_snippets": [
+        "\n/****************************************************************************\n* Name: Donna Gabai\n* NetID: dgabai\n* Precept: P99\n* Spring14 Exam 1\n*\n* Description: Inputs snowfall and temperature for a series of days.\n*              Outputs number of days, total inches of snow and coldest temp.\n* Dependencies: StdIn, StdOut\n* ***************************************************************************/\n\n   public static void main(String[] args) {\n      // start at day zero, no snow, hottest possible temperature\n      int days = 0;\n      double snowSum = 0.0;\n      int lowestTemp = Integer.MAX_VALUE;\n\n      // read data from standard input and count days\n      // add snowfall for total, keep lowest temp\n      while (!StdIn.isEmpty()) {\n         days++;\n         snowSum = snowSum + StdIn.readDouble();\n         int temp = StdIn.readInt();\n         if (temp < lowestTemp) lowestTemp = temp;\n      }\n      \n      StdOut.println(\"Number of days: \" + days);\n      StdOut.println(\"Total snow: \" + snowSum);\n      StdOut.println(\"Coldest temperature: \" + lowestTemp);\n   }\n"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class SnowStats {\n/****************************************************************************\n* Name: Donna Gabai\n* NetID: dgabai\n* Precept: P99\n* Spring14 Exam 1\n*\n* Description: Inputs snowfall and temperature for a series of days.\n*              Outputs number of days, total inches of snow and coldest temp.\n* Dependencies: StdIn, StdOut\n* ***************************************************************************/\n\n   public static void main(String[] args) {\n      // start at day zero, no snow, hottest possible temperature\n      int days = 0;\n      double snowSum = 0.0;\n      int lowestTemp = Integer.MAX_VALUE;\n\n      // read data from standard input and count days\n      // add snowfall for total, keep lowest temp\n      while (!StdIn.isEmpty()) {\n         days++;\n         snowSum = snowSum + StdIn.readDouble();\n         int temp = StdIn.readInt();\n         if (temp < lowestTemp) lowestTemp = temp;\n      }\n      \n      StdOut.println(\"Number of days: \" + days);\n      StdOut.println(\"Total snow: \" + snowSum);\n      StdOut.println(\"Coldest temperature: \" + lowestTemp);\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26,
+            "29": 27,
+            "30": 28,
+            "31": 29,
+            "32": 30,
+            "33": 31,
+            "34": 32,
+            "35": 33
+        }
+    ],
+    "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class SnowStats {\n/****************************************************************************\n* Name: Donna Gabai\n* NetID: dgabai\n* Precept: P99\n* Spring14 Exam 1\n*\n* Description: Inputs snowfall and temperature for a series of days.\n*              Outputs number of days, total inches of snow and coldest temp.\n* Dependencies: StdIn, StdOut\n* ***************************************************************************/\n\n   public static void main(String[] args) {\n      // start at day zero, no snow, hottest possible temperature\n      int days = 0;\n      double snowSum = 0.0;\n      int lowestTemp = Integer.MAX_VALUE;\n\n      // read data from standard input and count days\n      // add snowfall for total, keep lowest temp\n      while (!StdIn.isEmpty()) {\n         days++;\n         snowSum = snowSum + StdIn.readDouble();\n         int temp = StdIn.readInt();\n         if (temp < lowestTemp) lowestTemp = temp;\n      }\n      \n      StdOut.println(\"Number of days: \" + days);\n      StdOut.println(\"Total snow: \" + snowSum);\n      StdOut.println(\"Coldest temperature: \" + lowestTemp);\n   }\n}\n"
+}

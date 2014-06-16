@@ -1,0 +1,119 @@
+{
+    "combined_with_daveagp": [
+        true,
+        "package combined.daveagp;\nimport stdlibpack.*;\nimport java.util.Set;\nimport java.util.TreeSet;\npublic class CME {\n   public static void addReverses(Set<String> words) {\n      Set<String> wordsCopy = new TreeSet<String>();\n      for (String s : words) wordsCopy.add(s);\n      for (String s : wordsCopy) { // for each string in the set \n\n         // a one-liner to compute the reverse of a string\n         String sReverse = new StringBuffer(s).reverse().toString();\n\n         // add it to our set\n         words.add(sReverse);\n      }\n   }\n\n   // test client: e.g. \"java CME HI MOM\" should print out on 3 lines HI IH MOM\n   public static void main(String[] args) {\n      Set<String> testSet = new TreeSet<String>();\n      for (int i=0; i < args.length; i++)\n         testSet.add(args[i]); \n\n      addReverses(testSet);\n\n      for (String s : testSet)\n         System.out.println(s);\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26,
+            "29": 27,
+            "30": 28,
+            "31": 29
+        }
+    ],
+    "initial_snippets": [
+        "\n      for (String s : words) { // for each string in the set \n\n         // a one-liner to compute the reverse of a string\n         String sReverse = new StringBuffer(s).reverse().toString();\n\n         // add it to our set\n         words.add(sReverse);\n      }\n"
+    ],
+    "json_template": [
+        "import java.util.Set;\nimport java.util.TreeSet;\npublic class CME {\n   public static void addReverses(Set<String> words) {",
+        "\n      for (String s : words) { // for each string in the set \n\n         // a one-liner to compute the reverse of a string\n         String sReverse = new StringBuffer(s).reverse().toString();\n\n         // add it to our set\n         words.add(sReverse);\n      }\n",
+        "   }\n\n   // test client: e.g. \"java CME HI MOM\" should print out on 3 lines HI IH MOM\n   public static void main(String[] args) {\n      Set<String> testSet = new TreeSet<String>();\n      for (int i=0; i < args.length; i++)\n         testSet.add(args[i]); \n\n      addReverses(testSet);\n\n      for (String s : testSet)\n         System.out.println(s);\n   }\n}"
+    ],
+    "combined_with_initial": [
+        true,
+        "package combined.initial;\nimport stdlibpack.*;\nimport java.util.Set;\nimport java.util.TreeSet;\npublic class CME {\n   public static void addReverses(Set<String> words) {\n      for (String s : words) { // for each string in the set \n\n         // a one-liner to compute the reverse of a string\n         String sReverse = new StringBuffer(s).reverse().toString();\n\n         // add it to our set\n         words.add(sReverse);\n      }\n   }\n\n   // test client: e.g. \"java CME HI MOM\" should print out on 3 lines HI IH MOM\n   public static void main(String[] args) {\n      Set<String> testSet = new TreeSet<String>();\n      for (int i=0; i < args.length; i++)\n         testSet.add(args[i]); \n\n      addReverses(testSet);\n\n      for (String s : testSet)\n         System.out.println(s);\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26,
+            "29": 27
+        }
+    ],
+    "daveagp": [
+        "\n      Set<String> wordsCopy = new TreeSet<String>();\n      for (String s : words) wordsCopy.add(s);\n      for (String s : wordsCopy) { // for each string in the set \n\n         // a one-liner to compute the reverse of a string\n         String sReverse = new StringBuffer(s).reverse().toString();\n\n         // add it to our set\n         words.add(sReverse);\n      }\n"
+    ],
+    "reference_snippets": [
+        "\n      // we will put the reverses in a new place for now\n      // while we iterate through the main set\n      java.util.HashSet<String> tmp = new java.util.HashSet<String>();\n      for (String s : words) \n         tmp.add(new StringBuffer(s).reverse().toString());\n     \n      // now that we're done iterating through 'words', add to it\n      for (String s : tmp) \n         words.add(s);\n"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\nimport java.util.Set;\nimport java.util.TreeSet;\npublic class CME {\n   public static void addReverses(Set<String> words) {\n      // we will put the reverses in a new place for now\n      // while we iterate through the main set\n      java.util.HashSet<String> tmp = new java.util.HashSet<String>();\n      for (String s : words) \n         tmp.add(new StringBuffer(s).reverse().toString());\n     \n      // now that we're done iterating through 'words', add to it\n      for (String s : tmp) \n         words.add(s);\n   }\n\n   // test client: e.g. \"java CME HI MOM\" should print out on 3 lines HI IH MOM\n   public static void main(String[] args) {\n      Set<String> testSet = new TreeSet<String>();\n      for (int i=0; i < args.length; i++)\n         testSet.add(args[i]); \n\n      addReverses(testSet);\n\n      for (String s : testSet)\n         System.out.println(s);\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26,
+            "29": 27,
+            "30": 28
+        }
+    ],
+    "reference_solution": "package reference;\nimport stdlibpack.*;\nimport java.util.Set;\nimport java.util.TreeSet;\npublic class CME {\n   public static void addReverses(Set<String> words) {\n      // we will put the reverses in a new place for now\n      // while we iterate through the main set\n      java.util.HashSet<String> tmp = new java.util.HashSet<String>();\n      for (String s : words) \n         tmp.add(new StringBuffer(s).reverse().toString());\n     \n      // now that we're done iterating through 'words', add to it\n      for (String s : tmp) \n         words.add(s);\n   }\n\n   // test client: e.g. \"java CME HI MOM\" should print out on 3 lines HI IH MOM\n   public static void main(String[] args) {\n      Set<String> testSet = new TreeSet<String>();\n      for (int i=0; i < args.length; i++)\n         testSet.add(args[i]); \n\n      addReverses(testSet);\n\n      for (String s : testSet)\n         System.out.println(s);\n   }\n}\n"
+}

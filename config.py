@@ -75,13 +75,17 @@ def save_submission(student, problem, user_state, result_column, passed):
 # the rest don't run if not logged in
 
 # returns a json list of code fragments, or False
-def load_submission(student, problem, onlyPassed = False):
+def load_submission(student, problem, onlyPassed = False, maxId = None):
         if student=="anonymous": return False
         db = connect()
         cursor = db.cursor()
-        pc = " AND passed = 1 " if onlyPassed else "" # passed clause
+        passed_clause = " AND passed = 1 " if onlyPassed else "" 
+        maxid_clause = " AND id <= " + str(maxId) if maxId is not None else ""
         cursor.execute(
-            "select submission from ws_history WHERE user = %s AND problem = %s "+pc+" ORDER BY ID DESC LIMIT 1;",
+            "select submission from ws_history " +
+            "WHERE user = %s AND problem = %s "
+             + passed_clause + maxid_clause +
+            " ORDER BY ID DESC LIMIT 1;",
             (student, 
              problem))
         result = "false"

@@ -1,0 +1,53 @@
+{
+    "combined_with_daveagp": [
+        true,
+        "package combined.daveagp;\nimport stdlibpack.*;\npublic class PizzaCalculator {\n   public static void main(String[] args) {\n      double PERSONAL_AREA = 100; // in square cm\n      double radius = Double.parseDouble(args[0]);\n      double area = radius * radius * Math.PI;\n      System.out.println((int)(area/PERSONAL_AREA));\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9
+        }
+    ],
+    "initial_snippets": [
+        "\n\n\n\n\n\n"
+    ],
+    "json_template": [
+        "public class PizzaCalculator {\n   public static void main(String[] args) {\n      double PERSONAL_AREA = 100; // in square cm",
+        "\n\n\n\n\n\n",
+        "   }\n}"
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 9, editable region 1:\nmust not be empty"
+    ],
+    "daveagp": [
+        "\n      double radius = Double.parseDouble(args[0]);\n      double area = radius * radius * Math.PI;\n      System.out.println((int)(area/PERSONAL_AREA));\n"
+    ],
+    "reference_snippets": [
+        "\n        double r = Double.parseDouble(args[0]); // radius\n        double area = r*r*Math.PI;\n        // cast to int rounds down:\n        int people = (int) (area / 100); \n        System.out.println(people);\n"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class PizzaCalculator {\n   public static void main(String[] args) {\n      double PERSONAL_AREA = 100; // in square cm\n        double r = Double.parseDouble(args[0]); // radius\n        double area = r*r*Math.PI;\n        // cast to int rounds down:\n        int people = (int) (area / 100); \n        System.out.println(people);\n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11
+        }
+    ],
+    "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class PizzaCalculator {\n   public static void main(String[] args) {\n      double PERSONAL_AREA = 100; // in square cm\n        double r = Double.parseDouble(args[0]); // radius\n        double area = r*r*Math.PI;\n        // cast to int rounds down:\n        int people = (int) (area / 100); \n        System.out.println(people);\n   }\n}\n"
+}

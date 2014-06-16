@@ -291,9 +291,7 @@ class Websheet:
 
     def make_student_solution(self, student_code, package = None):
         """
-        student_code: a list of dicts, each for a blank region in the ui,
-                      with "code" (the text),
-                      (deprecated) and "from" and "to" (like CodeMirror)
+        student_code: a list of chunks, one for each blank region in the UI
 
         returns [False, "error string"] -- usually error means student
           did some syntactically bad thing like unmatched parens within a blank
@@ -345,7 +343,14 @@ class Websheet:
                 i = blanks_processed
                 blanks_processed += 1
 
-                user_text = student_code[i]['code']
+                user_text = student_code[i]
+
+                # deprecated: in place of a code chunk,
+                # you can pass a dict with "code" as the code chunk,
+                # plus other attributes                
+                if isinstance(user_text, dict):
+                    user_text = user_text["code"]
+
                 if (len(user_text)) < 2:
                     return ["False", "Internal error: User chunk " + str(i)
                             + " too short: " + user_text]
@@ -505,80 +510,90 @@ self.classname + " to = new " + self.classname + "();\n" +
     def from_filesystem(slug):
         return Websheet.from_module(getattr(__import__("exercises." + slug), slug))
 
-if __name__ == "__main__":
-
-    # call Websheet.py json
-    if sys.argv[1:] == ["json"]:
-        websheets = [Websheet.from_filesystem(slug) for slug in ("MaxThree", "FourSwap", "NextYear")]
-
-        # test of json chunking
-        for w in websheets:
-            print(w.get_json_template())
-        sys.exit(0)
-
-    # call Websheet.py interactive
-    if sys.argv[1:] == ["interactive"]:
-        websheets = [Websheet.from_filesystem(slug) for slug in ("MaxThree", "FourSwap", "NextYear")]
-
-        while True:  
-            print("#reference for "+w.classname+"#")
-            print(w.get_reference_solution())
-            stulist = []
-            for i in range(w.input_count):
-                r = ""
-                while True:
-                    inp = input("Enter more for input #"+str(i)
-                                +" (blank to stop): ")
-                    if inp != "":
-                        if r != "": r += "\n"
-                        r += inp
-                    else:
-                        break
-                if i==0 and r =="": break
-                stulist.append(r)
-            if stulist==[]: break
-            print("#student sample for "+w.classname+"#")
-            ss = w.make_student_solution(stulist)
-            if ss[0]:
-                print("Accepted:\n"+ss[1])
-            else:
-                print("Error:", ss[1])
-
-
-    # call Websheet.py get_reference_solution MaxThree
-    if sys.argv[1] == "get_reference_solution":
-        websheet = Websheet.from_filesystem(sys.argv[2])
-        print(json.dumps(websheet.get_reference_solution("Ref_Sols")))
-        sys.exit(0)
-
-    # call Websheet.py get_json_template MaxThree
-    if sys.argv[1] == "get_json_template":
-        websheet = Websheet.from_filesystem(sys.argv[2])
-        print(json.dumps(websheet.get_json_template()))
-        sys.exit(0)
-
-    # call Websheet.py get_html_template MaxThree
-    if sys.argv[1] == "get_html_template":
-        websheet = Websheet.from_filesystem(sys.argv[2])
-        print(json.dumps({"code":websheet.get_json_template(),"description":websheet.description}))
-        sys.exit(0)
-
-    # call Websheet.py make_student_solution MaxThree stu and input [{code: " int ", from: ..., to: ...}, ...]
-    if sys.argv[1] == "make_student_solution":
-        websheet = Websheet.from_filesystem(sys.argv[2])
-        user_input = input() # assume json all on one line
-        user_poschunks = json.loads(user_input)
-        print(json.dumps(websheet.make_student_solution(user_poschunks, "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
-        sys.exit(0)
-
-    # call Websheet.py list
-    if sys.argv[1:] == ["list"]:
+    @staticmethod
+    def list_filesystem():
         r = []
         for file in os.listdir("exercises"):
             if file.endswith(".py") and not file.startswith("_"): r.append(file[:-3])
         r.sort()
-        print(json.dumps(r))
-        sys.exit(0)
+        return r
 
-    print("Invalid command for Websheet")
-    sys.exit(1)
+    def testing_ui(self):
+        import config
+        r = {}
+        r["json_template"] = self.get_json_template()
+        r["initial_snippets"] = self.get_initial_snippets()
+        r["reference_snippets"] = self.get_reference_snippets()
+        r["reference_solution"] = self.get_reference_solution("reference")
+        r["combined_with_initial"] = self.make_student_solution(r["initial_snippets"], "combined.initial")
+        r["combined_with_reference"] = self.make_student_solution(r["reference_snippets"], "combined.reference")
+        r["daveagp"] = config.load_submission("daveagp@gmail.com", self.slug, maxId = 876)
+        r["combined_with_daveagp"] = self.make_student_solution(r["daveagp"], "combined.daveagp")
+        return r
+
+    def regression_ui(self):
+        regressed = False
+        current_result = self.testing_ui()
+        old_result = json.load(open("_regression_/"+self.slug+".json"))
+        for key in current_result:
+            if current_result[key] != old_result[key]:
+                print(self.slug+" differs in key " + key + ", was: ")
+                print(repr(old_result[key]))
+                print("now:")
+                print(repr(current_result[key]))
+                regressed = True
+        return regressed
+
+    def regression_save(self):
+        outf=open("_regression_/"+self.slug+".json", 'w')
+        print(json.dumps(self.testing_ui(),indent=4, separators=(',', ': ')),
+              file=outf)
+        outf.close()
+
+if __name__ == "__main__":
+
+    # call Websheet.py get_reference_solution MaxThree
+    if sys.argv[1] == "get_reference_solution":
+        websheet = Websheet.from_filesystem(sys.argv[2])
+        print(json.dumps(websheet.get_reference_solution("reference")))
+
+    # call Websheet.py get_json_template MaxThree
+    elif sys.argv[1] == "get_json_template":
+        websheet = Websheet.from_filesystem(sys.argv[2])
+        print(json.dumps(websheet.get_json_template()))
+
+    # call Websheet.py get_html_template MaxThree
+    elif sys.argv[1] == "get_html_template":
+        websheet = Websheet.from_filesystem(sys.argv[2])
+        print(json.dumps({"code":websheet.get_json_template(),"description":websheet.description}))
+
+    # call Websheet.py make_student_solution MaxThree stu and input [{code: " int ", from: ..., to: ...}, ...]
+    elif sys.argv[1] == "make_student_solution":
+        websheet = Websheet.from_filesystem(sys.argv[2])
+        user_input = input() # assume json all on one line
+        user_poschunks = json.loads(user_input)
+        print(json.dumps(websheet.make_student_solution(user_poschunks, "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
+
+    elif sys.argv[1] == "testing_ui":
+        print(json.dumps(Websheet.from_filesystem(sys.argv[2]).testing_ui()))
+
+    elif sys.argv[1] == "testall_ui":
+        list = Websheet.list_filesystem()
+        print(json.dumps({slug: Websheet.from_filesystem(slug).testing_ui() for slug in list}
+                         ,indent=4, separators=(',', ': '))) # pretty!
+
+    elif sys.argv[1] == "regression_save":
+        Websheet.from_filesystem(sys.argv[2]).regression_save()
+
+    elif sys.argv[1] == "regression_save_all":
+        list = Websheet.list_filesystem()
+        for slug in list:
+            print(slug)
+            Websheet.from_filesystem(slug).regression_save()
+
+    elif sys.argv[1] == "list":
+        print(json.dumps(Websheet.list_filesystem()))
+
+    else:
+        print("Invalid command for Websheet")
+        sys.exit(1)

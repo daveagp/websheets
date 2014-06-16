@@ -1,0 +1,71 @@
+{
+    "combined_with_daveagp": [
+        true,
+        "package combined.daveagp;\nimport stdlibpack.*;\npublic class ComplementaryDNA {\n   public static String complementWC(String dna) {\n      // replace all 'C's with 'G's and vice-versa\n      dna = dna.replaceAll(\"C\", \"X\");\n      dna = dna.replaceAll(\"G\", \"C\");\n      dna = dna.replaceAll(\"X\", \"G\");\n      // replace all 'A's with 'T's and vice-versa\n      dna = dna.replaceAll(\"T\", \"X\");\n      dna = dna.replaceAll(\"A\", \"T\");\n      dna = dna.replaceAll(\"X\", \"A\");\n      return  dna;  \n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14
+        }
+    ],
+    "initial_snippets": [
+        "\n\n\n\n",
+        "\n\n\n\n",
+        "      "
+    ],
+    "json_template": [
+        "public class ComplementaryDNA {\n   public static String complementWC(String dna) {\n      // replace all 'C's with 'G's and vice-versa",
+        "\n\n\n\n",
+        "      // replace all 'A's with 'T's and vice-versa",
+        "\n\n\n\n",
+        "      return ",
+        "      ",
+        " \n   }\n}"
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 7, editable region 1:\nmust not be empty"
+    ],
+    "daveagp": [
+        "\n      dna = dna.replaceAll(\"C\", \"X\");\n      dna = dna.replaceAll(\"G\", \"C\");\n      dna = dna.replaceAll(\"X\", \"G\");\n",
+        "\n      dna = dna.replaceAll(\"T\", \"X\");\n      dna = dna.replaceAll(\"A\", \"T\");\n      dna = dna.replaceAll(\"X\", \"A\");\n",
+        " dna; "
+    ],
+    "reference_snippets": [
+        "\n      String tmp = dna.replaceAll(\"C\", \"X\");\n      tmp = tmp.replaceAll(\"G\", \"C\");\n      tmp = tmp.replaceAll(\"X\", \"G\");\n",
+        "\n      tmp = tmp.replaceAll(\"A\", \"X\");\n      tmp = tmp.replaceAll(\"T\", \"A\");\n      tmp = tmp.replaceAll(\"X\", \"T\");\n",
+        " tmp; "
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class ComplementaryDNA {\n   public static String complementWC(String dna) {\n      // replace all 'C's with 'G's and vice-versa\n      String tmp = dna.replaceAll(\"C\", \"X\");\n      tmp = tmp.replaceAll(\"G\", \"C\");\n      tmp = tmp.replaceAll(\"X\", \"G\");\n      // replace all 'A's with 'T's and vice-versa\n      tmp = tmp.replaceAll(\"A\", \"X\");\n      tmp = tmp.replaceAll(\"T\", \"A\");\n      tmp = tmp.replaceAll(\"X\", \"T\");\n      return  tmp;  \n   }\n}\n",
+        {
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7,
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14
+        }
+    ],
+    "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class ComplementaryDNA {\n   public static String complementWC(String dna) {\n      // replace all 'C's with 'G's and vice-versa\n      String tmp = dna.replaceAll(\"C\", \"X\");\n      tmp = tmp.replaceAll(\"G\", \"C\");\n      tmp = tmp.replaceAll(\"X\", \"G\");\n      // replace all 'A's with 'T's and vice-versa\n      tmp = tmp.replaceAll(\"A\", \"X\");\n      tmp = tmp.replaceAll(\"T\", \"A\");\n      tmp = tmp.replaceAll(\"X\", \"T\");\n      return  tmp;  \n   }\n}\n"
+}
