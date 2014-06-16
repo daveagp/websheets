@@ -53,6 +53,12 @@ pre { /* for long outputs */
    overflow-y: auto;
 }
 
+div#epilogue {
+    text-align: center;
+    font-style: italic;
+    padding: 5px 0px;
+}
+
 @media print {
     .noprint, .noprint * { display: none; } 
     .CodeMirror, .CodeMirror * {font-size: 14px; line-height: 16px}

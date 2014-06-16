@@ -12,7 +12,7 @@ public class MaxMin {
       int min =\[ max ]\;
     
       // read in the data, keep track of min and max
-      while (\[! StdIn.isEmpty() ]\) {
+      while (\[!StdIn.isEmpty()]\) {
          int value = StdIn.readInt();
 \[
          min = Math.min(min, value);

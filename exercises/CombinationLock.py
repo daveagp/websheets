@@ -15,7 +15,7 @@ public void tryUnlock(String attempt)</tt>
 public void changePassword(String newpass)</tt>
 </ul>
 Make sure you use <tt>.equals()</tt> to compare strings in <tt>tryUnlock()</tt>, not the <tt>==</tt> operator. 
-<i>Note: in practice, passwords are not stored directly, but only as <b>hashes</b>."""
+<i>Note: in practice, passwords are not stored directly, but only as <a href="http://en.wikipedia.org/wiki/Cryptographic_hash_function#Password_verification">hashes</a>."""
 
 source_code = r"""\[
 private boolean locked; // is it locked right now?

@@ -16,8 +16,8 @@ public Name(char firstInit, String lastName) {
    // "lastName = lastName;" won't work;
    // it copies the parameter into itself.
 
-   // "String lastName = lastName;" won't work; it creates a local 
-   // variable in the constructor but doesn't affect the instance.
+   // "String lastName = lastName;" won't work; it tries to create a local 
+   // variable in the constructor (rather than affecting the instance).
 
    // You will need to use the Java keyword "this".
 }

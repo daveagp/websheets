@@ -3,7 +3,6 @@ public class FourChargeClient {
     public static void main(String[] args) {
         double r = Double.parseDouble(args[0]);
 
-        // center of standard drawing window
         double cx = 0.5;
         double cy = 0.5;
 
@@ -42,10 +41,12 @@ String toString()                        // string representation
 Write a program that takes a double value 
 <tt>r</tt> from the command line, creates four
 <tt>Charge</tt> objects that are each distance 
-<tt>r</tt> from the center of the screen (.5, .5), and
+<tt>r</tt> from the center of the unit square (.5, .5), and
 prints the potential at location (.25, .5) due 
 to the combined four charges. All four
-charges should have unit positive charge.
+charges should have unit positive charge. See the illustration below.
+
+<div style='text-align:center'><img src='exercises/charges.ipe.png'></div>
 
 <p>For example, <tt>java FourChargeClient 0.1</tt>
 should print out

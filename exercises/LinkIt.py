@@ -54,7 +54,7 @@ public void deleteKth(int k) {
    if (\[first == null || k < 1]\)
       throw new RuntimeException("Invalid index!");
    
-   // now insert the item
+   // now delete the item, and throw an exception if the item doesn't exist
 \[
    if (k == 1) {
       // this is the only case where first changes
@@ -100,12 +100,10 @@ public static void main(String[] args) {
    StdOut.println(test2); // should be: over well
    test2.deleteKth(2);
    StdOut.println(test2); // should be: over
-   test2.deleteKth(2);    // your code should throw a RuntimeException
 }
 """
 
 tests = r"""
-expectException = true;
 testMain();
 saveAs = "linkit";
 test("fromStrings", (Object)new String[]{"sesquipedalian"});

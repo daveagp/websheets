@@ -49,6 +49,11 @@ To help get the binary search
 started, you may use the fact that $0 \le W(x) \le \max(1, \ln(x))$.
 Terminate the binary search when 
 the search endpoints differ by 10<sup>-8</sup> or less.
+
+<p>
+<i>Hint</i>: you will need <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Math.html#exp-double-">several</a>
+<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Math.html#log-double-">methods</a>
+from the <tt>Math</tt> library.
 """
 
 tests = r"""

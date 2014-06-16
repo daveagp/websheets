@@ -57,7 +57,8 @@ public class TigerBook {
         // return the right Person
         return users.get(id);
     }
-]\\hide[
+]\
+\hide[
     public static void exampleClientMain(String[] args) {
         TigerBook tb = new TigerBook(); 
 

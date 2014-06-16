@@ -19,7 +19,7 @@ Use simple multiplication rather than using exponents.
 """
 
 epilogue = r"""
-<i>Note:</i> It's better to call
+It's better to call
 <code>Integer.parseInt(args[0])</code>
 once rather than twice; 
 avoiding redundant

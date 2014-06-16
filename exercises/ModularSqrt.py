@@ -13,6 +13,8 @@ Use the format shown in this example:
 7
 2 square roots were found
 </pre>
+(There's no need to have correct English grammar: print <tt>1 square roots were found</tt> if
+exactly 1 is found.)
 """
 
 source_code = r"""

@@ -38,9 +38,9 @@ public Interval(double lo, double hi) {
 ]\
 // text representation
 public String toString() {
-   // use something like String.format("%.3g", ...);
+   // if you want, use String.format("%.6e", ...);
 \[
-   return String.format("[%.3g, %.3g]", lo, hi);
+   return String.format("[%.6e, %.6e]", lo, hi);
 ]\
 }
 // other instance methods
@@ -84,6 +84,7 @@ testMain();
 saveAs = "persianEmpire"; testConstructor(-550.0, 651.0);
 testOn("persianEmpire", "toString");
 testOn("persianEmpire", "contains", 126.0);
+testOn("persianEmpire", "contains", 6126.0);
 saveAs = "tangDynasty"; testConstructor(623.0, 907.0);
 testOn("tangDynasty", "contains", 126.0);
 testOn("persianEmpire", "intersects", var("tangDynasty"));

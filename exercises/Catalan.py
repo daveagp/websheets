@@ -49,7 +49,7 @@ triangulations, valid parenthesizations, and other ubiquituous combinatorial
 families. Their recursive definition is
 <ul>
 <li> $C_0 = 1$</li>
-<li>for $\displaystyle n > 0, C_n = \sum_{i=0}^{n-1} (C_i \times C_{n-i-1})$</li>
+<li>for $\displaystyle k > 0, C_k = \sum_{i=0}^{k-1} (C_i \times C_{k-i-1})$</li>
 </li>
 </ul>
 It is straightforward to write this as a recursive static method, 

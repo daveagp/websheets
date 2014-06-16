@@ -15,34 +15,18 @@ function websheet(textarea_id, fragments, initial_snippets) {
       && (compare(int2.to, int1.to) < 0);
   }
 
-  function goto(range, backward) {
-    var pos = backward ? range.from : range.to;
-    //console.log(pos);
-    // back past the last, ineditable, character
-    if (!backward) {
-      if (pos.ch == 0) 
-        pos = {line: pos.line-1, ch: cm.getLine(pos.line-1).length};
-      else
-        pos.ch--;
-    }
-    else {
-      if (pos.ch == cm.getLine(pos.line).length) 
-        pos = {line: pos.line+1, ch:0};
-      else
-        pos.ch++;
-    }
-    //console.log(pos);
-    if (!backward) return pos;
+  function goto(range, inline) {
+    if (!inline)
+      // put at end of first line in this multi-line region
+      return {line: range.from.line+1,
+              ch: cm.getLine(range.from.line+1).length};
 
-    // skip past any spaces that immediately follow
-    // but not out of the editable range
-    var theline = cm.getLine(pos.line);
-    while (theline.charAt(pos.ch)==' ') {
-      var newpos = {line: pos.line, ch: pos.ch+1};
-      if (compare(newpos, range.to) == 0) return pos;
-      pos = newpos;
-    }
-    return pos;
+    var pos = range.to.ch-1;
+    // put at end of region, but before any trailing spaces
+    while (pos > range.from.ch+1 && cm.getLine(range.to.line).charAt(pos-1)==' ')
+      pos--;
+    
+    return {line: range.from.line, ch: pos};
   }
 
   // tab jumps you to the start of the next input field
@@ -52,14 +36,14 @@ function websheet(textarea_id, fragments, initial_snippets) {
     var first = null;
     var tgt = null;
     for (var i=(reverse ? editable.length-1 : 0); i>=0 && i<editable.length; i += (reverse ? -1 : 1)) {
-      var ustart = goto(editable[i].find(), reverse);
+      var ustart = goto(editable[i].find(), editable_info[i].type=="inline");
       if (compare(ustart, pos) == (reverse ? -1 : 1)) {
         cm.setCursor(ustart);
         return;
       }
     }
-    cm.setCursor(goto(editable[reverse ? editable.length-1 : 0].find(),
-                     reverse));
+    var x = reverse ? editable.length-1 : 0;
+    cm.setCursor(goto(editable[x].find(), editable_info[x].type=="inline"));
   }
 
   var keyMap = {PageDown: function() {next_blank(false); return true;},

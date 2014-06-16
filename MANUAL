@@ -1,0 +1,62 @@
+WRITING NEW WEBSHEET EXERCISES
+
+The simplest kind of websheet consists of 
+- a program that you wrote
+  plus areas you want to blank out for the student to fill in
+- tests
+- an html description of the exercise
+
+WRITING THE PROGRAM AND INDICATING BLANKS
+
+For composing exercises, use the delimeters \[ ... ]\ to indicate a 
+part of the reference solution that should be left blank for the student
+to fill in. It should take one of two forms:
+(1) starting and ending on the same line
+OR
+(2) starting with \[ on a line by itself and ending with ]\ on a line by itself
+
+In the latter case (2/multi-line), additional whitespace on the lines
+containing the delimiters \[ and ]\ is currently ignored, although it
+could be meaningful in a later version where Python is used.
+
+Example: here's a refernce solution and template with two blanks for the 
+student to fill in.
+
+public class Square {
+  public static void main(String[] args) {
+    int x = \[Integer.parseInt(args[0])]\; // convert arg to int
+    // compute x squared and print it
+\[
+    int xsquared = x*x;
+    System.out.println(xsquared);
+]\
+}
+
+This leaves two blanks for the student.
+
+FANCY STUFF
+
+You can use \hide[ ... ]\ to have the code that we run on the server include
+parts that the student won't see. E.g., see {example}.
+
+You can use \fake[ ... ]\ to display read-only text to the user pretending
+it is part of the program, but that won't actually be included. 
+E.g., see {example}.
+
+You can use \[ blah \show: foo ]\ to have the blank initially populated
+with some text (foo). Here "blah" will be the correct replacement for
+foo in the reference solution. This is useful for debugging -- where
+foo some buggy text and blah is a successfully debugged version of it.
+E.g., see {example}.
+
+All of these work both in single-line or multi-line format. All delimiters 
+--- i.e. \hide[ \fake[ \show: --- should be on their own line (ignoring 
+whitespace) if you are doing a multi-line construction.
+
+CHEATSHEET: WHAT ELEMENTS APPEAR WHERE?
+
+plain text:            UI (read-only),   reference solution, student solution
+blanked-out (\[...]\): UI (empty blank), reference solution, inserted in stu.s.
+"show" of blanked-out: UI (read-write)
+\fake[ ... ]\:         UI (read-only)
+\hide[ ... ]\:                           reference solution, student solution

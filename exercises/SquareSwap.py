@@ -4,7 +4,8 @@ public static void squareSwap(String top, String bottom,
   String left, String right) {
   String[] args = new String[0];
 ]\
-\fake[public static void main(String[] args) {
+\fake[
+public static void main(String[] args) {
    // the grader will pre-define 4 variables with color names
    String top = ...; // e.g. "red" or "blue", etc
    String bottom = ...;
@@ -56,3 +57,4 @@ that occurs when we rotate a square 90 degrees clockwise.
 <div><img style='height:150px;margin-top:5px' src='exercises/FourSwap.ipe.png'></div>
 """
 
+show_class_decl = False

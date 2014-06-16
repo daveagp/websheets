@@ -81,7 +81,8 @@ foreach (scandir("./exercises") as $filename) {
 }
 
 foreach ($filesystem_exercises as $f_ex => $whatevs)
-  if (!array_key_exists($f_ex, $categorized_exercises))
+  if (!array_key_exists($f_ex, $categorized_exercises)
+      && substr($f_ex, 0, 1) != "_") // hide __init__, for example
     echo "<br>Warning: $f_ex in filesystem with no category";
 foreach ($categorized_exercises as $c_ex => $whatevs)
   if (!array_key_exists($c_ex, $filesystem_exercises))

@@ -50,10 +50,10 @@ so that
 <ol>
 <li>
 the total weight of the items
-you select is as large as possible (steal maximum value), but </li>
+you select is as large as possible (steal as much as possible), but </li>
 <li>
 the total weight of the items you select
-must not be larger than the capacity (or else the knapsack will break).
+must not be larger than the capacity (or else the knapsack will rip).
 </li>
 </ol>
 
@@ -70,13 +70,13 @@ are possible, but they are too slow. Instead, use a dynamic programming
 approach that computes:
 <ul>
 <li>
-For each weight <tt>i=0</tt> &hellip; <tt>capacity</tt>, is it possible to
-steal a total weight of exactly i, if you steal either no items or only 
-the first item?
+If you steal either no items or only the first item,
+for each weight <tt>i=0</tt> &hellip; <tt>capacity</tt>, is it possible to
+steal a total weight of exactly i?
 <li>
-For each weight <tt>i=0</tt> &hellip; <tt>capacity</tt>, is it possible to
-steal a total weight of exactly i, if you steal only a subset of the first 
-two items?
+If you steal only a subset of the first two items,
+for each weight <tt>i=0</tt> &hellip; <tt>capacity</tt>, is it possible to
+steal a total weight of exactly i?
 </li>
 <li>Same as before, but only a subset of the first three items?</li>
 <li>And so on, until you determine all weights that could be stolen
@@ -93,7 +93,7 @@ What if each item
 has a dollar value (unrelated to its weight) and you want to 
 steal a maximum-value subset? What if there are both weight and size limits
 (and each item's size is given)? How do you <i>find</i> the best subset? (See
- the next problem <b>KnapsackBacktrack</b>.)
+ the next problem <a href="?group=KnapsackBacktrack">KnapsackBacktrack</a>.)
 
 """
 

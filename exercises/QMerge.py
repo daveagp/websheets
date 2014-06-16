@@ -81,6 +81,7 @@ testStdin = "3 7 8 2 4 5 2 4 1";
 testMain();
 testStdinURL = "http://www.cs.princeton.edu/~cos126/websheets/data/100rand126.txt";
 testMain();
+setMaxOutputBytes(100000);
 testStdinURL = "http://www.cs.princeton.edu/~cos126/websheets/data/10000rand.txt";
 testMain();
 """
@@ -101,5 +102,6 @@ It should use <tt>size()</tt> from the <tt>Queue</tt> API to break the queue arb
 (non-ordered) queues each about half as big as the original. Then sort both halves recusrively, and merge them.
 </li>
 </ol>
+You may find the <a href="http://algs4.cs.princeton.edu/code/javadoc/Queue.html">Queue API</a> helpful!
 """
 

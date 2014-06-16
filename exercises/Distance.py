@@ -12,7 +12,8 @@ public static void main(String[] args) {
 ]\
 
    // print output
-\[          System.out.print("distance from ");
+\[
+   System.out.print("distance from ");
    System.out.print("(" + x + ", " + y + ")");
    System.out.println(" to (0, 0) = " + dist);
 ]\
