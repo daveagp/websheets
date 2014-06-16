@@ -3,13 +3,6 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\npublic class FourChargeClient {\n    public static void main(String[] args) {\n        double r = Double.parseDouble(args[0]);\n\n        double cx = 0.5;\n        double cy = 0.5;\n\n        // construct four charges\n        Charge c1 = new Charge(cx + r, cy,     1.0);    // east\n        Charge c2 =  new Charge(cx,     cy - r, 1.0) ;    // south\n        Charge c3 =  new Charge(cx - r, cy,     1.0) ;    // west\n        Charge c4 =  new Charge(cx,     cy + r, 1.0) ;    // north\n\n        // Compute potentials at (.25, .5)\n        double px = 0.25;\n        double py = 0.5;\n        double v1 = c1.potentialAt( px, py );\n        double v2 =  c2.potentialAt(px, py) ;\n        double v3 =  c3.potentialAt(px, py) ;\n        double v4 =  c4.potentialAt(px, py) ;\n\n        // compute and output total potential\n        double sum =  1.00001*(v1 + v2 + v3 + v4) ;\n        System.out.println(\"total potential:\");\n        System.out.println(sum);\n    }\n}\n",
         {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
             "10": 8,
             "11": 9,
             "12": 10,
@@ -30,8 +23,63 @@
             "27": 25,
             "28": 26,
             "29": 27,
-            "30": 28
+            "3": 1,
+            "30": 28,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 10:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class FourChargeClient {\n    public static void main(String[] args) {\n        double r = Double.parseDouble(args[0]);\n\n        double cx = 0.5;\n        double cy = 0.5;\n\n        // construct four charges\n        Charge c1 = new Charge(cx + r, cy,     1.0);    // east\n        Charge c2 =  new Charge(cx,     cy - r, 1.0) ;    // south\n        Charge c3 =  new Charge(cx - r, cy,     1.0) ;    // west\n        Charge c4 =  new Charge(cx,     cy + r, 1.0) ;    // north\n\n        // Compute potentials at (.25, .5)\n        double px = 0.25;\n        double py = 0.5;\n        double v1 = c1.potentialAt( px, py );\n        double v2 =  c2.potentialAt(px, py) ;\n        double v3 =  c3.potentialAt(px, py) ;\n        double v4 =  c4.potentialAt(px, py) ;\n\n        // compute and output total potential\n        double sum =  v1 + v2 + v3 + v4 ;\n        System.out.println(\"total potential:\");\n        System.out.println(sum);\n    }\n}\n",
+        {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26,
+            "29": 27,
+            "3": 1,
+            "30": 28,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
+        }
+    ],
+    "daveagp": [
+        " new Charge(cx,     cy - r, 1.0) ",
+        " new Charge(cx - r, cy,     1.0) ",
+        " new Charge(cx,     cy + r, 1.0) ",
+        " px, py ",
+        " c2.potentialAt(px, py) ",
+        " c3.potentialAt(px, py) ",
+        " c4.potentialAt(px, py) ",
+        " 1.00001*(v1 + v2 + v3 + v4) "
     ],
     "initial_snippets": [
         "                                 ",
@@ -62,20 +110,6 @@
         "                   ",
         ";\n        System.out.println(\"total potential:\");\n        System.out.println(sum);\n    }\n}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 10:\nmust not be empty"
-    ],
-    "daveagp": [
-        " new Charge(cx,     cy - r, 1.0) ",
-        " new Charge(cx - r, cy,     1.0) ",
-        " new Charge(cx,     cy + r, 1.0) ",
-        " px, py ",
-        " c2.potentialAt(px, py) ",
-        " c3.potentialAt(px, py) ",
-        " c4.potentialAt(px, py) ",
-        " 1.00001*(v1 + v2 + v3 + v4) "
-    ],
     "reference_snippets": [
         " new Charge(cx,     cy - r, 1.0) ",
         " new Charge(cx - r, cy,     1.0) ",
@@ -85,40 +119,6 @@
         " c3.potentialAt(px, py) ",
         " c4.potentialAt(px, py) ",
         " v1 + v2 + v3 + v4 "
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class FourChargeClient {\n    public static void main(String[] args) {\n        double r = Double.parseDouble(args[0]);\n\n        double cx = 0.5;\n        double cy = 0.5;\n\n        // construct four charges\n        Charge c1 = new Charge(cx + r, cy,     1.0);    // east\n        Charge c2 =  new Charge(cx,     cy - r, 1.0) ;    // south\n        Charge c3 =  new Charge(cx - r, cy,     1.0) ;    // west\n        Charge c4 =  new Charge(cx,     cy + r, 1.0) ;    // north\n\n        // Compute potentials at (.25, .5)\n        double px = 0.25;\n        double py = 0.5;\n        double v1 = c1.potentialAt( px, py );\n        double v2 =  c2.potentialAt(px, py) ;\n        double v3 =  c3.potentialAt(px, py) ;\n        double v4 =  c4.potentialAt(px, py) ;\n\n        // compute and output total potential\n        double sum =  v1 + v2 + v3 + v4 ;\n        System.out.println(\"total potential:\");\n        System.out.println(sum);\n    }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13,
-            "16": 14,
-            "17": 15,
-            "18": 16,
-            "19": 17,
-            "20": 18,
-            "21": 19,
-            "22": 20,
-            "23": 21,
-            "24": 22,
-            "25": 23,
-            "26": 24,
-            "27": 25,
-            "28": 26,
-            "29": 27,
-            "30": 28
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class FourChargeClient {\n    public static void main(String[] args) {\n        double r = Double.parseDouble(args[0]);\n\n        double cx = 0.5;\n        double cy = 0.5;\n\n        // construct four charges\n        Charge c1 = new Charge(cx + r, cy,     1.0);    // east\n        Charge c2 =  new Charge(cx,     cy - r, 1.0) ;    // south\n        Charge c3 =  new Charge(cx - r, cy,     1.0) ;    // west\n        Charge c4 =  new Charge(cx,     cy + r, 1.0) ;    // north\n\n        // Compute potentials at (.25, .5)\n        double px = 0.25;\n        double py = 0.5;\n        double v1 = c1.potentialAt( px, py );\n        double v2 =  c2.potentialAt(px, py) ;\n        double v3 =  c3.potentialAt(px, py) ;\n        double v4 =  c4.potentialAt(px, py) ;\n\n        // compute and output total potential\n        double sum =  v1 + v2 + v3 + v4 ;\n        System.out.println(\"total potential:\");\n        System.out.println(sum);\n    }\n}\n"
 }

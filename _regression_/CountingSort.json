@@ -3,13 +3,6 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\npublic class CountingSort {\n   public static void main(String[] args) {\n      Clicker[] counts =  new Clicker[10];  // array of Clickers\n   \n      // initialize them all\n      for (int i=0; i<=9; i++)\n         counts[i] = new Clicker();\n\n   \n      // read each digit\n      while (!StdIn.isEmpty()) {\n         int digit = StdIn.readInt();\n         // increment the right clicker\n         counts[digit].inc();\n      }\n   \n      // print out each number once for each time it was seen\n      for (int i=0; i<10; i++) {\n         while (counts[i].curr() > 0) {\n            StdOut.print(i+\" \");\n            counts[i].dec();\n         }\n      }\n      StdOut.println();\n   }\n   public static class Clicker {\n      // private instance variable(s) you will use are declared here:\n      private int value; // currently held value\n      \n      // constructor, make new clicker with value 0\n      public Clicker() {\n         value = 0;\n      }\n      // add one to the current value\n      public void inc() {\n         value++;\n      }\n      \n      // subtract one from the current value\n      public void dec() {\n         value--;\n      }\n      \n      // return the current value\n      public int curr() {\n         return value;\n      }\n      \n      // testing suite\n      public static void main(String[] args) {\n         Clicker myClick = new Clicker();\n         StdOut.println(myClick.curr()); // should be 0\n         myClick.inc();\n         myClick.inc();\n         StdOut.println(myClick.curr()); // should be 2\n         myClick.dec();\n         myClick.dec();\n         myClick.dec();\n         StdOut.println(myClick.curr()); // should be -1\n      \n         Clicker clickMore = new Clicker();\n         StdOut.println(clickMore.curr()); // should be 0\n         clickMore.inc();\n         clickMore.inc();\n         clickMore.inc();\n         StdOut.println(clickMore.curr()); // should be 3\n      \n         // the next line won't work if you used static variables\n         StdOut.println(myClick.curr()); // should still be -1\n      }\n   }\n}\n",
         {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
             "10": 8,
             "11": 9,
             "12": 10,
@@ -29,8 +22,57 @@
             "26": 24,
             "27": 25,
             "28": 26,
-            "75": 27
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "75": 27,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 3:\nmust have exactly one semicolon, at the end"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class CountingSort {\n   public static void main(String[] args) {\n      Clicker[] counts =  new Clicker[10];  // array of Clickers\n   \n      // initialize them all\n      for (int i=0; i<10; i++) {\n         counts[i] = new Clicker(); // initialize one\n      }\n   \n      // read each digit\n      while (!StdIn.isEmpty()) {\n         int digit = StdIn.readInt();\n         // increment the right clicker\n         counts[digit].inc();\n      }\n   \n      // print out each number once for each time it was seen\n      for (int i=0; i<10; i++) {\n         while (counts[i].curr() > 0) {\n            StdOut.print(i+\" \");\n            counts[i].dec();\n         }\n      }\n      StdOut.println();\n   }\n   public static class Clicker {\n      // private instance variable(s) you will use are declared here:\n      private int value; // currently held value\n      \n      // constructor, make new clicker with value 0\n      public Clicker() {\n         value = 0;\n      }\n      // add one to the current value\n      public void inc() {\n         value++;\n      }\n      \n      // subtract one from the current value\n      public void dec() {\n         value--;\n      }\n      \n      // return the current value\n      public int curr() {\n         return value;\n      }\n      \n      // testing suite\n      public static void main(String[] args) {\n         Clicker myClick = new Clicker();\n         StdOut.println(myClick.curr()); // should be 0\n         myClick.inc();\n         myClick.inc();\n         StdOut.println(myClick.curr()); // should be 2\n         myClick.dec();\n         myClick.dec();\n         myClick.dec();\n         StdOut.println(myClick.curr()); // should be -1\n      \n         Clicker clickMore = new Clicker();\n         StdOut.println(clickMore.curr()); // should be 0\n         clickMore.inc();\n         clickMore.inc();\n         clickMore.inc();\n         StdOut.println(clickMore.curr()); // should be 3\n      \n         // the next line won't work if you used static variables\n         StdOut.println(myClick.curr()); // should still be -1\n      }\n   }\n}\n",
+        {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "75": 27,
+            "8": 6,
+            "9": 7
+        }
+    ],
+    "daveagp": [
+        " new Clicker[10]; ",
+        "\n      for (int i=0; i<=9; i++)\n         counts[i] = new Clicker();\n\n",
+        "\n         counts[digit].inc();\n"
     ],
     "initial_snippets": [
         "                  ",
@@ -46,52 +88,10 @@
         "\n\n",
         "      }\n   \n      // print out each number once for each time it was seen\n      for (int i=0; i<10; i++) {\n         while (counts[i].curr() > 0) {\n            StdOut.print(i+\" \");\n            counts[i].dec();\n         }\n      }\n      StdOut.println();\n   }\n}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 3:\nmust have exactly one semicolon, at the end"
-    ],
-    "daveagp": [
-        " new Clicker[10]; ",
-        "\n      for (int i=0; i<=9; i++)\n         counts[i] = new Clicker();\n\n",
-        "\n         counts[digit].inc();\n"
-    ],
     "reference_snippets": [
         " new Clicker[10]; ",
         "\n      for (int i=0; i<10; i++) {\n         counts[i] = new Clicker(); // initialize one\n      }\n",
         "\n         counts[digit].inc();\n"
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class CountingSort {\n   public static void main(String[] args) {\n      Clicker[] counts =  new Clicker[10];  // array of Clickers\n   \n      // initialize them all\n      for (int i=0; i<10; i++) {\n         counts[i] = new Clicker(); // initialize one\n      }\n   \n      // read each digit\n      while (!StdIn.isEmpty()) {\n         int digit = StdIn.readInt();\n         // increment the right clicker\n         counts[digit].inc();\n      }\n   \n      // print out each number once for each time it was seen\n      for (int i=0; i<10; i++) {\n         while (counts[i].curr() > 0) {\n            StdOut.print(i+\" \");\n            counts[i].dec();\n         }\n      }\n      StdOut.println();\n   }\n   public static class Clicker {\n      // private instance variable(s) you will use are declared here:\n      private int value; // currently held value\n      \n      // constructor, make new clicker with value 0\n      public Clicker() {\n         value = 0;\n      }\n      // add one to the current value\n      public void inc() {\n         value++;\n      }\n      \n      // subtract one from the current value\n      public void dec() {\n         value--;\n      }\n      \n      // return the current value\n      public int curr() {\n         return value;\n      }\n      \n      // testing suite\n      public static void main(String[] args) {\n         Clicker myClick = new Clicker();\n         StdOut.println(myClick.curr()); // should be 0\n         myClick.inc();\n         myClick.inc();\n         StdOut.println(myClick.curr()); // should be 2\n         myClick.dec();\n         myClick.dec();\n         myClick.dec();\n         StdOut.println(myClick.curr()); // should be -1\n      \n         Clicker clickMore = new Clicker();\n         StdOut.println(clickMore.curr()); // should be 0\n         clickMore.inc();\n         clickMore.inc();\n         clickMore.inc();\n         StdOut.println(clickMore.curr()); // should be 3\n      \n         // the next line won't work if you used static variables\n         StdOut.println(myClick.curr()); // should still be -1\n      }\n   }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13,
-            "16": 14,
-            "17": 15,
-            "18": 16,
-            "19": 17,
-            "20": 18,
-            "21": 19,
-            "22": 20,
-            "23": 21,
-            "24": 22,
-            "25": 23,
-            "26": 24,
-            "27": 25,
-            "28": 26,
-            "75": 27
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class CountingSort {\n   public static void main(String[] args) {\n      Clicker[] counts =  new Clicker[10];  // array of Clickers\n   \n      // initialize them all\n      for (int i=0; i<10; i++) {\n         counts[i] = new Clicker(); // initialize one\n      }\n   \n      // read each digit\n      while (!StdIn.isEmpty()) {\n         int digit = StdIn.readInt();\n         // increment the right clicker\n         counts[digit].inc();\n      }\n   \n      // print out each number once for each time it was seen\n      for (int i=0; i<10; i++) {\n         while (counts[i].curr() > 0) {\n            StdOut.print(i+\" \");\n            counts[i].dec();\n         }\n      }\n      StdOut.println();\n   }\n   public static class Clicker {\n      // private instance variable(s) you will use are declared here:\n      private int value; // currently held value\n      \n      // constructor, make new clicker with value 0\n      public Clicker() {\n         value = 0;\n      }\n      // add one to the current value\n      public void inc() {\n         value++;\n      }\n      \n      // subtract one from the current value\n      public void dec() {\n         value--;\n      }\n      \n      // return the current value\n      public int curr() {\n         return value;\n      }\n      \n      // testing suite\n      public static void main(String[] args) {\n         Clicker myClick = new Clicker();\n         StdOut.println(myClick.curr()); // should be 0\n         myClick.inc();\n         myClick.inc();\n         StdOut.println(myClick.curr()); // should be 2\n         myClick.dec();\n         myClick.dec();\n         myClick.dec();\n         StdOut.println(myClick.curr()); // should be -1\n      \n         Clicker clickMore = new Clicker();\n         StdOut.println(clickMore.curr()); // should be 0\n         clickMore.inc();\n         clickMore.inc();\n         clickMore.inc();\n         StdOut.println(clickMore.curr()); // should be 3\n      \n         // the next line won't work if you used static variables\n         StdOut.println(myClick.curr()); // should still be -1\n      }\n   }\n}\n"
 }

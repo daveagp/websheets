@@ -3,13 +3,6 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\npublic class CombinationLock {\n   public String pass;\n   public boolean locked;\n      \n   public CombinationLock(String initpass) {\n      locked = false;\n      pass = initpass;\n   }\n   \n   public boolean isLocked() {\n      return locked;\n   }\n   \n   public void tryUnlock(String attempt) {\n      if (pass.equals(attempt)) locked = false;\n   }\n   \n   public void lock() {\n      locked = true;\n   }\n\n   public void changePassword(String newpass) {\n      if (locked)\n         System.out.println(\"ERROR: LOCKED\");\n      else\n         pass = newpass;\n   }\n\n\n\n\n\n\n}\n",
         {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
             "10": 8,
             "11": 9,
             "12": 10,
@@ -30,6 +23,7 @@
             "27": 25,
             "28": 26,
             "29": 27,
+            "3": 1,
             "30": 28,
             "31": 29,
             "32": 30,
@@ -37,8 +31,62 @@
             "34": 32,
             "35": 33,
             "36": 34,
-            "37": 35
+            "37": 35,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 34, editable region 1:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class CombinationLock {\n   private boolean locked; // is it locked right now?\n   private String password; // current password\n   \n   // construct new lock with this initial password, initially unlocked\n   public CombinationLock(String initpass) {\n      password = initpass; // save password\n      locked = false; // initially unlocked\n   }\n   \n   // is this lock currently locked? \n   public boolean isLocked() {\n      return locked;\n   }\n   \n   // if current password equals attempt, unlock (no effect if already unlocked)\n   public void tryUnlock(String attempt) {\n      if (attempt.equals(password))\n         locked = false;\n   }\n   \n   // make this lock become locked (no effect if already locked)\n   public void lock() {\n      locked = true;\n   }\n   \n   // if locked, print \"ERROR: LOCKED\" else change password to newpass\n   public void changePassword(String newpass) {\n      if (locked) \n         StdOut.println(\"ERROR: LOCKED\");\n      else\n         password = newpass;\n   }\n}\n",
+        {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26,
+            "29": 27,
+            "3": 1,
+            "30": 28,
+            "31": 29,
+            "32": 30,
+            "33": 31,
+            "34": 32,
+            "35": 33,
+            "36": 34,
+            "37": 35,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
+        }
+    ],
+    "daveagp": [
+        "\n   public String pass;\n   public boolean locked;\n      \n   public CombinationLock(String initpass) {\n      locked = false;\n      pass = initpass;\n   }\n   \n   public boolean isLocked() {\n      return locked;\n   }\n   \n   public void tryUnlock(String attempt) {\n      if (pass.equals(attempt)) locked = false;\n   }\n   \n   public void lock() {\n      locked = true;\n   }\n\n   public void changePassword(String newpass) {\n      if (locked)\n         System.out.println(\"ERROR: LOCKED\");\n      else\n         pass = newpass;\n   }\n\n\n\n\n\n\n"
     ],
     "initial_snippets": [
         "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
@@ -48,56 +96,8 @@
         "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
         "}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 34, editable region 1:\nmust not be empty"
-    ],
-    "daveagp": [
-        "\n   public String pass;\n   public boolean locked;\n      \n   public CombinationLock(String initpass) {\n      locked = false;\n      pass = initpass;\n   }\n   \n   public boolean isLocked() {\n      return locked;\n   }\n   \n   public void tryUnlock(String attempt) {\n      if (pass.equals(attempt)) locked = false;\n   }\n   \n   public void lock() {\n      locked = true;\n   }\n\n   public void changePassword(String newpass) {\n      if (locked)\n         System.out.println(\"ERROR: LOCKED\");\n      else\n         pass = newpass;\n   }\n\n\n\n\n\n\n"
-    ],
     "reference_snippets": [
         "\n   private boolean locked; // is it locked right now?\n   private String password; // current password\n   \n   // construct new lock with this initial password, initially unlocked\n   public CombinationLock(String initpass) {\n      password = initpass; // save password\n      locked = false; // initially unlocked\n   }\n   \n   // is this lock currently locked? \n   public boolean isLocked() {\n      return locked;\n   }\n   \n   // if current password equals attempt, unlock (no effect if already unlocked)\n   public void tryUnlock(String attempt) {\n      if (attempt.equals(password))\n         locked = false;\n   }\n   \n   // make this lock become locked (no effect if already locked)\n   public void lock() {\n      locked = true;\n   }\n   \n   // if locked, print \"ERROR: LOCKED\" else change password to newpass\n   public void changePassword(String newpass) {\n      if (locked) \n         StdOut.println(\"ERROR: LOCKED\");\n      else\n         password = newpass;\n   }\n"
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class CombinationLock {\n   private boolean locked; // is it locked right now?\n   private String password; // current password\n   \n   // construct new lock with this initial password, initially unlocked\n   public CombinationLock(String initpass) {\n      password = initpass; // save password\n      locked = false; // initially unlocked\n   }\n   \n   // is this lock currently locked? \n   public boolean isLocked() {\n      return locked;\n   }\n   \n   // if current password equals attempt, unlock (no effect if already unlocked)\n   public void tryUnlock(String attempt) {\n      if (attempt.equals(password))\n         locked = false;\n   }\n   \n   // make this lock become locked (no effect if already locked)\n   public void lock() {\n      locked = true;\n   }\n   \n   // if locked, print \"ERROR: LOCKED\" else change password to newpass\n   public void changePassword(String newpass) {\n      if (locked) \n         StdOut.println(\"ERROR: LOCKED\");\n      else\n         password = newpass;\n   }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13,
-            "16": 14,
-            "17": 15,
-            "18": 16,
-            "19": 17,
-            "20": 18,
-            "21": 19,
-            "22": 20,
-            "23": 21,
-            "24": 22,
-            "25": 23,
-            "26": 24,
-            "27": 25,
-            "28": 26,
-            "29": 27,
-            "30": 28,
-            "31": 29,
-            "32": 30,
-            "33": 31,
-            "34": 32,
-            "35": 33,
-            "36": 34,
-            "37": 35
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class CombinationLock {\n   private boolean locked; // is it locked right now?\n   private String password; // current password\n   \n   // construct new lock with this initial password, initially unlocked\n   public CombinationLock(String initpass) {\n      password = initpass; // save password\n      locked = false; // initially unlocked\n   }\n   \n   // is this lock currently locked? \n   public boolean isLocked() {\n      return locked;\n   }\n   \n   // if current password equals attempt, unlock (no effect if already unlocked)\n   public void tryUnlock(String attempt) {\n      if (attempt.equals(password))\n         locked = false;\n   }\n   \n   // make this lock become locked (no effect if already locked)\n   public void lock() {\n      locked = true;\n   }\n   \n   // if locked, print \"ERROR: LOCKED\" else change password to newpass\n   public void changePassword(String newpass) {\n      if (locked) \n         StdOut.println(\"ERROR: LOCKED\");\n      else\n         password = newpass;\n   }\n}\n"
 }

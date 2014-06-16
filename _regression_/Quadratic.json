@@ -3,13 +3,6 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\npublic class Quadratic {\n   public static void main(String[] args) {\n      double b = Double.parseDouble(args[0]);\n      double c = Double.parseDouble(args[1]);\n      double disc = b*b-4*1*c;\n      if (Math.abs(disc) < 1E-6)\n         System.out.println(-b/2);\n      else if (disc < 0)\n         System.out.println(\"There are no roots\");\n         else {\n         System.out.println((-b-Math.sqrt(disc))/2);\n         System.out.println((-b+Math.sqrt(disc))/2);\n      }\n   }\n}\n",
         {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
             "10": 8,
             "11": 9,
             "12": 10,
@@ -18,38 +11,24 @@
             "15": 13,
             "16": 14,
             "17": 15,
-            "18": 16
-        }
-    ],
-    "initial_snippets": [
-        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-    ],
-    "json_template": [
-        "public class Quadratic {\n   public static void main(String[] args) {\n      double b = Double.parseDouble(args[0]);\n      double c = Double.parseDouble(args[1]);",
-        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
-        "   }\n}"
-    ],
-    "combined_with_initial": [
-        false,
-        "Line 20, editable region 1:\nmust not be empty"
-    ],
-    "daveagp": [
-        "\n      double disc = b*b-4*1*c;\n      if (Math.abs(disc) < 1E-6)\n         System.out.println(-b/2);\n      else if (disc < 0)\n         System.out.println(\"There are no roots\");\n         else {\n         System.out.println((-b-Math.sqrt(disc))/2);\n         System.out.println((-b+Math.sqrt(disc))/2);\n      }\n"
-    ],
-    "reference_snippets": [
-        "\n      double disc = (b*b-4*c);\n   \n      if (Math.abs(disc) < 1E-6) {\n         // avoid square roots: sqrt(disc) could cause \"not a number\" if disc < 0\n         System.out.println(-b/2);\n      }\n      else if (disc < 0) {\n         System.out.println(\"There are no roots\");\n      }\n      else {\n         double root1 = (-b-Math.sqrt(disc))/2;\n         double root2 = (-b+Math.sqrt(disc))/2;\n         System.out.println(root1);\n         System.out.println(root2);\n      }\n"
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class Quadratic {\n   public static void main(String[] args) {\n      double b = Double.parseDouble(args[0]);\n      double c = Double.parseDouble(args[1]);\n      double disc = (b*b-4*c);\n   \n      if (Math.abs(disc) < 1E-6) {\n         // avoid square roots: sqrt(disc) could cause \"not a number\" if disc < 0\n         System.out.println(-b/2);\n      }\n      else if (disc < 0) {\n         System.out.println(\"There are no roots\");\n      }\n      else {\n         double root1 = (-b-Math.sqrt(disc))/2;\n         double root2 = (-b+Math.sqrt(disc))/2;\n         System.out.println(root1);\n         System.out.println(root2);\n      }\n   }\n}\n",
-        {
+            "18": 16,
             "3": 1,
             "4": 2,
             "5": 3,
             "6": 4,
             "7": 5,
             "8": 6,
-            "9": 7,
+            "9": 7
+        }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 20, editable region 1:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class Quadratic {\n   public static void main(String[] args) {\n      double b = Double.parseDouble(args[0]);\n      double c = Double.parseDouble(args[1]);\n      double disc = (b*b-4*c);\n   \n      if (Math.abs(disc) < 1E-6) {\n         // avoid square roots: sqrt(disc) could cause \"not a number\" if disc < 0\n         System.out.println(-b/2);\n      }\n      else if (disc < 0) {\n         System.out.println(\"There are no roots\");\n      }\n      else {\n         double root1 = (-b-Math.sqrt(disc))/2;\n         double root2 = (-b+Math.sqrt(disc))/2;\n         System.out.println(root1);\n         System.out.println(root2);\n      }\n   }\n}\n",
+        {
             "10": 8,
             "11": 9,
             "12": 10,
@@ -64,8 +43,29 @@
             "21": 19,
             "22": 20,
             "23": 21,
-            "24": 22
+            "24": 22,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "daveagp": [
+        "\n      double disc = b*b-4*1*c;\n      if (Math.abs(disc) < 1E-6)\n         System.out.println(-b/2);\n      else if (disc < 0)\n         System.out.println(\"There are no roots\");\n         else {\n         System.out.println((-b-Math.sqrt(disc))/2);\n         System.out.println((-b+Math.sqrt(disc))/2);\n      }\n"
+    ],
+    "initial_snippets": [
+        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+    ],
+    "json_template": [
+        "public class Quadratic {\n   public static void main(String[] args) {\n      double b = Double.parseDouble(args[0]);\n      double c = Double.parseDouble(args[1]);",
+        "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "   }\n}"
+    ],
+    "reference_snippets": [
+        "\n      double disc = (b*b-4*c);\n   \n      if (Math.abs(disc) < 1E-6) {\n         // avoid square roots: sqrt(disc) could cause \"not a number\" if disc < 0\n         System.out.println(-b/2);\n      }\n      else if (disc < 0) {\n         System.out.println(\"There are no roots\");\n      }\n      else {\n         double root1 = (-b-Math.sqrt(disc))/2;\n         double root2 = (-b+Math.sqrt(disc))/2;\n         System.out.println(root1);\n         System.out.println(root2);\n      }\n"
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class Quadratic {\n   public static void main(String[] args) {\n      double b = Double.parseDouble(args[0]);\n      double c = Double.parseDouble(args[1]);\n      double disc = (b*b-4*c);\n   \n      if (Math.abs(disc) < 1E-6) {\n         // avoid square roots: sqrt(disc) could cause \"not a number\" if disc < 0\n         System.out.println(-b/2);\n      }\n      else if (disc < 0) {\n         System.out.println(\"There are no roots\");\n      }\n      else {\n         double root1 = (-b-Math.sqrt(disc))/2;\n         double root2 = (-b+Math.sqrt(disc))/2;\n         System.out.println(root1);\n         System.out.println(root2);\n      }\n   }\n}\n"
 }

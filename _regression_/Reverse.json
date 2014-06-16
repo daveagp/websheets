@@ -12,23 +12,9 @@
             "9": 7
         }
     ],
-    "initial_snippets": [
-        "\n\n\n"
-    ],
-    "json_template": [
-        "public class Reverse {\n   public static void main(String[] args) {",
-        "\n\n\n",
-        "   }\n}"
-    ],
     "combined_with_initial": [
         false,
         "Line 5, editable region 1:\nmust not be empty"
-    ],
-    "daveagp": [
-        "\n      for (int i=args.length-1; i>=0; i--)\n         System.out.print(args[i]+\" \");\n"
-    ],
-    "reference_snippets": [
-        "\n      for (int i=args.length-1; i>=0; i--)\n         System.out.print(args[i]+\" \");\n"
     ],
     "combined_with_reference": [
         true,
@@ -42,6 +28,20 @@
             "8": 6,
             "9": 7
         }
+    ],
+    "daveagp": [
+        "\n      for (int i=args.length-1; i>=0; i--)\n         System.out.print(args[i]+\" \");\n"
+    ],
+    "initial_snippets": [
+        "\n\n\n"
+    ],
+    "json_template": [
+        "public class Reverse {\n   public static void main(String[] args) {",
+        "\n\n\n",
+        "   }\n}"
+    ],
+    "reference_snippets": [
+        "\n      for (int i=args.length-1; i>=0; i--)\n         System.out.print(args[i]+\" \");\n"
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class Reverse {\n   public static void main(String[] args) {\n      for (int i=args.length-1; i>=0; i--)\n         System.out.print(args[i]+\" \");\n   }\n}\n"
 }

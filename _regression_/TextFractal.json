@@ -3,13 +3,6 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\npublic class TextFractal {\n   public static void printRuler(int n) {\n      // return if we're in the base case. \n      if (n==0) return;\n      // otherwise, make two recursive calls, with a length-n line in between\n      printRuler( n-1 );\n      for (int i=0; i<n; i++) System.out.print(\"-\");\n      System.out.println();\n      printRuler(n-1);\n\n   }\n   \n   public static void main(String[] args) {\n      // just a test\n      printRuler(3);\n   }\n}\n",
         {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
             "10": 8,
             "11": 9,
             "12": 10,
@@ -20,8 +13,48 @@
             "17": 15,
             "18": 16,
             "19": 17,
-            "20": 18
+            "20": 18,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 5, editable region 1:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class TextFractal {\n   public static void printRuler(int n) {\n      // return if we're in the base case. \n      if (n == 0) return;\n      // otherwise, make two recursive calls, with a length-n line in between\n      printRuler( n-1 );\n      for (int i=0; i<n; i++)\n         StdOut.print('-');\n      StdOut.println(); \n      printRuler(n-1);\n   }\n   \n   public static void main(String[] args) {\n      // just a test\n      printRuler(3);\n   }\n}\n",
+        {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
+        }
+    ],
+    "daveagp": [
+        "\n      if (n==0) return;\n",
+        " n-1 ",
+        "\n      for (int i=0; i<n; i++) System.out.print(\"-\");\n      System.out.println();\n      printRuler(n-1);\n\n"
     ],
     "initial_snippets": [
         "\n\n",
@@ -37,43 +70,10 @@
         "\n\n\n\n\n",
         "   }\n   \n   public static void main(String[] args) {\n      // just a test\n      printRuler(3);\n   }\n}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 5, editable region 1:\nmust not be empty"
-    ],
-    "daveagp": [
-        "\n      if (n==0) return;\n",
-        " n-1 ",
-        "\n      for (int i=0; i<n; i++) System.out.print(\"-\");\n      System.out.println();\n      printRuler(n-1);\n\n"
-    ],
     "reference_snippets": [
         "\n      if (n == 0) return;\n",
         " n-1 ",
         "\n      for (int i=0; i<n; i++)\n         StdOut.print('-');\n      StdOut.println(); \n      printRuler(n-1);\n"
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class TextFractal {\n   public static void printRuler(int n) {\n      // return if we're in the base case. \n      if (n == 0) return;\n      // otherwise, make two recursive calls, with a length-n line in between\n      printRuler( n-1 );\n      for (int i=0; i<n; i++)\n         StdOut.print('-');\n      StdOut.println(); \n      printRuler(n-1);\n   }\n   \n   public static void main(String[] args) {\n      // just a test\n      printRuler(3);\n   }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13,
-            "16": 14,
-            "17": 15,
-            "18": 16,
-            "19": 17,
-            "20": 18
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class TextFractal {\n   public static void printRuler(int n) {\n      // return if we're in the base case. \n      if (n == 0) return;\n      // otherwise, make two recursive calls, with a length-n line in between\n      printRuler( n-1 );\n      for (int i=0; i<n; i++)\n         StdOut.print('-');\n      StdOut.println(); \n      printRuler(n-1);\n   }\n   \n   public static void main(String[] args) {\n      // just a test\n      printRuler(3);\n   }\n}\n"
 }

@@ -3,13 +3,6 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\npublic class Find {\n   public static int find( int  needle,  int[]  haystack) {\n      int n = haystack.length;\n      for ( int i=0; i<n; i++ ) {\n         // check if this element of haystack equals needle\n         if ( needle == haystack[i] ) \n            // quit immediately with this index\n            return  i ;\n      }\n      // if we get this far, the needle was not found\n      return -1;\n   }\n   \n   public static void main(String[] args) {\n      int[] arr = {1, 2, 6};\n      System.out.println(\"index of 1 in arr: \" + find(1, arr)); // should be 0\n      System.out.println(\"index of 2 in arr: \" + find(2, arr)); // should be 1\n      System.out.println(\"index of 6 in arr: \" + find(6, arr)); // should be 2\n      System.out.println(\"index of 4 in arr: \" + find(4, arr)); // should be -1\n   }\n}\n",
         {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
             "10": 8,
             "11": 9,
             "12": 10,
@@ -24,8 +17,54 @@
             "21": 19,
             "22": 20,
             "23": 21,
-            "24": 22
+            "24": 22,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 2:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class Find {\n   public static int find( int  needle,  int[]  haystack) {\n      int n = haystack.length;\n      for ( int i=0; i<n; i++ ) {\n         // check if this element of haystack equals needle\n         if ( haystack[i] == needle ) \n            // quit immediately with this index\n            return  i ;\n      }\n      // if we get this far, the needle was not found\n      return -1;\n   }\n   \n   public static void main(String[] args) {\n      int[] arr = {1, 2, 6};\n      System.out.println(\"index of 1 in arr: \" + find(1, arr)); // should be 0\n      System.out.println(\"index of 2 in arr: \" + find(2, arr)); // should be 1\n      System.out.println(\"index of 6 in arr: \" + find(6, arr)); // should be 2\n      System.out.println(\"index of 4 in arr: \" + find(4, arr)); // should be -1\n   }\n}\n",
+        {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
+        }
+    ],
+    "daveagp": [
+        " int ",
+        " int[] ",
+        " int i=0; i<n; i++ ",
+        " needle == haystack[i] ",
+        " i "
     ],
     "initial_snippets": [
         "     ",
@@ -47,51 +86,12 @@
         "   ",
         ";\n      }\n      // if we get this far, the needle was not found\n      return -1;\n   }\n   \n   public static void main(String[] args) {\n      int[] arr = {1, 2, 6};\n      System.out.println(\"index of 1 in arr: \" + find(1, arr)); // should be 0\n      System.out.println(\"index of 2 in arr: \" + find(2, arr)); // should be 1\n      System.out.println(\"index of 6 in arr: \" + find(6, arr)); // should be 2\n      System.out.println(\"index of 4 in arr: \" + find(4, arr)); // should be -1\n   }\n}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 2:\nmust not be empty"
-    ],
-    "daveagp": [
-        " int ",
-        " int[] ",
-        " int i=0; i<n; i++ ",
-        " needle == haystack[i] ",
-        " i "
-    ],
     "reference_snippets": [
         " int ",
         " int[] ",
         " int i=0; i<n; i++ ",
         " haystack[i] == needle ",
         " i "
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class Find {\n   public static int find( int  needle,  int[]  haystack) {\n      int n = haystack.length;\n      for ( int i=0; i<n; i++ ) {\n         // check if this element of haystack equals needle\n         if ( haystack[i] == needle ) \n            // quit immediately with this index\n            return  i ;\n      }\n      // if we get this far, the needle was not found\n      return -1;\n   }\n   \n   public static void main(String[] args) {\n      int[] arr = {1, 2, 6};\n      System.out.println(\"index of 1 in arr: \" + find(1, arr)); // should be 0\n      System.out.println(\"index of 2 in arr: \" + find(2, arr)); // should be 1\n      System.out.println(\"index of 6 in arr: \" + find(6, arr)); // should be 2\n      System.out.println(\"index of 4 in arr: \" + find(4, arr)); // should be -1\n   }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13,
-            "16": 14,
-            "17": 15,
-            "18": 16,
-            "19": 17,
-            "20": 18,
-            "21": 19,
-            "22": 20,
-            "23": 21,
-            "24": 22
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class Find {\n   public static int find( int  needle,  int[]  haystack) {\n      int n = haystack.length;\n      for ( int i=0; i<n; i++ ) {\n         // check if this element of haystack equals needle\n         if ( haystack[i] == needle ) \n            // quit immediately with this index\n            return  i ;\n      }\n      // if we get this far, the needle was not found\n      return -1;\n   }\n   \n   public static void main(String[] args) {\n      int[] arr = {1, 2, 6};\n      System.out.println(\"index of 1 in arr: \" + find(1, arr)); // should be 0\n      System.out.println(\"index of 2 in arr: \" + find(2, arr)); // should be 1\n      System.out.println(\"index of 6 in arr: \" + find(6, arr)); // should be 2\n      System.out.println(\"index of 4 in arr: \" + find(4, arr)); // should be -1\n   }\n}\n"
 }

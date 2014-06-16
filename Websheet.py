@@ -529,7 +529,7 @@ self.classname + " to = new " + self.classname + "();\n" +
         r["combined_with_reference"] = self.make_student_solution(r["reference_snippets"], "combined.reference")
         r["daveagp"] = config.load_submission("daveagp@gmail.com", self.slug, maxId = 876)
         r["combined_with_daveagp"] = self.make_student_solution(r["daveagp"], "combined.daveagp")
-        return r
+        return json.loads(json.dumps(r)) # to remove things like numeric keys
 
     def regression_ui(self):
         regressed = False
@@ -538,15 +538,15 @@ self.classname + " to = new " + self.classname + "();\n" +
         for key in current_result:
             if current_result[key] != old_result[key]:
                 print(self.slug+" differs in key " + key + ", was: ")
-                print(repr(old_result[key]))
+                print(json.dumps(old_result[key],indent=4, separators=(',', ': '), sort_keys=True))
                 print("now:")
-                print(repr(current_result[key]))
+                print(json.dumps(current_result[key],indent=4, separators=(',', ': '), sort_keys=True))
                 regressed = True
         return regressed
 
     def regression_save(self):
         outf=open("_regression_/"+self.slug+".json", 'w')
-        print(json.dumps(self.testing_ui(),indent=4, separators=(',', ': ')),
+        print(json.dumps(self.testing_ui(),indent=4, separators=(',', ': '), sort_keys=True),
               file=outf)
         outf.close()
 
@@ -590,6 +590,15 @@ if __name__ == "__main__":
         for slug in list:
             print(slug)
             Websheet.from_filesystem(slug).regression_save()
+
+    elif sys.argv[1] == "regression":
+        Websheet.from_filesystem(sys.argv[2]).regression_ui()
+
+    elif sys.argv[1] == "regression_all":
+        list = Websheet.list_filesystem()
+        for slug in list:
+            print(slug)
+            Websheet.from_filesystem(slug).regression_ui()
 
     elif sys.argv[1] == "list":
         print(json.dumps(Websheet.list_filesystem()))

@@ -12,28 +12,9 @@
             "9": 7
         }
     ],
-    "initial_snippets": [
-        "                           ",
-        "                     "
-    ],
-    "json_template": [
-        "public class SquareOf {\n   public static void main(String[] args) {\n      int inputNum =",
-        "                           ",
-        "; // convert the input\n      System.out.println(",
-        "                     ",
-        "); // print its square\n   }\n}"
-    ],
     "combined_with_initial": [
         false,
         "Line 3:\nmust not be empty"
-    ],
-    "daveagp": [
-        " Integer.parseInt(args[0]) ",
-        " inputNum * inputNum "
-    ],
-    "reference_snippets": [
-        " Integer.parseInt(args[0]) ",
-        " inputNum * inputNum "
     ],
     "combined_with_reference": [
         true,
@@ -47,6 +28,25 @@
             "8": 6,
             "9": 7
         }
+    ],
+    "daveagp": [
+        " Integer.parseInt(args[0]) ",
+        " inputNum * inputNum "
+    ],
+    "initial_snippets": [
+        "                           ",
+        "                     "
+    ],
+    "json_template": [
+        "public class SquareOf {\n   public static void main(String[] args) {\n      int inputNum =",
+        "                           ",
+        "; // convert the input\n      System.out.println(",
+        "                     ",
+        "); // print its square\n   }\n}"
+    ],
+    "reference_snippets": [
+        " Integer.parseInt(args[0]) ",
+        " inputNum * inputNum "
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class SquareOf {\n   public static void main(String[] args) {\n      int inputNum = Integer.parseInt(args[0]) ; // convert the input\n      System.out.println( inputNum * inputNum ); // print its square\n   }\n}\n"
 }

@@ -3,13 +3,6 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\npublic class Name {\n   // instance variables\n   private char firstInitial;\n   private String lastName;\n   \n   // constructor, takes two parameters\n   public Name(char firstInit, String lastName) {\n      // instance variable firstInitial copies constructor parameter firstInit\n      firstInitial = firstInit;\n   \n      // instance variable lastName copies constructor parameter lastName\n       this.lastName  =  lastName ;\n   \n      // Hints:\n   \n      // \"lastName = lastName;\" won't work;\n      // it copies the parameter into itself.\n   \n      // \"String lastName = lastName;\" won't work; it tries to create a local \n      // variable in the constructor (rather than affecting the instance).\n   \n      // You will need to use the Java keyword \"this\".\n   }\n   \n   // print name of person corresponding to this instance\n   public void display() {\n      StdOut.println(firstInitial + \". \" + lastName);\n   }\n   \n   // test client\n   public static void main(String[] args) {\n      Name n = new Name('R', \"Sedgewick\");\n      n.display();\n   }\n}\n",
         {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
             "10": 8,
             "11": 9,
             "12": 10,
@@ -30,6 +23,7 @@
             "27": 25,
             "28": 26,
             "29": 27,
+            "3": 1,
             "30": 28,
             "31": 29,
             "32": 30,
@@ -38,8 +32,64 @@
             "35": 33,
             "36": 34,
             "37": 35,
-            "38": 36
+            "38": 36,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 12:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class Name {\n   // instance variables\n   private char firstInitial;\n   private String lastName;\n   \n   // constructor, takes two parameters\n   public Name(char firstInit, String lastName) {\n      // instance variable firstInitial copies constructor parameter firstInit\n      firstInitial = firstInit;\n   \n      // instance variable lastName copies constructor parameter lastName\n       this.lastName  =  lastName ;\n   \n      // Hints:\n   \n      // \"lastName = lastName;\" won't work;\n      // it copies the parameter into itself.\n   \n      // \"String lastName = lastName;\" won't work; it tries to create a local \n      // variable in the constructor (rather than affecting the instance).\n   \n      // You will need to use the Java keyword \"this\".\n   }\n   \n   // print name of person corresponding to this instance\n   public void display() {\n      StdOut.println(firstInitial + \". \" + lastName);\n   }\n   \n   // test client\n   public static void main(String[] args) {\n      Name n = new Name('R', \"Sedgewick\");\n      n.display();\n   }\n}\n",
+        {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26,
+            "29": 27,
+            "3": 1,
+            "30": 28,
+            "31": 29,
+            "32": 30,
+            "33": 31,
+            "34": 32,
+            "35": 33,
+            "36": 34,
+            "37": 35,
+            "38": 36,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
+        }
+    ],
+    "daveagp": [
+        " this.lastName ",
+        " lastName "
     ],
     "initial_snippets": [
         "               ",
@@ -52,59 +102,9 @@
         "          ",
         ";\n   \n      // Hints:\n   \n      // \"lastName = lastName;\" won't work;\n      // it copies the parameter into itself.\n   \n      // \"String lastName = lastName;\" won't work; it tries to create a local \n      // variable in the constructor (rather than affecting the instance).\n   \n      // You will need to use the Java keyword \"this\".\n   }\n   \n   // print name of person corresponding to this instance\n   public void display() {\n      StdOut.println(firstInitial + \". \" + lastName);\n   }\n   \n   // test client\n   public static void main(String[] args) {\n      Name n = new Name('R', \"Sedgewick\");\n      n.display();\n   }\n}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 12:\nmust not be empty"
-    ],
-    "daveagp": [
-        " this.lastName ",
-        " lastName "
-    ],
     "reference_snippets": [
         " this.lastName ",
         " lastName "
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class Name {\n   // instance variables\n   private char firstInitial;\n   private String lastName;\n   \n   // constructor, takes two parameters\n   public Name(char firstInit, String lastName) {\n      // instance variable firstInitial copies constructor parameter firstInit\n      firstInitial = firstInit;\n   \n      // instance variable lastName copies constructor parameter lastName\n       this.lastName  =  lastName ;\n   \n      // Hints:\n   \n      // \"lastName = lastName;\" won't work;\n      // it copies the parameter into itself.\n   \n      // \"String lastName = lastName;\" won't work; it tries to create a local \n      // variable in the constructor (rather than affecting the instance).\n   \n      // You will need to use the Java keyword \"this\".\n   }\n   \n   // print name of person corresponding to this instance\n   public void display() {\n      StdOut.println(firstInitial + \". \" + lastName);\n   }\n   \n   // test client\n   public static void main(String[] args) {\n      Name n = new Name('R', \"Sedgewick\");\n      n.display();\n   }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13,
-            "16": 14,
-            "17": 15,
-            "18": 16,
-            "19": 17,
-            "20": 18,
-            "21": 19,
-            "22": 20,
-            "23": 21,
-            "24": 22,
-            "25": 23,
-            "26": 24,
-            "27": 25,
-            "28": 26,
-            "29": 27,
-            "30": 28,
-            "31": 29,
-            "32": 30,
-            "33": 31,
-            "34": 32,
-            "35": 33,
-            "36": 34,
-            "37": 35,
-            "38": 36
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class Name {\n   // instance variables\n   private char firstInitial;\n   private String lastName;\n   \n   // constructor, takes two parameters\n   public Name(char firstInit, String lastName) {\n      // instance variable firstInitial copies constructor parameter firstInit\n      firstInitial = firstInit;\n   \n      // instance variable lastName copies constructor parameter lastName\n       this.lastName  =  lastName ;\n   \n      // Hints:\n   \n      // \"lastName = lastName;\" won't work;\n      // it copies the parameter into itself.\n   \n      // \"String lastName = lastName;\" won't work; it tries to create a local \n      // variable in the constructor (rather than affecting the instance).\n   \n      // You will need to use the Java keyword \"this\".\n   }\n   \n   // print name of person corresponding to this instance\n   public void display() {\n      StdOut.println(firstInitial + \". \" + lastName);\n   }\n   \n   // test client\n   public static void main(String[] args) {\n      Name n = new Name('R', \"Sedgewick\");\n      n.display();\n   }\n}\n"
 }

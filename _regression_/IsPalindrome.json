@@ -11,6 +11,32 @@
             "8": 6
         }
     ],
+    "combined_with_initial": [
+        false,
+        "Line 11, editable region 1:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class IsPalindrome {\n   public static boolean isPalindrome(String s) {\n   // it's only necessary to do half the length many checks\n   for (int i=0; i<s.length()/2; i++) {\n      // look at ith character from start and end\n      if (s.charAt(i) != s.charAt(s.length()-i-1))\n         return false;\n   }\n   \n   return true; // everything matched\n   }\n}\n",
+        {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
+        }
+    ],
+    "daveagp": [
+        "\n      return s.equals(new StringBuilder(s).reverse().toString());\n"
+    ],
     "initial_snippets": [
         "\n\n\n\n\n\n\n\n\n"
     ],
@@ -19,34 +45,8 @@
         "\n\n\n\n\n\n\n\n\n",
         "   }\n}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 11, editable region 1:\nmust not be empty"
-    ],
-    "daveagp": [
-        "\n      return s.equals(new StringBuilder(s).reverse().toString());\n"
-    ],
     "reference_snippets": [
         "\n   // it's only necessary to do half the length many checks\n   for (int i=0; i<s.length()/2; i++) {\n      // look at ith character from start and end\n      if (s.charAt(i) != s.charAt(s.length()-i-1))\n         return false;\n   }\n   \n   return true; // everything matched\n"
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class IsPalindrome {\n   public static boolean isPalindrome(String s) {\n   // it's only necessary to do half the length many checks\n   for (int i=0; i<s.length()/2; i++) {\n      // look at ith character from start and end\n      if (s.charAt(i) != s.charAt(s.length()-i-1))\n         return false;\n   }\n   \n   return true; // everything matched\n   }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class IsPalindrome {\n   public static boolean isPalindrome(String s) {\n   // it's only necessary to do half the length many checks\n   for (int i=0; i<s.length()/2; i++) {\n      // look at ith character from start and end\n      if (s.charAt(i) != s.charAt(s.length()-i-1))\n         return false;\n   }\n   \n   return true; // everything matched\n   }\n}\n"
 }

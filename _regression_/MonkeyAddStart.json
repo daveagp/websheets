@@ -3,13 +3,6 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\npublic class MonkeyChain {\n   // structure of items in list\n   class Node {\n      // each node knows \"next\" node\n      Node next;\n      // and stores a value\n      String name;\n      // constructor for nodes\n      Node(String initialName) {\n         name = initialName;\n      }\n   }\n   \n   // beginning of the list, initially empty\n   private Node first = null;\n   \n   // a demo to create a length-3 list\n   public void threeKongs() {\n      first = new Node(\"DK Sr.\");\n      first.next = new Node(\"DK\");\n      first.next.next = new Node(\"DK Jr.\");\n   }\n   \n   // a working copy of this method from MonkeyTraverse will be included\n   // it prints all Strings in the linked list, from first to last\n   public void printAll() // ... method body not shown\n   {\n      Node current = first; // start at beginning\n   \n      // if current isn't past the last node,\n      while (current != null) {\n         // println current node's name; then repeat loop w/next one\n         System.out.println(current.name);\n         current = current.next;\n      }\n   }\n   \n   // add a new node, containing this name, at the start of the list\n   public void addStart(String newName) {\n      Node newFirst = new Node(newName);\n      newFirst.next = first;\n      first = newFirst;\n\n\n   }\n}\n",
         {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
             "10": 8,
             "11": 9,
             "12": 10,
@@ -30,6 +23,8 @@
             "27": 25,
             "28": 26,
             "29": 27,
+            "3": 1,
+            "4": 2,
             "40": 28,
             "41": 29,
             "42": 30,
@@ -39,8 +34,63 @@
             "46": 34,
             "47": 35,
             "48": 36,
-            "49": 37
+            "49": 37,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 35, editable region 1:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class MonkeyChain {\n   // structure of items in list\n   class Node {\n      // each node knows \"next\" node\n      Node next;\n      // and stores a value\n      String name;\n      // constructor for nodes\n      Node(String initialName) {\n         name = initialName;\n      }\n   }\n   \n   // beginning of the list, initially empty\n   private Node first = null;\n   \n   // a demo to create a length-3 list\n   public void threeKongs() {\n      first = new Node(\"DK Sr.\");\n      first.next = new Node(\"DK\");\n      first.next.next = new Node(\"DK Jr.\");\n   }\n   \n   // a working copy of this method from MonkeyTraverse will be included\n   // it prints all Strings in the linked list, from first to last\n   public void printAll() // ... method body not shown\n   {\n      Node current = first; // start at beginning\n   \n      // if current isn't past the last node,\n      while (current != null) {\n         // println current node's name; then repeat loop w/next one\n         System.out.println(current.name);\n         current = current.next;\n      }\n   }\n   \n   // add a new node, containing this name, at the start of the list\n   public void addStart(String newName) {\n      Node newFirst = new Node(newName);\n      Node oldFirst = first;\n      first = newFirst;\n      first.next = oldFirst;\n      // there's also a slightly trickier 2-line solution\n   }\n}\n",
+        {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "20": 18,
+            "21": 19,
+            "22": 20,
+            "23": 21,
+            "24": 22,
+            "25": 23,
+            "26": 24,
+            "27": 25,
+            "28": 26,
+            "29": 27,
+            "3": 1,
+            "4": 2,
+            "40": 28,
+            "41": 29,
+            "42": 30,
+            "43": 31,
+            "44": 32,
+            "45": 33,
+            "46": 34,
+            "47": 35,
+            "48": 36,
+            "49": 37,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
+        }
+    ],
+    "daveagp": [
+        "\n      newFirst.next = first;\n      first = newFirst;\n\n\n"
     ],
     "initial_snippets": [
         "\n\n\n\n\n"
@@ -50,58 +100,8 @@
         "\n\n\n\n\n",
         "   }\n}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 35, editable region 1:\nmust not be empty"
-    ],
-    "daveagp": [
-        "\n      newFirst.next = first;\n      first = newFirst;\n\n\n"
-    ],
     "reference_snippets": [
         "\n      Node oldFirst = first;\n      first = newFirst;\n      first.next = oldFirst;\n      // there's also a slightly trickier 2-line solution\n"
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class MonkeyChain {\n   // structure of items in list\n   class Node {\n      // each node knows \"next\" node\n      Node next;\n      // and stores a value\n      String name;\n      // constructor for nodes\n      Node(String initialName) {\n         name = initialName;\n      }\n   }\n   \n   // beginning of the list, initially empty\n   private Node first = null;\n   \n   // a demo to create a length-3 list\n   public void threeKongs() {\n      first = new Node(\"DK Sr.\");\n      first.next = new Node(\"DK\");\n      first.next.next = new Node(\"DK Jr.\");\n   }\n   \n   // a working copy of this method from MonkeyTraverse will be included\n   // it prints all Strings in the linked list, from first to last\n   public void printAll() // ... method body not shown\n   {\n      Node current = first; // start at beginning\n   \n      // if current isn't past the last node,\n      while (current != null) {\n         // println current node's name; then repeat loop w/next one\n         System.out.println(current.name);\n         current = current.next;\n      }\n   }\n   \n   // add a new node, containing this name, at the start of the list\n   public void addStart(String newName) {\n      Node newFirst = new Node(newName);\n      Node oldFirst = first;\n      first = newFirst;\n      first.next = oldFirst;\n      // there's also a slightly trickier 2-line solution\n   }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13,
-            "16": 14,
-            "17": 15,
-            "18": 16,
-            "19": 17,
-            "20": 18,
-            "21": 19,
-            "22": 20,
-            "23": 21,
-            "24": 22,
-            "25": 23,
-            "26": 24,
-            "27": 25,
-            "28": 26,
-            "29": 27,
-            "40": 28,
-            "41": 29,
-            "42": 30,
-            "43": 31,
-            "44": 32,
-            "45": 33,
-            "46": 34,
-            "47": 35,
-            "48": 36,
-            "49": 37
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class MonkeyChain {\n   // structure of items in list\n   class Node {\n      // each node knows \"next\" node\n      Node next;\n      // and stores a value\n      String name;\n      // constructor for nodes\n      Node(String initialName) {\n         name = initialName;\n      }\n   }\n   \n   // beginning of the list, initially empty\n   private Node first = null;\n   \n   // a demo to create a length-3 list\n   public void threeKongs() {\n      first = new Node(\"DK Sr.\");\n      first.next = new Node(\"DK\");\n      first.next.next = new Node(\"DK Jr.\");\n   }\n   \n   // a working copy of this method from MonkeyTraverse will be included\n   // it prints all Strings in the linked list, from first to last\n   public void printAll() // ... method body not shown\n   {\n      Node current = first; // start at beginning\n   \n      // if current isn't past the last node,\n      while (current != null) {\n         // println current node's name; then repeat loop w/next one\n         System.out.println(current.name);\n         current = current.next;\n      }\n   }\n   \n   // add a new node, containing this name, at the start of the list\n   public void addStart(String newName) {\n      Node newFirst = new Node(newName);\n      Node oldFirst = first;\n      first = newFirst;\n      first.next = oldFirst;\n      // there's also a slightly trickier 2-line solution\n   }\n}\n"
 }

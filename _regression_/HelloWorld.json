@@ -3,20 +3,46 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\n/*\n * Name: Alan Turing\n * Netid: at12\n * Precept: P63X\n *\n * A program with an existential greeting\n */\npublic class HelloWorld {\n   public static void main(String[] args) {\n      System.out.println(new In(\"http://www.google.com\").readAll());\n   }\n}\n",
         {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
             "3": 1,
             "4": 2,
             "5": 3,
             "6": 4,
             "7": 5,
             "8": 6,
-            "9": 7,
+            "9": 7
+        }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 11, editable region 1:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\n/*\n * Name: Alan Turing\n * Netid: at12\n * Precept: P63X\n *\n * A program with an existential greeting\n */\npublic class HelloWorld {\n   public static void main(String[] args) {\n      System.out.println(\"Hello, World\");\n   }\n}\n",
+        {
             "10": 8,
             "11": 9,
             "12": 10,
             "13": 11,
             "14": 12,
-            "15": 13
+            "15": 13,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "daveagp": [
+        "\n      System.out.println(new In(\"http://www.google.com\").readAll());\n"
     ],
     "initial_snippets": [
         "\n\n"
@@ -26,34 +52,8 @@
         "\n\n",
         "   }\n}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 11, editable region 1:\nmust not be empty"
-    ],
-    "daveagp": [
-        "\n      System.out.println(new In(\"http://www.google.com\").readAll());\n"
-    ],
     "reference_snippets": [
         "\n      System.out.println(\"Hello, World\");\n"
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\n/*\n * Name: Alan Turing\n * Netid: at12\n * Precept: P63X\n *\n * A program with an existential greeting\n */\npublic class HelloWorld {\n   public static void main(String[] args) {\n      System.out.println(\"Hello, World\");\n   }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\n/*\n * Name: Alan Turing\n * Netid: at12\n * Precept: P63X\n *\n * A program with an existential greeting\n */\npublic class HelloWorld {\n   public static void main(String[] args) {\n      System.out.println(\"Hello, World\");\n   }\n}\n"
 }

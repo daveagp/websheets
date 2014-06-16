@@ -4,8 +4,11 @@
         "package combined.daveagp;\nimport stdlibpack.*;\nimport java.util.concurrent.Semaphore;\npublic class FTPLimiter {\nstatic int NUMFILES = 20;\n    public static class FTP {\n        static int maxload = 0;\n        static int connections = 0;\n        static int successes = 0;\n        static int left = 0;\n        static Stopwatch w;\n        static int[] counts = new int[NUMFILES];\n        static int totalTime = 0;\n        static boolean errored = false;\n        static void init() {w = new Stopwatch();}\n        static String err = null;\n        static synchronized void error(String msg) {\n           if (err == null) err = msg;\n           errored = true;\n        }\n        public static void get(String filename) {\n            left++;\n            if (!(filename.startsWith(\"file\") || filename.endsWith(\".zip\")))\n               error(\"File not on server: \" + filename);\n            String c = filename.substring(4, filename.length()-4);\n            if (!(c.length()==1 || c.length()==2))\n               error(\"File not on server: \" + filename);\n            for (char ch:c.toCharArray()) if (ch < '0' || ch > '9')\n               error(\"File not on server: \" + filename);\n            if (c.charAt(0)=='0' && c.length()==2)\n               error(\"File not on server: \" + filename);\n            if (errored) return;\n            int index = Integer.parseInt(c);\n            synchronized (FTP.class) {\n                connections++;\n                maxload = Math.max(maxload, connections);\n                System.out.println(\"Getting \"+filename+\"...\");\n                if (connections > 5) {error(\"More than 5 connections!\"); return;}\n                if (counts[index] > 0) {error(\"Tried to download \" + filename + \" twice!\"); return;}\n                counts[index] = 1;\n            }\n            int i = index;\n            int time = 5 + (i*67)%39;\n            try {Thread.sleep(time);} catch (InterruptedException e) {error(\"interrupt!\");}\n            synchronized (FTP.class) {successes++;\n                totalTime += time;\n                System.out.println(\"... finished downloading \"+filename+\" (\"+time+\" ms)!\");\n                connections--;\n            }\n            if (successes == NUMFILES) {\n           double elapsed = w.elapsedTime();\n           System.out.println(\"Elapsed real time: \" + elapsed + \" seconds\");\n           double load = totalTime/elapsed/1000;\n           System.out.printf(\"Cumulative download time %d ms, average load %.3f, max load %d\\n\", totalTime, load, maxload);\n           if (load <= 3) error(\"Average load is too small.\");\n           if (maxload <= 4) error(\"Max load should be 5\");\n}\n                left--;\n        }\n        static void done() {\n           while (!errored && left > 0) Thread.yield();\n           if (successes < NUMFILES) error(\"Did not download all files.\");\n           if (errored) {throw new framework.GenericTester.FailException(err);}\n        }\n    }\n   static Semaphore  sem = new Semaphore(6)       ;\n   static class X extends Thread {\n      int i;\n      X(int i) {this.i = i;}\n      public void run() {\n//         sem.acquireUninterruptibly();\n         FTP.get(\"file\"+i+\".zip\");\n  //       sem.release();\n      }\n   }\n   public static void main(String[] args) { FTP.init();  \n      java.util.concurrent.ExecutorService pool = \n         java.util.concurrent.Executors.newFixedThreadPool(5);\n      \n      for (int i=0; i<=19; i++)\n         pool.execute(new X(i));\n      \n           pool.shutdown();               // ask to shut down\n      while (!pool.isTerminated());\nFTP.done();\n   }\n}\n",
         {
             "3": 1,
-            "68": 5,
+            "4": 2,
             "5": 3,
+            "67": 4,
+            "68": 5,
+            "69": 6,
             "70": 7,
             "71": 8,
             "72": 9,
@@ -23,47 +26,23 @@
             "84": 21,
             "85": 22,
             "87": 23,
-            "88": 24,
-            "4": 2,
-            "69": 6,
-            "67": 4
+            "88": 24
         }
-    ],
-    "initial_snippets": [
-        "                              ",
-        "\n;// extra inner classes or anything else?\n",
-        "\n\n\n"
-    ],
-    "json_template": [
-        "import java.util.concurrent.Semaphore;\npublic class FTPLimiter {\n   static Semaphore ",
-        "                              ",
-        ";",
-        "\n;// extra inner classes or anything else?\n",
-        "   public static void main(String[] args) { ",
-        "\n\n\n",
-        "   }\n}"
     ],
     "combined_with_initial": [
         false,
         "Line 3:\nmust not be empty"
-    ],
-    "daveagp": [
-        " sem = new Semaphore(6)       ",
-        "\n   static class X extends Thread {\n      int i;\n      X(int i) {this.i = i;}\n      public void run() {\n//         sem.acquireUninterruptibly();\n         FTP.get(\"file\"+i+\".zip\");\n  //       sem.release();\n      }\n   }\n",
-        "\n      java.util.concurrent.ExecutorService pool = \n         java.util.concurrent.Executors.newFixedThreadPool(5);\n      \n      for (int i=0; i<=19; i++)\n         pool.execute(new X(i));\n      \n           pool.shutdown();               // ask to shut down\n      while (!pool.isTerminated());\n"
-    ],
-    "reference_snippets": [
-        " semaphore = new Semaphore(5) ",
-        "\nstatic class GetThread extends Thread {\n   String filename;\n   GetThread(String filename) {\n      this.filename = filename;\n   }\n   public void run() {\n      semaphore.acquireUninterruptibly();\n      try {\n         FTP.get(filename);\n      } finally {\n         semaphore.release();\n      }\n   }\n}\n",
-        "\n      for (int i=0; i<20; i++) \n         new GetThread(\"file\"+i+\".zip\").start();\n"
     ],
     "combined_with_reference": [
         true,
         "package combined.reference;\nimport stdlibpack.*;\nimport java.util.concurrent.Semaphore;\npublic class FTPLimiter {\nstatic int NUMFILES = 20;\n    public static class FTP {\n        static int maxload = 0;\n        static int connections = 0;\n        static int successes = 0;\n        static int left = 0;\n        static Stopwatch w;\n        static int[] counts = new int[NUMFILES];\n        static int totalTime = 0;\n        static boolean errored = false;\n        static void init() {w = new Stopwatch();}\n        static String err = null;\n        static synchronized void error(String msg) {\n           if (err == null) err = msg;\n           errored = true;\n        }\n        public static void get(String filename) {\n            left++;\n            if (!(filename.startsWith(\"file\") || filename.endsWith(\".zip\")))\n               error(\"File not on server: \" + filename);\n            String c = filename.substring(4, filename.length()-4);\n            if (!(c.length()==1 || c.length()==2))\n               error(\"File not on server: \" + filename);\n            for (char ch:c.toCharArray()) if (ch < '0' || ch > '9')\n               error(\"File not on server: \" + filename);\n            if (c.charAt(0)=='0' && c.length()==2)\n               error(\"File not on server: \" + filename);\n            if (errored) return;\n            int index = Integer.parseInt(c);\n            synchronized (FTP.class) {\n                connections++;\n                maxload = Math.max(maxload, connections);\n                System.out.println(\"Getting \"+filename+\"...\");\n                if (connections > 5) {error(\"More than 5 connections!\"); return;}\n                if (counts[index] > 0) {error(\"Tried to download \" + filename + \" twice!\"); return;}\n                counts[index] = 1;\n            }\n            int i = index;\n            int time = 5 + (i*67)%39;\n            try {Thread.sleep(time);} catch (InterruptedException e) {error(\"interrupt!\");}\n            synchronized (FTP.class) {successes++;\n                totalTime += time;\n                System.out.println(\"... finished downloading \"+filename+\" (\"+time+\" ms)!\");\n                connections--;\n            }\n            if (successes == NUMFILES) {\n           double elapsed = w.elapsedTime();\n           System.out.println(\"Elapsed real time: \" + elapsed + \" seconds\");\n           double load = totalTime/elapsed/1000;\n           System.out.printf(\"Cumulative download time %d ms, average load %.3f, max load %d\\n\", totalTime, load, maxload);\n           if (load <= 3) error(\"Average load is too small.\");\n           if (maxload <= 4) error(\"Max load should be 5\");\n}\n                left--;\n        }\n        static void done() {\n           while (!errored && left > 0) Thread.yield();\n           if (successes < NUMFILES) error(\"Did not download all files.\");\n           if (errored) {throw new framework.GenericTester.FailException(err);}\n        }\n    }\n   static Semaphore  semaphore = new Semaphore(5) ;\nstatic class GetThread extends Thread {\n   String filename;\n   GetThread(String filename) {\n      this.filename = filename;\n   }\n   public void run() {\n      semaphore.acquireUninterruptibly();\n      try {\n         FTP.get(filename);\n      } finally {\n         semaphore.release();\n      }\n   }\n}\n   public static void main(String[] args) { FTP.init();  \n      for (int i=0; i<20; i++) \n         new GetThread(\"file\"+i+\".zip\").start();\nFTP.done();\n   }\n}\n",
         {
             "3": 1,
-            "68": 5,
+            "4": 2,
             "5": 3,
+            "67": 4,
+            "68": 5,
+            "69": 6,
             "70": 7,
             "71": 8,
             "72": 9,
@@ -80,11 +59,32 @@
             "83": 20,
             "84": 21,
             "86": 22,
-            "87": 23,
-            "4": 2,
-            "69": 6,
-            "67": 4
+            "87": 23
         }
+    ],
+    "daveagp": [
+        " sem = new Semaphore(6)       ",
+        "\n   static class X extends Thread {\n      int i;\n      X(int i) {this.i = i;}\n      public void run() {\n//         sem.acquireUninterruptibly();\n         FTP.get(\"file\"+i+\".zip\");\n  //       sem.release();\n      }\n   }\n",
+        "\n      java.util.concurrent.ExecutorService pool = \n         java.util.concurrent.Executors.newFixedThreadPool(5);\n      \n      for (int i=0; i<=19; i++)\n         pool.execute(new X(i));\n      \n           pool.shutdown();               // ask to shut down\n      while (!pool.isTerminated());\n"
+    ],
+    "initial_snippets": [
+        "                              ",
+        "\n;// extra inner classes or anything else?\n",
+        "\n\n\n"
+    ],
+    "json_template": [
+        "import java.util.concurrent.Semaphore;\npublic class FTPLimiter {\n   static Semaphore ",
+        "                              ",
+        ";",
+        "\n;// extra inner classes or anything else?\n",
+        "   public static void main(String[] args) { ",
+        "\n\n\n",
+        "   }\n}"
+    ],
+    "reference_snippets": [
+        " semaphore = new Semaphore(5) ",
+        "\nstatic class GetThread extends Thread {\n   String filename;\n   GetThread(String filename) {\n      this.filename = filename;\n   }\n   public void run() {\n      semaphore.acquireUninterruptibly();\n      try {\n         FTP.get(filename);\n      } finally {\n         semaphore.release();\n      }\n   }\n}\n",
+        "\n      for (int i=0; i<20; i++) \n         new GetThread(\"file\"+i+\".zip\").start();\n"
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\nimport java.util.concurrent.Semaphore;\npublic class FTPLimiter {\nstatic int NUMFILES = 20;\n    public static class FTP {\n        static int maxload = 0;\n        static int connections = 0;\n        static int successes = 0;\n        static int left = 0;\n        static Stopwatch w;\n        static int[] counts = new int[NUMFILES];\n        static int totalTime = 0;\n        static boolean errored = false;\n        static void init() {w = new Stopwatch();}\n        static String err = null;\n        static synchronized void error(String msg) {\n           if (err == null) err = msg;\n           errored = true;\n        }\n        public static void get(String filename) {\n            left++;\n            if (!(filename.startsWith(\"file\") || filename.endsWith(\".zip\")))\n               error(\"File not on server: \" + filename);\n            String c = filename.substring(4, filename.length()-4);\n            if (!(c.length()==1 || c.length()==2))\n               error(\"File not on server: \" + filename);\n            for (char ch:c.toCharArray()) if (ch < '0' || ch > '9')\n               error(\"File not on server: \" + filename);\n            if (c.charAt(0)=='0' && c.length()==2)\n               error(\"File not on server: \" + filename);\n            if (errored) return;\n            int index = Integer.parseInt(c);\n            synchronized (FTP.class) {\n                connections++;\n                maxload = Math.max(maxload, connections);\n                System.out.println(\"Getting \"+filename+\"...\");\n                if (connections > 5) {error(\"More than 5 connections!\"); return;}\n                if (counts[index] > 0) {error(\"Tried to download \" + filename + \" twice!\"); return;}\n                counts[index] = 1;\n            }\n            int i = index;\n            int time = 5 + (i*67)%39;\n            try {Thread.sleep(time);} catch (InterruptedException e) {error(\"interrupt!\");}\n            synchronized (FTP.class) {successes++;\n                totalTime += time;\n                System.out.println(\"... finished downloading \"+filename+\" (\"+time+\" ms)!\");\n                connections--;\n            }\n            if (successes == NUMFILES) {\n           double elapsed = w.elapsedTime();\n           System.out.println(\"Elapsed real time: \" + elapsed + \" seconds\");\n           double load = totalTime/elapsed/1000;\n           System.out.printf(\"Cumulative download time %d ms, average load %.3f, max load %d\\n\", totalTime, load, maxload);\n           if (load <= 3) error(\"Average load is too small.\");\n           if (maxload <= 4) error(\"Max load should be 5\");\n}\n                left--;\n        }\n        static void done() {\n           while (!errored && left > 0) Thread.yield();\n           if (successes < NUMFILES) error(\"Did not download all files.\");\n           if (errored) {throw new framework.GenericTester.FailException(err);}\n        }\n    }\n   static Semaphore  semaphore = new Semaphore(5) ;\nstatic class GetThread extends Thread {\n   String filename;\n   GetThread(String filename) {\n      this.filename = filename;\n   }\n   public void run() {\n      semaphore.acquireUninterruptibly();\n      try {\n         FTP.get(filename);\n      } finally {\n         semaphore.release();\n      }\n   }\n}\n   public static void main(String[] args) { FTP.init();  \n      for (int i=0; i<20; i++) \n         new GetThread(\"file\"+i+\".zip\").start();\nFTP.done();\n   }\n}\n"
 }

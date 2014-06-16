@@ -3,13 +3,6 @@
         true,
         "package combined.daveagp;\nimport stdlibpack.*;\npublic class ThreeSort {\n    public static void main(String[] args) {\n       int x = Integer.parseInt(args[0]);\n       int y = Integer.parseInt(args[1]);\n       int z = Integer.parseInt(args[2]);\n\n       int min = Math.min(x, Math.min(y, z));\n       int max = Math.max(x, Math.max(y, z));\n\n       System.out.print(min+\" \");\n       System.out.print(x+y+z-min-max+\" \");\n       System.out.println(max);\n\n\n    }\n}\n",
         {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
             "10": 8,
             "11": 9,
             "12": 10,
@@ -19,8 +12,45 @@
             "16": 14,
             "17": 15,
             "18": 16,
-            "19": 17
+            "19": 17,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
         }
+    ],
+    "combined_with_initial": [
+        false,
+        "Line 15, editable region 1:\nmust not be empty"
+    ],
+    "combined_with_reference": [
+        true,
+        "package combined.reference;\nimport stdlibpack.*;\npublic class ThreeSort {\n    public static void main(String[] args) {\n        int a = Integer.parseInt(args[0]);\n        int b = Integer.parseInt(args[1]);\n        int c = Integer.parseInt(args[2]);\n\n        int smallest = Math.min(a, Math.min(b, c));\n        int biggest = Math.max(a, Math.max(b, c));\n        // main trick: original sum equals the sorted sum\n        int middle = a + b + c - smallest - biggest;\n\n        System.out.print(smallest + \" \");\n        System.out.print(middle + \" \");\n        System.out.println(biggest);\n    }\n}\n",
+        {
+            "10": 8,
+            "11": 9,
+            "12": 10,
+            "13": 11,
+            "14": 12,
+            "15": 13,
+            "16": 14,
+            "17": 15,
+            "18": 16,
+            "19": 17,
+            "3": 1,
+            "4": 2,
+            "5": 3,
+            "6": 4,
+            "7": 5,
+            "8": 6,
+            "9": 7
+        }
+    ],
+    "daveagp": [
+        "\n       int x = Integer.parseInt(args[0]);\n       int y = Integer.parseInt(args[1]);\n       int z = Integer.parseInt(args[2]);\n\n       int min = Math.min(x, Math.min(y, z));\n       int max = Math.max(x, Math.max(y, z));\n\n       System.out.print(min+\" \");\n       System.out.print(x+y+z-min-max+\" \");\n       System.out.println(max);\n\n\n"
     ],
     "initial_snippets": [
         "\n\n\n\n\n\n\n\n\n\n\n\n\n"
@@ -30,38 +60,8 @@
         "\n\n\n\n\n\n\n\n\n\n\n\n\n",
         "    }\n}"
     ],
-    "combined_with_initial": [
-        false,
-        "Line 15, editable region 1:\nmust not be empty"
-    ],
-    "daveagp": [
-        "\n       int x = Integer.parseInt(args[0]);\n       int y = Integer.parseInt(args[1]);\n       int z = Integer.parseInt(args[2]);\n\n       int min = Math.min(x, Math.min(y, z));\n       int max = Math.max(x, Math.max(y, z));\n\n       System.out.print(min+\" \");\n       System.out.print(x+y+z-min-max+\" \");\n       System.out.println(max);\n\n\n"
-    ],
     "reference_snippets": [
         "\n        int a = Integer.parseInt(args[0]);\n        int b = Integer.parseInt(args[1]);\n        int c = Integer.parseInt(args[2]);\n\n        int smallest = Math.min(a, Math.min(b, c));\n        int biggest = Math.max(a, Math.max(b, c));\n        // main trick: original sum equals the sorted sum\n        int middle = a + b + c - smallest - biggest;\n\n        System.out.print(smallest + \" \");\n        System.out.print(middle + \" \");\n        System.out.println(biggest);\n"
-    ],
-    "combined_with_reference": [
-        true,
-        "package combined.reference;\nimport stdlibpack.*;\npublic class ThreeSort {\n    public static void main(String[] args) {\n        int a = Integer.parseInt(args[0]);\n        int b = Integer.parseInt(args[1]);\n        int c = Integer.parseInt(args[2]);\n\n        int smallest = Math.min(a, Math.min(b, c));\n        int biggest = Math.max(a, Math.max(b, c));\n        // main trick: original sum equals the sorted sum\n        int middle = a + b + c - smallest - biggest;\n\n        System.out.print(smallest + \" \");\n        System.out.print(middle + \" \");\n        System.out.println(biggest);\n    }\n}\n",
-        {
-            "3": 1,
-            "4": 2,
-            "5": 3,
-            "6": 4,
-            "7": 5,
-            "8": 6,
-            "9": 7,
-            "10": 8,
-            "11": 9,
-            "12": 10,
-            "13": 11,
-            "14": 12,
-            "15": 13,
-            "16": 14,
-            "17": 15,
-            "18": 16,
-            "19": 17
-        }
     ],
     "reference_solution": "package reference;\nimport stdlibpack.*;\npublic class ThreeSort {\n    public static void main(String[] args) {\n        int a = Integer.parseInt(args[0]);\n        int b = Integer.parseInt(args[1]);\n        int c = Integer.parseInt(args[2]);\n\n        int smallest = Math.min(a, Math.min(b, c));\n        int biggest = Math.max(a, Math.max(b, c));\n        // main trick: original sum equals the sorted sum\n        int middle = a + b + c - smallest - biggest;\n\n        System.out.print(smallest + \" \");\n        System.out.print(middle + \" \");\n        System.out.println(biggest);\n    }\n}\n"
 }
