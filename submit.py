@@ -197,7 +197,7 @@ def submit_and_log(websheet_name, student, client_request, meta):
   if (not client_request["viewing_ref"]):
     # remove positional information
     user_snippets = [blank["code"] for blank in client_request["snippets"]]
-    config.save_submission(student, classname, user_snippets, save_this, passed)
+    config.save_submission(student, websheet.slug, user_snippets, save_this, passed)
 
   return json.dumps(print_output,
                     indent=4, separators=(',', ': ')) # pretty!

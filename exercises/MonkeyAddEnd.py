@@ -44,12 +44,13 @@ public void printAll() // ... method body not shown
    }
 }
 ]\
+
 // add a new node, containing this name, at the end of the list
 public void addEnd(String newName) {
    Node newLast = new Node(newName);
 
-   // loop like printAll(), but stops *just before* 
-   // the end, then adds the new node
+   // loop like printAll(), but stop *just before* the end.
+   // then, add the new node
 \[
    if (first == null) {
       first = newLast;
@@ -76,6 +77,7 @@ tests = r"""
 testMain();
 saveAs = "mc";
 testConstructor();
+remark("Checking if special case of adding to empty list is handled correctly&hellip;");
 testOn("mc", "addEnd", "Curious George");
 testOn("mc", "addEnd", "Bubbles");
 testOn("mc", "printAll");

@@ -212,7 +212,7 @@ class Websheet:
         # optional fields AND default values
         optional_fields = {"tester_preamble": None, "show_class_decl": True,
                            "epilogue": None, "dependencies": [], "imports": [],
-                           "lang": "Java"}
+                           "lang": "Java", "slug": None}
         if "lang" in field_dict:
             optional_fields["show_class_decl"] = False
 
@@ -224,6 +224,9 @@ class Websheet:
                     field_dict[field] if field in field_dict
                     else optional_fields[field])
 
+        if self.slug is None:
+            self.slug = self.classname
+            
         for field in field_dict:
             if (not field.startswith("_") and
                 field not in mandatory_fields and
@@ -495,6 +498,7 @@ self.classname + " to = new " + self.classname + "();\n" +
         dicted = {attname: getattr(module, attname) for attname in dir(module)}
         if "classname" not in dicted:
             dicted["classname"] = module.__name__.split(".")[-1]
+        dicted["slug"] = module.__name__.split(".")[-1]
         return Websheet(dicted)
 
     @staticmethod

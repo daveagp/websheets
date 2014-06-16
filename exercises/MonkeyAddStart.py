@@ -44,6 +44,7 @@ public void printAll() // ... method body not shown
    }
 }
 ]\
+
 // add a new node, containing this name, at the start of the list
 public void addStart(String newName) {
    Node newFirst = new Node(newName);
