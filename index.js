@@ -9,7 +9,7 @@ resetup = function(data) {
   window.testWS = websheet("code", data.template_code, lastload.initial_snippets);
     $("#description").html(data.description);
     MathJax.Hub.Typeset();
-    testWS.cm.addKeyMap({F2: checkSolution, F5: function() {return false;}});
+    testWS.cm.addKeyMap({F2: checkSolution});
 }
 
 loadProblem = function(slug) {

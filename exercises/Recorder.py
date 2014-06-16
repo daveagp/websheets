@@ -38,7 +38,7 @@ public static void main(String[] args) {
    r.record("bonjour");
    StdOut.println("The new message is:      "  + r.playback());       
    Recorder card = new Recorder("happy birthday!");
-   StdOut.println("The new recorder says    "  + card.playback());       
+   StdOut.println("The new recorder says:   "  + card.playback());       
    StdOut.println("The old one still says:  "  + r.playback());       
 }
 """

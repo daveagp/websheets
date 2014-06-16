@@ -30,6 +30,14 @@ public abstract class GenericTester {
 
     public static PrintStream orig_graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
 
+    public void remark(String S) {
+        graderOut.println("<div class='testcase-desc'>"+S+"</div>");
+    }
+
+    public static void storePlaceholderFunc() {}
+    static Method storePlaceholder;
+    static {try {storePlaceholder = GenericTester.class.getMethod("storePlaceholderFunc");}
+        catch (Exception e) {throw new RuntimeException(e.toString());}}
 
     public static ByteArrayOutputStream gbaos = null;
 
@@ -86,9 +94,16 @@ public abstract class GenericTester {
         }
         if (a.getClass() == Double.class) {
             return equalsApprox((Double)a, (Double)b);
-        } else if (a.getClass() == Float.class) {
+        }
+        
+        if (a.getClass() == Float.class) {
             return equalsApprox((Float)a, (Float)b);
         }
+        
+        if (a.getClass() == String.class) {
+            return equalsApprox((String)a, (String)b);
+        }
+
         return a.equals(b);
     }
 
@@ -199,13 +214,18 @@ public abstract class GenericTester {
                     graderOut.print("Defining ");
                     tmp = saveAs + " = ";
                 }
-                tmp += apparentName + "(";
-                if (args.length == 0) tmp += ")";
-                else {
+                if (apparentName.equals("<<store>>")) {
                     tmp += repr(args[0]);
-                    for (int i=1; i<args.length; i++)
-                        tmp += ", " + repr(args[i]);
-                    tmp += ")";
+                }
+                else {
+                    tmp += apparentName + "(";
+                    if (args.length == 0) tmp += ")";
+                    else {
+                        tmp += repr(args[0]);
+                        for (int i=1; i<args.length; i++)
+                            tmp += ", " + repr(args[i]);
+                        tmp += ")";
+                    }
                 }
                 graderOut.println(code(tmp));
             }
@@ -235,6 +255,11 @@ public abstract class GenericTester {
         }
 
         protected void test(Class refClazz, Class stuClazz) {
+            if (methodName.equals("<<store>>")) {
+                compare(storePlaceholder, storePlaceholder, args, thisName);
+                return;
+            }
+
             boolean notfound = true;
             tryMethods: for (Method m : refClazz.getMethods())
                 if (m.getName().equals(methodName)) {
@@ -243,10 +268,11 @@ public abstract class GenericTester {
                     //System.out.println(java.util.Arrays.toString(args));
                     if (formalParms.length != args.length) continue;
                     for (int i=0; i<args.length; i++) {
-                        if (args[i] instanceof NamedObject) continue; // ok
-                        if (formalParms[i] == int.class && args[i].getClass() == Integer.class) continue; // ok
-                        if (formalParms[i] == double.class && args[i].getClass() == Double.class) continue; // ok
-                        if (!formalParms[i].isAssignableFrom(args[i].getClass())) continue tryMethods;
+                        Object arg = args[i];
+                        if (arg instanceof NamedObject) arg = ((NamedObject)arg).value(true); // convert to ref obj to look at class
+                        if (formalParms[i] == int.class && arg.getClass() == Integer.class) continue; // ok
+                        if (formalParms[i] == double.class && arg.getClass() == Double.class) continue; // ok
+                        if (!formalParms[i].isAssignableFrom(arg.getClass())) continue tryMethods;
                     }
 
                     notfound = false;
@@ -278,7 +304,8 @@ public abstract class GenericTester {
                         throw new FailTestException("You need to declare a public method " + code(methodName) + " that accepts arguments" + code(argTypes));
                     }
                 }            
-            if (notfound) throw new RuntimeException("Could not find the reference method "+ code(methodName)+"! Check that floating-point numbers are explicitly specified.");
+            if (notfound) 
+                throw new RuntimeException("Could not find the reference method "+ code(methodName)+"! Check that floating-point numbers are explicitly specified.");
         }
 
         protected void testConstructor() {
@@ -293,10 +320,11 @@ public abstract class GenericTester {
                 Class[] formalParms = m.getParameterTypes();
                 if (formalParms.length != args.length) continue;
                 checkParms: for (int i=0; i<args.length; i++) {
-                    if (args[i] instanceof NamedObject) continue; // ok
-                    if (formalParms[i] == int.class && args[i].getClass() == Integer.class) continue checkParms;
-                    if (formalParms[i] == double.class && args[i].getClass() == Double.class) continue checkParms;
-                    if (!formalParms[i].isAssignableFrom(args[i].getClass())) continue tryMethods;
+                    Object arg = args[i];
+                    if (arg instanceof NamedObject) arg = ((NamedObject)arg).value(true); // convert to ref obj to look at class
+                    if (formalParms[i] == int.class && arg.getClass() == Integer.class) continue checkParms;
+                    if (formalParms[i] == double.class && arg.getClass() == Double.class) continue checkParms;
+                    if (!formalParms[i].isAssignableFrom(arg.getClass())) continue tryMethods;
                 }
                 notfound = false;
                 String argTypes = classListToString(m.getParameterTypes());
@@ -423,12 +451,18 @@ public abstract class GenericTester {
     public boolean suppressStdinDescription = false;
     public boolean expectException = false;
 
+    public boolean cloneForStudent = true;
+    public boolean cloneForReference = true;
+
     TreeMap<String,Object> studentObjects = new TreeMap<>();
     TreeMap<String,Object> referenceObjects = new TreeMap<>();
 
-    static class NamedObject {
+    class NamedObject {
 	public final String name;
 	NamedObject(String S) {name = S;}
+        public Object value(boolean reference) {
+            return (reference?referenceObjects:studentObjects).get(name);
+        }
     }
 
     public NamedObject var(String name) {
@@ -597,6 +631,19 @@ public abstract class GenericTester {
         }
     }
 
+    class StoreCapturer extends Capturer {
+        public StoreCapturer(Object valToStore) {
+            notdone = false;
+            stdout = "";
+            crashed = false;
+            retval = valToStore;
+        }
+        public boolean threadsLeftOver() {
+            return false;
+        }
+        public void run_command() { throw new UnsupportedOperationException("Can't run_command a StoreCapturer");}
+    }
+
     class InvokeCapturer extends Capturer {
         Method m;
         Object dis;
@@ -620,6 +667,8 @@ public abstract class GenericTester {
             crashed = true;
         }
         void run_command() throws IllegalAccessException, InvocationTargetException, InstantiationException {
+            //graderOut.println(c);
+            //graderOut.println(repr(args));
             retval = c.newInstance(args);
         }
     }
@@ -637,7 +686,17 @@ public abstract class GenericTester {
         }
     }
 
-    Object semicopy(Object O, TreeMap<String, Object> dict) {
+    Object[] lookupNamedObjects(Object[] args, TreeMap<String, Object> dict) {
+        Object[] result = new Object[args.length];
+        for (int i=0; i<args.length; i++)
+            if (args[i] instanceof NamedObject)
+                result[i] = dict.get(((NamedObject)args[i]).name);
+            else
+                result[i] = args[i];
+        return result;
+    }
+
+    Object semicopy(Object O) {
         // basic immutable types
         if (O == null || O instanceof String || O instanceof Integer || O instanceof Long || O instanceof Character
             || O instanceof Boolean || O instanceof Short || O instanceof Float || O instanceof Double
@@ -656,10 +715,12 @@ public abstract class GenericTester {
             Object[] OA = (Object[])O;
             Object[] r = (Object[]) Array.newInstance(cType, OA.length);
             for (int i=0; i<OA.length; i++)
-                r[i] = semicopy(OA[i], dict);
+                r[i] = semicopy(OA[i]);
             return r;
         }
-        if (O instanceof NamedObject) return dict.get(((NamedObject)O).name);
+        if (O.getClass().getName().startsWith("student.")) return O;
+        if (O.getClass().getName().startsWith("reference.")) return O;
+        //if (O instanceof NamedObject) return dict.get(((NamedObject)O).name);
         throw new RuntimeException("Don't know how to semicopy "+O.toString());
     }
 
@@ -704,115 +765,126 @@ public abstract class GenericTester {
         Capturer ref = null, stu = null;
 	String currStdin = testStdin;
 	testStdin = null;
-        Object[] argsPassedToRef = (Object[])semicopy(args, referenceObjects);
-        Object[] argsPassedToStu = (Object[])semicopy(args, studentObjects);
+        Object[] argsPassedToRef = lookupNamedObjects(args, referenceObjects);
+        if (cloneForReference) argsPassedToRef = (Object[]) semicopy(argsPassedToRef);
+        Object[] argsPassedToStu = lookupNamedObjects(args, studentObjects);
+        if (cloneForStudent) argsPassedToStu = (Object[]) semicopy(argsPassedToStu);
         Throwable referenceException = null;
         Throwable studentException = null;
 	if (currStdin != null)
 	    StdIn.setString(currStdin);
-        try {
-            if (dontRunReference) ; else {
-            if (methods) {
-                //if (thisName != null) System.out.println(thisName+" "+referenceObjects.get(thisName));
-                ref = new InvokeCapturer((Method)referenceM, thisName==null?null:referenceObjects.get(thisName), argsPassedToRef);
-                ((InvokeCapturer)ref).runUserCode();
-            }
-            else { // constructors
-                ref = new ConstructCapturer((Constructor)referenceM, argsPassedToRef);
-                ((ConstructCapturer)ref).runUserCode();
-            }
-            }
-            if (expectException) throw new RuntimeException("Internal error: bad exception flag");
-            if (!dontRunReference && ref.notdone) {
-                while (ref.threadsLeftOver()) 
-                    Thread.yield();
-                ref.end();
-            }
-        }
-        catch (ClassNotFoundException e) {
-            throw new RuntimeException("Internal error: CNFE");
-        }
-        catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
 
-            if (e instanceof InvocationTargetException && expectException) {
-                referenceException = ((InvocationTargetException)e).getTargetException();
-            }
-            else {
-                e.printStackTrace();
-                if (e instanceof InvocationTargetException)
-                    ((InvocationTargetException)e).getTargetException().printStackTrace();
-                throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + ((ref != null && ref.stdout != null) ? pre(ref.stdout) : ""));                
-            }
+        if (referenceM == storePlaceholder) {
+            ref = new StoreCapturer(argsPassedToRef[0]);
+            stu = new StoreCapturer(argsPassedToStu[0]);
         }
-	if (currStdin != null)
-	    StdIn.setString(currStdin);
-        try {
-            if (methods) {                
-                stu = new InvokeCapturer((Method)studentM, thisName==null?null:studentObjects.get(thisName), argsPassedToStu);
-                ((InvokeCapturer)stu).runUserCode();
-            }
-            else { // constructors
-                stu = new ConstructCapturer((Constructor)studentM, argsPassedToStu);
-                ((ConstructCapturer)stu).runUserCode();
-            }
-            if (expectException) throw new FailTestException("Was supposed to throw a " + referenceException.getClass().getSimpleName() + " but did not.");
-            if (stu.notdone) {
-                graderOut.println("<div class='no-bottom-line'>Some new threads were spawned. Waiting until they all finish&hellip;</div>");
-                while (stu.threadsLeftOver()) 
-                    Thread.yield();
-                graderOut.println("<div class='no-top-line'>&hellip;all terminated ok.</div>");
-                stu.end();
-            }
-        }
-        catch (ClassNotFoundException e) {
-            throw new RuntimeException("Internal error: CNFE");
-        }
-        catch (IllegalAccessException e) {
-            throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(stu.stdout));
-        }
-        catch (InstantiationException e) {
-            throw new FailTestException("Error: " + className + " must not be abstract.");
-        }
-        catch (InvocationTargetException e) {
-            if (stu.notdone) {
-                stu.end(); // crashed, so leftover threads may not be worth waiting for
-                graderOut.println("<div class='no-top-line no-bottom-line'>Warning: leftover threads after crash may cause extra output below.</div>");
-            }
-            studentException = e.getTargetException();
-            
-            if (studentException instanceof TooMuchOutputException) {
-                graderOut.println("<div>Printed too much output:" + pre(stu.stdout) + "</div>");
-                throw new FailTestException("Did not pass due to output overflow.");
-            }
-            if (studentException instanceof FailException) {
-                System.out.println("<div>Your program printed this output: " + pre(stu.stdout) + "</div>");
-                throw new FailTestException("Failed: "+code(studentException.getMessage()));
-            }
-            
-            if (referenceException != null && referenceException.getClass() == studentException.getClass()) {
-                // passed!
-            }
-            else {
-                String stackTrace = studentException.toString();
-                boolean first = true;
-                for (StackTraceElement ste : studentException.getStackTrace()) {
-                    if (ste.getClassName().equals("student."+className)) {
-                        stackTrace += "\n   "+(first?"at":"called from")+" line " + ste.getLineNumber() + " in " + ste.getMethodName() + "()";
-                        first = false;
+        else {
+            try {
+                if (!dontRunReference) {
+                    if (methods) {
+                        //if (thisName != null) System.out.println(thisName+" "+referenceObjects.get(thisName));
+                        ref = new InvokeCapturer((Method)referenceM, thisName==null?null:referenceObjects.get(thisName), argsPassedToRef);
+                        ((InvokeCapturer)ref).runUserCode();
+                    }
+                    else { // constructors
+                        ref = new ConstructCapturer((Constructor)referenceM, argsPassedToRef);
+                        ((ConstructCapturer)ref).runUserCode();
                     }
                 }
-                String msg = "Runtime error:";
-                if (referenceException != null) // expected an exception, but not this kind.
-                    msg = "An unexpected error was thrown: expected a "+code(referenceException.getClass().getSimpleName())+" but got a "
-                        +code(studentException.getClass().getSimpleName()+":");
-                throw new FailTestException(msg
-                                            + 
-                                            pre(stackTrace) 
-                                            + 
-                                            (stu == null || stu.stdout == null || stu.stdout.equals("") ? "" : "<br>Partial printed output:" + pre(stu.stdout)));
+                if (expectException) throw new RuntimeException("Internal error: bad exception flag");
+                if (!dontRunReference && ref.notdone) {
+                    while (ref.threadsLeftOver()) 
+                        Thread.yield();
+                    ref.end();
+                }
+            }
+            catch (ClassNotFoundException e) {
+                throw new RuntimeException("Internal error: CNFE");
+            }
+            catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                
+                if (e instanceof InvocationTargetException && expectException) {
+                    referenceException = ((InvocationTargetException)e).getTargetException();
+                }
+                else {
+                    e.printStackTrace();
+                    if (e instanceof InvocationTargetException)
+                        ((InvocationTargetException)e).getTargetException().printStackTrace();
+                    throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + ((ref != null && ref.stdout != null) ? pre(ref.stdout) : ""));                
+                }
+            }
+            
+            
+            if (currStdin != null)
+                StdIn.setString(currStdin);
+            try {
+                if (methods) {                
+                    stu = new InvokeCapturer((Method)studentM, thisName==null?null:studentObjects.get(thisName), argsPassedToStu);
+                    ((InvokeCapturer)stu).runUserCode();
+                }
+                else { // constructors
+                    stu = new ConstructCapturer((Constructor)studentM, argsPassedToStu);
+                    ((ConstructCapturer)stu).runUserCode();
+                }
+                if (expectException) throw new FailTestException("Was supposed to throw a " + referenceException.getClass().getSimpleName() + " but did not.");
+                if (stu.notdone) {
+                    graderOut.println("<div class='no-bottom-line'>Some new threads were spawned. Waiting until they all finish&hellip;</div>");
+                    while (stu.threadsLeftOver()) 
+                        Thread.yield();
+                    graderOut.println("<div class='no-top-line'>&hellip;all terminated ok.</div>");
+                    stu.end();
+                }
+            }
+            catch (ClassNotFoundException e) {
+                throw new RuntimeException("Internal error: CNFE");
+            }
+            catch (IllegalAccessException e) {
+                throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + pre(stu.stdout));
+            }
+            catch (InstantiationException e) {
+                throw new FailTestException("Error: " + className + " must not be abstract.");
+            }
+            catch (InvocationTargetException e) {
+                if (stu.notdone) {
+                    stu.end(); // crashed, so leftover threads may not be worth waiting for
+                    graderOut.println("<div class='no-top-line no-bottom-line'>Warning: leftover threads after crash may cause extra output below.</div>");
+                }
+                studentException = e.getTargetException();
+                
+                if (studentException instanceof TooMuchOutputException) {
+                    graderOut.println("<div>Printed too much output:" + pre(stu.stdout) + "</div>");
+                    throw new FailTestException("Did not pass due to output overflow.");
+                }
+                if (studentException instanceof FailException) {
+                    System.out.println("<div>Your program printed this output: " + pre(stu.stdout) + "</div>");
+                    throw new FailTestException("Failed: "+code(studentException.getMessage()));
+                }
+                
+                if (referenceException != null && referenceException.getClass() == studentException.getClass()) {
+                    // passed!
+                }
+                else {
+                    String stackTrace = studentException.toString();
+                    boolean first = true;
+                    for (StackTraceElement ste : studentException.getStackTrace()) {
+                        if (ste.getClassName().equals("student."+className)) {
+                            stackTrace += "\n   "+(first?"at":"called from")+" line " + ste.getLineNumber() + " in " + ste.getMethodName() + "()";
+                            first = false;
+                        }
+                    }
+                    String msg = "Runtime error:";
+                    if (referenceException != null) // expected an exception, but not this kind.
+                        msg = "An unexpected error was thrown: expected a "+code(referenceException.getClass().getSimpleName())+" but got a "
+                            +code(studentException.getClass().getSimpleName()+":");
+                    throw new FailTestException(msg
+                                                + 
+                                                pre(stackTrace) 
+                                                + 
+                                                (stu == null || stu.stdout == null || stu.stdout.equals("") ? "" : "<br>Partial printed output:" + pre(stu.stdout)));
+                }
             }
         }
-
+        
         if (!dontRunReference && ref.stdout.length() > 0) {
             String reason = describeOutputDifference(stu.stdout, ref.stdout);
             if (reason != null)
@@ -844,7 +916,7 @@ public abstract class GenericTester {
         if (!dontRunReference && !ref.stdout.equals("")) {
             goodStuff += "Printed correct output " + pre(stu.stdout) + "\n";
         }
-        if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE
+        if (methods && !expectException && ((Method)referenceM).getReturnType() != Void.TYPE && !(ref instanceof StoreCapturer)
             && ((Method)referenceM).getReturnType() != referenceC
             && (!((Method)referenceM).getReturnType().getName().startsWith("reference."))
             && (!opaque(stu.retval))) {

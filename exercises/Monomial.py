@@ -38,7 +38,8 @@ public double evaluate(double x) {
    return String.format("%.3f", \[a]\) + \["*x^" + b]\;
 }
 
-// testing
+// test main: print out a table of several monomials' values, evaluated for
+// different values of x specified as command-line arguments
 public static void main(String[] args) {
    Monomial negativeX = new Monomial(-1.0, 1);
    Monomial squaredX = new Monomial(1.0, 2);

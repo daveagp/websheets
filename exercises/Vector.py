@@ -29,7 +29,7 @@ public class Vector {
       this.data = new double[N]; // using "this" on these lines is optional
       for (int i = 0; i < N; i++)
          this.data[i] = d[i];
-]\\default[
+\show:
       double[] data = d; //<-- this isn't it!
 
 
@@ -80,6 +80,13 @@ public class Vector {
         for (int i = 0; i < N; i++)
             sum = sum + (this.data[i] * that.data[i]);
         return sum;
+\show:
+        return 0; // fill this in!
+
+
+
+
+        
 ]\
         // remark: is used with "this" in the magnitude() method
     }
@@ -105,6 +112,13 @@ public class Vector {
             if (i < N-1) s+= ", "; 
         }
         return s + ")";
+\show:
+        return ""; // fill this in!
+
+
+
+
+        
 ]\
     }
 
@@ -122,8 +136,20 @@ public class Vector {
 """
 
 tests = r"""
+cloneForStudent = false;
+double[] nums = new double[]{3, -4};
+saveAs = "nums";
+test("<<store>>", nums);
 saveAs = "velocity";
-testConstructor(new double[]{3, -4});
+testConstructor(var("nums"));
+testOn("velocity", "cartesian", 0);
+testOn("velocity", "cartesian", 1);
+remark("Setting <tt>nums[0] = 100</tt> to check for aliasing&hellip;");
+nums[0] = 100;
+testOn("velocity", "cartesian", 0);
+
+cloneForStudent = true;
+
 testOn("velocity", "magnitude");
 testOn("velocity", "toString");
 testOn("velocity", "dot", var("velocity"));
