@@ -792,7 +792,8 @@ public abstract class GenericTester {
                         ((ConstructCapturer)ref).runUserCode();
                     }
                 }
-                if (expectException) throw new RuntimeException("Internal error: bad exception flag");
+                if (expectException) 
+                    throw new RuntimeException("Internal error: bad exception flag");
                 if (!dontRunReference && ref.notdone) {
                     while (ref.threadsLeftOver()) 
                         Thread.yield();
@@ -803,15 +804,17 @@ public abstract class GenericTester {
                 throw new RuntimeException("Internal error: CNFE");
             }
             catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-                
                 if (e instanceof InvocationTargetException && expectException) {
                     referenceException = ((InvocationTargetException)e).getTargetException();
                 }
                 else {
+                    Throwable ex = e;
+                    if (e instanceof InvocationTargetException) {
+                        ex = ((InvocationTargetException)e).getTargetException();
+                        ex.printStackTrace();
+                    }
                     e.printStackTrace();
-                    if (e instanceof InvocationTargetException)
-                        ((InvocationTargetException)e).getTargetException().printStackTrace();
-                    throw new RuntimeException("Internal error: " + e.toString() + "<br>Partial output:" + ((ref != null && ref.stdout != null) ? pre(ref.stdout) : ""));                
+                    throw new RuntimeException("Internal error: " + ex.toString() + "<br>Partial output:" + ((ref != null && ref.stdout != null) ? pre(ref.stdout) : ""));                
                 }
             }
             
@@ -1082,7 +1085,7 @@ public abstract class GenericTester {
             timer.purge();
         }
         // now, any usercode errors should already have been caught.
-        // but this is to make sure internally generated errors are handles sanely
+        // but this is to make sure internally generated errors are handled sanely
         catch (Error | RuntimeException t) { // throwable == catchable
             // don't hang forever
             timer.cancel();

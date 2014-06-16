@@ -10,9 +10,11 @@ imports = ["java.util.concurrent.*",
            "java.util.concurrent.locks.*"]
 
 source_code = r"""
+public class SumParallel {
+
    // utility function
-   static void nap(int ms) {
-      try {Thread.sleep(ms);} 
+   static void nap(int limit_ms) {
+      try {Thread.sleep((int)(limit_ms*Math.random()));} 
       catch (InterruptedException ie) 
        {System.out.println("!");} 
    }
@@ -20,8 +22,9 @@ source_code = r"""
    static int total;
 
 \[
-   static Lock lock = new ReentrantLock();
-]\\default[   ; // more variables? 
+      static Lock lock = new ReentrantLock();
+\show:
+   ; // more variables? 
 ]\
 
    // a class that adds a number to total
@@ -31,20 +34,24 @@ source_code = r"""
       public void run() {
 \[
          // do nothing here
-]\\default[
+\show:
 ;// maybe do something here?
-]\
-         // introduce some delays 
-         nap(15); 
+]\         
+         nap(10); // random delay up to 10ms
 \[
          lock.lock();
-]\\default[
+\show:
 ;// maybe do something here?
 ]\
-         total += increment; 
+         {
+            // increase total by increment
+            int oldTotal = total;
+            nap(2); // random delay up to 2ms
+            total = oldTotal + increment;
+         }
 \[
          lock.unlock();
-]\\default[
+\show:
 ;// maybe do something here?
 ]\
       }
@@ -56,20 +63,22 @@ source_code = r"""
       int n = Integer.parseInt(args[0]);
         
       // keep track of all the things we execute
-      ExecutorService pool = Executors.newCachedThreadPool();
-        
+      // & impose limit b/c using many threads at makes memory run out
+      ExecutorService pool = Executors.newFixedThreadPool(23);
+  
       for (int i=1; i<=n; i++)
          pool.execute(new AdderRunnable(i));
 
 \[
-      pool.shutdown();
+      pool.shutdown();               // ask to shut down
       while (!pool.isTerminated()) 
-         Thread.yield();
-]\\default[
-         pool.shutdown();
+         Thread.yield();             // wait until shutdown complete
+\show:
+      pool.shutdown();               // ask to shut down
 ]\
       System.out.println(total);
    }
+}
 """
 
 tests = r"""

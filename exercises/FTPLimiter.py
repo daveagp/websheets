@@ -1,6 +1,6 @@
 description = r"""
-You would like to download some files from an FTP site. You want to download 100 files called 
-<tt>file0.zip</tt>, <tt>file1.zip</tt>, ..., <tt>file99.zip</tt>. Assume that the <tt>static</tt> 
+You would like to download some files from an FTP site. You want to download 20 files called 
+<tt>file0.zip</tt>, <tt>file1.zip</tt>, ..., <tt>file19.zip</tt>. Assume that the <tt>static</tt> 
 method 
 <pre>FTP.get(String filename)</pre>
 has been defined for you, and that it tells your FTP client to download that named file from
@@ -17,13 +17,14 @@ never downloading more than 5 at once.
 source_code = r"""
 public class FTPLimiter {
 \hide[
+static int NUMFILES = 20;
     public static class FTP {
         static int maxload = 0;
         static int connections = 0;
         static int successes = 0;
         static int left = 0;
         static Stopwatch w;
-        static int[] counts = new int[100];
+        static int[] counts = new int[NUMFILES];
         static int totalTime = 0;
         static boolean errored = false;
         static void init() {w = new Stopwatch();}
@@ -61,23 +62,25 @@ public class FTPLimiter {
                 System.out.println("... finished downloading "+filename+" ("+time+" ms)!");
                 connections--;
             }
-            if (successes == 100) {
+            if (successes == NUMFILES) {
            double elapsed = w.elapsedTime();
            System.out.println("Elapsed real time: " + elapsed + " seconds");
            double load = totalTime/elapsed/1000;
-           System.out.printf("Cumulative download time %d ms, average load %.3f\n", totalTime, load);
-           if (load <= 4) error("Average load should be greater than 4.");
+           System.out.printf("Cumulative download time %d ms, average load %.3f, max load %d\n", totalTime, load, maxload);
+           if (load <= 3) error("Average load is too small.");
+           if (maxload <= 4) error("Max load should be 5");
 }
                 left--;
         }
         static void done() {
            while (!errored && left > 0) Thread.yield();
-           if (successes < 100) error("Did not download all files.");
+           if (successes < NUMFILES) error("Did not download all files.");
            if (errored) {throw new framework.GenericTester.FailException(err);}
         }
     }
-]\\[
-static Semaphore semaphore = new Semaphore(5);
+]\
+   static Semaphore \[semaphore = new Semaphore(5)]\;
+\[
 static class GetThread extends Thread {
    String filename;
    GetThread(String filename) {
@@ -92,15 +95,18 @@ static class GetThread extends Thread {
       }
    }
 }
+\show:
+;// extra inner classes or anything else?
 ]\
-\default[;// extra classes, instance variables...?
-]\
-public static void main(String[] args) {\hide[ FTP.init(); ]\
+   public static void main(String[] args) {\hide[ FTP.init(); ]\
 \[
-   for (int i=0; i<100; i++) 
-      new GetThread("file"+i+".zip").start();
+      for (int i=0; i<20; i++) 
+         new GetThread("file"+i+".zip").start();
 ]\
-\hide[ FTP.done(); ]\}
+\hide[
+FTP.done();
+]\
+   }
 }
 """
 tests = r"""

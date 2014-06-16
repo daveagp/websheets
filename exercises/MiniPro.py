@@ -93,7 +93,8 @@ source_code = r"""
     public boolean isDone() {
         return pc == program.length;
     }
-]\\hide[
+]\
+\hide[
 public static void MPRun_main() {
 
    // read all input into lines; handle Windows newlines & extra space

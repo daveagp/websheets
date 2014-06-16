@@ -5,6 +5,7 @@ imports = ["java.util.concurrent.RecursiveAction",
 "java.util.concurrent.ForkJoinPool"]
 
 source_code = r"""
+public class FJSort {
    public static void main(String[] args) {
       int SIZE = 2_000_000;
       int[] list = new int[SIZE];
@@ -21,7 +22,7 @@ source_code = r"""
         timing[i] = parallelMergeSort((int[])list.clone(), i);
  
       for (int i=2; i<=maxProc; i++)
-         if (timing[i] > timing[i-1])
+         if (!(timing[i] < timing[i-1]/1.05))
            throw new RuntimeException("More processors should make it faster!");
     }
     
@@ -57,9 +58,9 @@ source_code = r"""
 \[
           invokeAll(new SortTask(firstHalf),
                     new SortTask(secondHalf));
-]\\default[
-          new SortTask(firstHalf).invoke();
-          new SortTask(secondHalf).invoke();
+\show:
+       new SortTask(firstHalf).invoke();
+       new SortTask(secondHalf).invoke();
 ]\
           // merge halves together
           merge(firstHalf, secondHalf, list);
@@ -76,6 +77,7 @@ source_code = r"""
       while (i1 < list1.length) merged[i3++] = list1[i1++];
       while (i2 < list2.length) merged[i3++] = list2[i2++];
    }
+}
 """
 
 tests = r"""

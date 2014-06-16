@@ -139,7 +139,8 @@ source_code = r"""
     public boolean isDone() {
         return pc >= program.length || pc < 0;
     }
-]\\hide[
+]\
+\hide[
 public static void MP2Run_main() {
 
    // read all input into lines; handle Windows newlines & extra space
