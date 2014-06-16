@@ -1,6 +1,7 @@
 imports = ["java.util.Set", "java.util.TreeSet"]
+
 description = r"""
-Define a method <tt>addReverses(Set&lt;String&gt; ss)</tt> that takes 
+Define a method <tt>addReverses(Set&lt;String&gt; words)</tt> that takes 
 a set of strings, and adds to that set the reverse of every string in the set.
 For example, if you call it on a set containing <tt>"HI"</tt> and <tt>"MOM"</tt>
 then after your method executes, it should contain <tt>"HI"</tt>, <tt>"IH"</tt> and <tt>"MOM"</tt>
@@ -11,25 +12,25 @@ A partial solution is given below, but it throws a <tt>ConcurrentModificationExc
 
 source_code = r"""
 public class CME {
-   public static void addReverses(Set<String> ss) {
+   public static void addReverses(Set<String> words) {
 \[
       // we will put the reverses in a new place for now
       // while we iterate through the main set
-      TreeSet<String> tmp = new TreeSet<String>();
-      for (String s:ss) 
+      java.util.HashSet<String> tmp = new java.util.HashSet<String>();
+      for (String s : words) 
          tmp.add(new StringBuffer(s).reverse().toString());
      
-      // now that we're done iterating through ss, add to it
-      for (String s:tmp) 
-         ss.add(s);
-]\\default[
-      for (String s : ss) { // for each string in the set 
+      // now that we're done iterating through 'words', add to it
+      for (String s : tmp) 
+         words.add(s);
+\show:
+      for (String s : words) { // for each string in the set 
 
-         // a simple way to compute the reverse of a string
-         String reverseOfS = new StringBuffer(s).reverse().toString();
+         // a one-liner to compute the reverse of a string
+         String sReverse = new StringBuffer(s).reverse().toString();
 
          // add it to our set
-         ss.add(reverseOfS);
+         words.add(sReverse);
       }
 ]\
    }

@@ -38,6 +38,7 @@ def submit_and_log(websheet_name, student, client_request, meta):
                "<div class='pre-syntax-error'>Syntax error:" + 
                "<pre>\n"+cgi.escape(student_solution[1])+"</pre></div>") # error text
     ss_to_ui_linemap = student_solution[2]
+
     def translate_line(ss_lineno):
         ss_lineno = int(ss_lineno)
         if ss_lineno in ss_to_ui_linemap:
@@ -49,6 +50,8 @@ def submit_and_log(websheet_name, student, client_request, meta):
 
     with open("GenericTester.java") as file:
         GTjava = "".join(file)
+
+    #print(repr(student_solution[1]))
 
     dump = {
         "reference." + classname : reference_solution,
@@ -143,8 +146,8 @@ def submit_and_log(websheet_name, student, client_request, meta):
         return ("Internal Error (RAMRun)", result)
       
     runtimeOutput = re.sub(
-        re.compile("at line (\d+) "),
-        lambda match: "at line " + translate_line(match.group(1)) + " ",
+        re.compile("(at|from) line (\d+) "),
+        lambda match: match.group(1)+" line " + translate_line(match.group(2)) + " ",
         runUser.stdout)
 
     #print(runtimeOutput)

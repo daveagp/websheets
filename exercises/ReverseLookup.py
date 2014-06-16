@@ -19,9 +19,8 @@ public static ST<String, Integer> invert(ST<Integer, String> st) {
    return result;
 }
 ]\
-// test client. Reads alternating strings and ints from stdin,
-// loads them into an ST<Integer, String>, inverts it and prints
-// the result
+// test client. Reads alternating strings and ints from stdin, loads them
+// into an ST<Integer, String>, inverts it and prints the result
 public static void main(String[] args) {
    ST<Integer, String> orig = new ST<Integer, String>();
    while (!StdIn.isEmpty()) {

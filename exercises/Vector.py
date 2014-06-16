@@ -139,7 +139,7 @@ tests = r"""
 cloneForStudent = false;
 double[] nums = new double[]{3, -4};
 saveAs = "nums";
-test("<<store>>", nums);
+store(nums);
 saveAs = "velocity";
 testConstructor(var("nums"));
 testOn("velocity", "cartesian", 0);

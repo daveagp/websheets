@@ -315,10 +315,10 @@ class Websheet:
         linemap[ss_lines] = ui_lines 
 
         for i in self.imports:
-            r.extend('import '+i+'\n')
+            r.extend('import '+i+';\n')
             ss_lines += 1
             ui_lines += 1
-            linemap[ss_lines] = ui_lines 
+            linemap[ss_lines] = ui_lines
 
         blanks_processed = 0
 
@@ -441,7 +441,7 @@ class Websheet:
         This will be used by the UI.
         """
 
-        r = ["\n".join("import "+x+";" for x in self.imports)]
+        r = ["".join("import "+x+";\n" for x in self.imports)]
 
         for chunk in self.chunks:
             if chunk.type in {ChunkType.plain, ChunkType.fake}:

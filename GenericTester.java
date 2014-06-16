@@ -720,6 +720,7 @@ public abstract class GenericTester {
         }
         if (O.getClass().getName().startsWith("student.")) return O;
         if (O.getClass().getName().startsWith("reference.")) return O;
+        if (O.getClass().getName().startsWith("stdlibpack.")) return O;
         //if (O instanceof NamedObject) return dict.get(((NamedObject)O).name);
         throw new RuntimeException("Don't know how to semicopy "+O.toString());
     }
@@ -880,7 +881,7 @@ public abstract class GenericTester {
                                                 + 
                                                 pre(stackTrace) 
                                                 + 
-                                                (stu == null || stu.stdout == null || stu.stdout.equals("") ? "" : "<br>Partial printed output:" + pre(stu.stdout)));
+                                                (stu == null || stu.stdout == null || stu.stdout.equals("") ? "" : "Partial printed output:" + pre(stu.stdout)));
                 }
             }
         }
@@ -931,6 +932,11 @@ public abstract class GenericTester {
             graderOut.print("Passed test!\n"+goodStuff);
             graderOut.println("</div>");
         }
+    }
+
+
+    protected void store(Object val) {
+        test("<<store>>", val);
     }
 
     protected void test(String methodName, Object... args) {

@@ -10,7 +10,7 @@ and supports the following functions.
  public void append(String text) 
 // replace all occurrences of "from" with "to"
  public void replaceEach(String from, String to)
-// undo the latest append/replaceAll operation that hasn't already been undone
+// undo the latest append/replaceEach operation that hasn't already been undone
  public void undo()
 </pre>
 For example,
