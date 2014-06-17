@@ -23,7 +23,7 @@
     ],
     "combined_with_initial": [
         false,
-        "Line 20, editable region 1:\nmust not be empty"
+        "Line 19:\nmust not be empty"
     ],
     "combined_with_reference": [
         true,

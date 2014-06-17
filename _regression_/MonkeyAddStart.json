@@ -24,6 +24,7 @@
             "28": 26,
             "29": 27,
             "3": 1,
+            "39": 27,
             "4": 2,
             "40": 28,
             "41": 29,
@@ -44,7 +45,7 @@
     ],
     "combined_with_initial": [
         false,
-        "Line 35, editable region 1:\nmust not be empty"
+        "Line 34:\nmust not be empty"
     ],
     "combined_with_reference": [
         true,
@@ -71,6 +72,7 @@
             "28": 26,
             "29": 27,
             "3": 1,
+            "39": 27,
             "4": 2,
             "40": 28,
             "41": 29,

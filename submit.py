@@ -29,7 +29,7 @@ def submit_and_log(websheet_name, student, client_request, meta):
     user_poschunks = client_request["snippets"]
 
     # this is the pre-syntax check
-    student_solution = websheet.make_student_solution(user_poschunks, "student")
+    student_solution = websheet.combine_with_template(user_poschunks, "student")
     if student_solution[0] == False:
         if student_solution[1] == "Internal error! Wrong number of inputs":
           return("Internal Error (Wrong number of snippets)", "Error: wrong number of snippets")
@@ -70,7 +70,7 @@ def submit_and_log(websheet_name, student, client_request, meta):
                "<div class='dependency-error'><i>Dependency error</i>: " + 
                "You need to successfully complete the <a href='javascript:loadProblem(\""+dep+"\")'><tt>"+dep+"</tt></a> websheet first (while logged in).</div>") # error text
       submission = [{'code': x, 'from': {'line': 0, 'ch':0}, 'to': {'line': 0, 'ch': 0}} for x in submission]
-      dump["student."+dep] = depws.make_student_solution(submission, "student")[1]
+      dump["student."+dep] = depws.combine_with_template(submission, "student")[1]
       
       dump["reference."+dep] = depws.get_reference_solution("reference")
       

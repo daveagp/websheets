@@ -36,7 +36,7 @@
     ],
     "combined_with_initial": [
         false,
-        "Line 7:\nmust have exactly one semicolon, at the end"
+        "Line 7, editable region 1:\nmust have exactly one semicolon, at the end"
     ],
     "combined_with_reference": [
         true,

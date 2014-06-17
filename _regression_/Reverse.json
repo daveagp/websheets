@@ -14,7 +14,7 @@
     ],
     "combined_with_initial": [
         false,
-        "Line 5, editable region 1:\nmust not be empty"
+        "Line 4:\nmust not be empty"
     ],
     "combined_with_reference": [
         true,

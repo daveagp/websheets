@@ -79,7 +79,7 @@
     ],
     "combined_with_initial": [
         false,
-        "Line 70, editable region 1:\nmust not be empty"
+        "Line 69:\nmust not be empty"
     ],
     "combined_with_reference": [
         true,

@@ -70,7 +70,7 @@ class Websheet:
                    r"\fake[":ChunkType.fake}
 
         # normalize by collapsing whitespace around syntactically correct
-        # delimiters for multi-line regions
+        # delimiters for multi-line regions.
         for d in delim | {r"\show:"}:
             source = re.sub("\n[ \t]*"+re.escape(d)+"[ \t]*\n",
                             "\n"+d.replace("\\", "\\\\")+"\n",
@@ -78,7 +78,11 @@ class Websheet:
 
         # replace ]\ at end of line, if not the only thing on line,
         # with ]\_ (space). This is so RHS of inline joins never start with \n
+        # e.g. "...(w);]\" at end of line in CircularQuote
         source = re.sub(r"(.)\]\\$", r"\1]\ ", source, flags=re.MULTILINE)
+
+        # analogous thing at start of line, although no websheets so far use it
+        source = re.sub(r"^\[\\(.)", r" \[\1", source, flags=re.MULTILINE)
 
         delim_expr = '|'.join(re.escape(d) for d in delim)
 
@@ -140,7 +144,6 @@ class Websheet:
 
                 if chunk.type == ChunkType.blank:
                     def normalize(text):
-                        if "\n" in text: return text
                         if not text.startswith(" "): text = " " + text
                         if not text.endswith(" "): text = text + " "
                         return text
@@ -160,12 +163,10 @@ class Websheet:
             last_close_end = close.end()
 
         interstitial = source[last_close_end:]
-        #if interstitial != "\n": let's keep this for consistency?
+
         result.append(Chunk(interstitial, ChunkType.plain))
 
-        # every \n ending a chunk will always be followed by a \n starting
-        # the next chunk. rendering both will leave a gap line. so we'll
-        # remove one of each pair. also do some sanity checking
+        # do some sanity checking
         for i in range(0, len(result)):
             def err(msg, info = None):
                 return [False, "Failed sanity check: chunk " + str(i) + " "
@@ -190,14 +191,7 @@ class Websheet:
                     if show_text[0] != '\n': return err("show has bad start")
                     if show_text[-1] != '\n': return err("show has bad end")
 
-            # cool, strip the extra newline
-            if i > 0 and result[i-1].text[-1] == "\n":
-                # prefer not to strip newline from fill-in-the-blank areas
-                if result[i].type != ChunkType.blank:
-                    result[i].text = result[i].text[1:]
-                else:
-                    result[i-1].text = result[i-1].text[:-1]
-
+        # parsed ok
         return [True, result]
 
     def __init__(self, field_dict):
@@ -269,7 +263,7 @@ class Websheet:
                 "\n}\s*$",
                 "\n" + r"\hide[" + "\n" + "}" + "\n" + "]\\\\" + "\n",
                 self.source_code)
-            
+
         chunkify_result = Websheet.chunkify(self.source_code)
 
         if not chunkify_result[0]:
@@ -278,18 +272,23 @@ class Websheet:
 
         self.chunks = chunkify_result[1]
 
-        # after chunkifying, remove initial newline. final is removed in UI
-        if (self.chunks[0].type == ChunkType.plain
-            and self.chunks[0].text.startswith('\n')):
-            self.chunks[0].text = self.chunks[0].text[1:]
-        # fail silently. SquareSwap is an example of this
+        if len(self.imports) > 0:
+            import_text = "\n" + "".join("import "+i+";\n"
+                                         for i in self.imports)
+            self.chunks = ([Chunk(import_text, ChunkType.plain)]
+                           + self.chunks)
+
+        self.chunks = ([Chunk("\nimport stdlibpack.*;\n", ChunkType.hide)]
+                       + self.chunks)
+
+        #print(repr(self.chunks))
         
         self.input_count = 0
         for chunk in self.chunks:
             if chunk.type == ChunkType.blank:
                 self.input_count += 1
 
-    def make_student_solution(self, student_code, package = None):
+    def combine_with_template(self, student_code, package = None):
         """
         student_code: a list of chunks, one for each blank region in the UI
 
@@ -301,42 +300,60 @@ class Websheet:
         if self.input_count != len(student_code):
             return [False, "Internal error! Wrong number of inputs"]
 
-        r = [] # result
+        r = [] # resulting text of combined solution, to be joined later
         linemap = {}
         ui_lines = 1 # user interface lines
-        ss_lines = 1 # student solution lines
+        cs_lines = 1 # combined solution lines
+        ui_endswith_newline = True
+        cs_endswith_newline = True
 
+        def add_text(text, to_ui, to_ss):
+            nonlocal r, linemap, ui_lines, cs_lines
+            nonlocal ui_endswith_newline, cs_endswith_newline
+
+            #print([text, to_ui, to_ss])
+            
+            # adjustment: when a chunk ends with a newline and is followed
+            # by a chunk starting with a newline, that's only one line
+            if to_ui and ui_endswith_newline and text.startswith("\n"):
+                ui_lines -= 1
+            if to_ss and cs_endswith_newline and text.startswith("\n"):
+                cs_lines -= 1
+
+            if to_ui and to_ss:
+                for i in range(text.count("\n")):
+                    linemap[cs_lines+i+1] = ui_lines+i+1
+
+            if to_ui:
+                ui_lines += text.count("\n")
+                ui_endswith_newline = text.endswith("\n")
+
+            if to_ss:
+                if cs_endswith_newline and text.startswith("\n"):
+                    r.append(text[1:])
+                else:
+                    r.append(text)
+
+                cs_lines += text.count("\n")
+                cs_endswith_newline = text.endswith("\n")
+            
         last_line_with_blank = -1
         blank_count_on_line = -1
 
-        r.extend('\n' if package is None else 'package '+package+';\n')
-        r.extend('import stdlibpack.*;\n')
-        ss_lines += 2
-
-        linemap[ss_lines] = ui_lines 
-
-        for i in self.imports:
-            r.extend('import '+i+';\n')
-            ss_lines += 1
-            ui_lines += 1
-            linemap[ss_lines] = ui_lines
+        add_text('\n' if package is None else 'package '+package+';\n',
+                 False, True)
 
         blanks_processed = 0
 
         for chunk in self.chunks:
             if chunk.type == ChunkType.plain:
-                r.append(chunk.text)
-                for i in range(0, chunk.text.count("\n")):
-                    ui_lines += 1
-                    ss_lines += 1
-                    linemap[ss_lines] = ui_lines 
+                add_text(chunk.text, True, True)
 
             elif chunk.type == ChunkType.fake:
-                ui_lines += chunk.text.count("\n")
+                add_text(chunk.text, True, False)
                 
             elif chunk.type == ChunkType.hide:
-                r.append(chunk.text)
-                ss_lines += chunk.text.count("\n")
+                add_text(chunk.text, False, True)
 
             elif chunk.type == ChunkType.blank:
                     
@@ -347,7 +364,7 @@ class Websheet:
 
                 # deprecated: in place of a code chunk,
                 # you can pass a dict with "code" as the code chunk,
-                # plus other attributes                
+                # plus other attributes. here we just pull out the text
                 if isinstance(user_text, dict):
                     user_text = user_text["code"]
 
@@ -383,23 +400,22 @@ class Websheet:
                         valid[1])
 
                     if match is None: # error at end of chunk
-                        user_pos = ui_lines
-                        user_pos += user_text.count("\n")
-                        user_pos = "Line "+str(user_pos)
+                        user_pos = ui_lines + user_text.count("\n") 
                         if "\n" in user_text:
-                            user_pos += (", editable region "
-                                         + str(blank_count_on_line))
-                        return [False, user_pos + ":\n" + valid[1]]
+                            user_pos -= 2
+                            pos_desc = "Line "+str(user_pos)
+                        else:
+                            pos_desc = ("Line "+str(user_pos)+
+                                        ", editable region "
+                                        + str(blank_count_on_line))
+                        return [False, pos_desc + ":\n" + valid[1]]
+
                     else: # error within chunk
                         user_line = ui_lines + int(match.group(1))
                         return [False, "Line "+str(user_line)
                                 + ": " + match.group(3)]
 
-                r.append(user_text)
-                for i in range(0, user_text.count("\n")):
-                    ui_lines += 1
-                    ss_lines += 1
-                    linemap[ss_lines] = ui_lines 
+                add_text(user_text, True, True)
                 
         return [True, ''.join(r), linemap]
 
@@ -407,18 +423,21 @@ class Websheet:
         """
         Get the reference solution for use in grading. Note that the UI
         exposes this in a different way, using get_reference_snippets
-        and then make_student_solution.
+        and then combine_with_template.
         """
         r = []
 
         r += ['\n' if package is None else 'package '+package+';\n']
-        r += ['import stdlibpack.*;\n']
-        r += ["import "+x+";\n" for x in self.imports]
 
         for chunk in self.chunks:
             if chunk.type in {ChunkType.plain,
                               ChunkType.blank, ChunkType.hide}:
-                r.append(chunk.text)
+                if r[-1].endswith("\n") != chunk.text.startswith("\n"):
+                    raise Exception("Sanity check failed: " + repr([r[-1], chunk.text]))
+                if r[-1].endswith("\n"):
+                    r.append(chunk.text[1:])
+                else:
+                    r.append(chunk.text)
         
         return ''.join(r)
 
@@ -444,22 +463,38 @@ class Websheet:
         the first (0th), third, etc are read-only,
         the other positions are editable areas for the student.
         Note that each editable area either starts and ends with a space,
-        or starts and ends with a newline, and that the last character of
-        each string equals the first character of the next.
-        This will be used by the UI.
+        or starts and ends with a newline. (The UI always assumes this.)
         """
 
-        r = ["".join("import "+x+";\n" for x in self.imports)]
+        r = ["\n"]
 
         for chunk in self.chunks:
             if chunk.type in {ChunkType.plain, ChunkType.fake}:
-                r[-1] += chunk.text
+                if (r[-1].endswith("\n")):
+                    if not r[0].startswith("\n"):
+                        raise Exception("Sanity check failed!")
+                    r[-1] += chunk.text[1:]
+                else:
+                    r[-1] += chunk.text
             elif chunk.type == ChunkType.blank:
                 r += [chunk.attr["show"]]
                 r += [""]
 
-        # remove trailing newlines from last read-only region
+        # absorb newlines into the editable part
+        for i in range(len(r)-1):
+            if r[i].endswith("\n") or r[i+1].startswith("\n"):
+                if not (r[i].endswith("\n") and r[i+1].startswith("\n")):
+                    raise Exception("Sanity check failed!")
+                if (i%2 == 0): r[i] = r[i][:-1]
+                else: r[i+1] = r[i+1][1:]
+
+        # remove trailing newlines from last read-only region and start of first
         while r[-1].endswith("\n"): r[-1] = r[-1][:-1]
+        if not (r[0].startswith("\n")):
+            #print(repr(r))
+            raise Exception("Sanity check failed!")
+        r[0] = r[0][1:]
+        
         return r
 
     def prefetch_urls(self, stringify = False):
@@ -525,23 +560,58 @@ self.classname + " to = new " + self.classname + "();\n" +
         r["initial_snippets"] = self.get_initial_snippets()
         r["reference_snippets"] = self.get_reference_snippets()
         r["reference_solution"] = self.get_reference_solution("reference")
-        r["combined_with_initial"] = self.make_student_solution(r["initial_snippets"], "combined.initial")
-        r["combined_with_reference"] = self.make_student_solution(r["reference_snippets"], "combined.reference")
+        r["combined_with_initial"] = self.combine_with_template(r["initial_snippets"], "combined.initial")
+        r["combined_with_reference"] = self.combine_with_template(r["reference_snippets"], "combined.reference")
         r["daveagp"] = config.load_submission("daveagp@gmail.com", self.slug, maxId = 876)
-        r["combined_with_daveagp"] = self.make_student_solution(r["daveagp"], "combined.daveagp")
+        r["combined_with_daveagp"] = self.combine_with_template(r["daveagp"], "combined.daveagp")
         return json.loads(json.dumps(r)) # to remove things like numeric keys
 
     def regression_ui(self):
+
+        def print_differences(old, new, desc):
+
+            def rangey(obj):        
+                if isinstance(obj, dict): return obj.keys()
+                if isinstance(obj, list): return range(len(obj))
+                return None
+
+            result = False
+            
+            oldrange = rangey(old)
+            newrange = rangey(new)
+            
+            # not both have members
+            if (oldrange == None) or (newrange == None):
+                if old != new:
+                    print(desc+" was " + repr(old) + " now " + repr(new))
+                return True
+
+            for x in oldrange:
+                if x not in newrange:
+                    print(desc+"["+repr(x)+"] was " + repr(old[x]) +
+                          "now doesn't exist")
+                    result = True
+
+            for x in newrange:
+                if x not in oldrange:
+                    print(desc+"["+repr(x)+"] didn't exist, now "
+                          + repr(new[x]))
+                    result = True
+
+            for x in newrange:
+                if x in oldrange:
+                    if print_differences(old[x], new[x], desc+"["+repr(x)+"]"):
+                        result = True
+
+            return result
+
         regressed = False
         current_result = self.testing_ui()
         old_result = json.load(open("_regression_/"+self.slug+".json"))
-        for key in current_result:
-            if current_result[key] != old_result[key]:
-                print(self.slug+" differs in key " + key + ", was: ")
-                print(json.dumps(old_result[key],indent=4, separators=(',', ': '), sort_keys=True))
-                print("now:")
-                print(json.dumps(current_result[key],indent=4, separators=(',', ': '), sort_keys=True))
-                regressed = True
+        if print_differences(old_result,
+                             current_result,
+                             "websheet " + self.slug + " key "):
+            regressed = True
         return regressed
 
     def regression_save(self):
@@ -567,27 +637,26 @@ if __name__ == "__main__":
         websheet = Websheet.from_filesystem(sys.argv[2])
         print(json.dumps({"code":websheet.get_json_template(),"description":websheet.description}))
 
-    # call Websheet.py make_student_solution MaxThree stu and input [{code: " int ", from: ..., to: ...}, ...]
-    elif sys.argv[1] == "make_student_solution":
+    # call Websheet.py combine_with_template MaxThree stu and input [{code: " int ", from: ..., to: ...}, ...]
+    elif sys.argv[1] == "combine_with_template":
         websheet = Websheet.from_filesystem(sys.argv[2])
         user_input = input() # assume json all on one line
         user_poschunks = json.loads(user_input)
-        print(json.dumps(websheet.make_student_solution(user_poschunks, "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
+        print(json.dumps(websheet.combine_with_template(user_poschunks, "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
 
     elif sys.argv[1] == "testing_ui":
         print(json.dumps(Websheet.from_filesystem(sys.argv[2]).testing_ui()))
 
     elif sys.argv[1] == "testall_ui":
-        list = Websheet.list_filesystem()
-        print(json.dumps({slug: Websheet.from_filesystem(slug).testing_ui() for slug in list}
+        wslist = Websheet.list_filesystem()
+        print(json.dumps({slug: Websheet.from_filesystem(slug).testing_ui() for slug in wslist}
                          ,indent=4, separators=(',', ': '))) # pretty!
 
     elif sys.argv[1] == "regression_save":
         Websheet.from_filesystem(sys.argv[2]).regression_save()
 
     elif sys.argv[1] == "regression_save_all":
-        list = Websheet.list_filesystem()
-        for slug in list:
+        for slug in Websheet.list_filesystem():
             print(slug)
             Websheet.from_filesystem(slug).regression_save()
 
@@ -595,8 +664,7 @@ if __name__ == "__main__":
         Websheet.from_filesystem(sys.argv[2]).regression_ui()
 
     elif sys.argv[1] == "regression_all":
-        list = Websheet.list_filesystem()
-        for slug in list:
+        for slug in Websheet.list_filesystem():
             print(slug)
             Websheet.from_filesystem(slug).regression_ui()
 

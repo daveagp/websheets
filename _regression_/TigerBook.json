@@ -41,12 +41,13 @@
             "7": 5,
             "8": 6,
             "9": 7,
+            "95": 38,
             "96": 39
         }
     ],
     "combined_with_initial": [
         false,
-        "Line 38, editable region 1:\nmust not be empty"
+        "Line 37:\nmust not be empty"
     ],
     "combined_with_reference": [
         true,
@@ -90,6 +91,7 @@
             "7": 5,
             "8": 6,
             "9": 7,
+            "95": 38,
             "96": 39
         }
     ],

@@ -1,11 +1,11 @@
 {
     "combined_with_daveagp": [
         false,
-        "Line 66, editable region 1:\nmust not be empty"
+        "Line 65:\nmust not be empty"
     ],
     "combined_with_initial": [
         false,
-        "Line 66, editable region 1:\nmust not be empty"
+        "Line 65:\nmust not be empty"
     ],
     "combined_with_reference": [
         true,

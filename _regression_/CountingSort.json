@@ -27,6 +27,7 @@
             "5": 3,
             "6": 4,
             "7": 5,
+            "74": 26,
             "75": 27,
             "8": 6,
             "9": 7
@@ -34,7 +35,7 @@
     ],
     "combined_with_initial": [
         false,
-        "Line 3:\nmust have exactly one semicolon, at the end"
+        "Line 3, editable region 1:\nmust have exactly one semicolon, at the end"
     ],
     "combined_with_reference": [
         true,
@@ -64,6 +65,7 @@
             "5": 3,
             "6": 4,
             "7": 5,
+            "74": 26,
             "75": 27,
             "8": 6,
             "9": 7

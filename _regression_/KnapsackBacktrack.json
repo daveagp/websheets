@@ -10,6 +10,7 @@
             "14": 12,
             "15": 13,
             "3": 1,
+            "33": 13,
             "34": 14,
             "35": 15,
             "36": 16,
@@ -69,7 +70,7 @@
     ],
     "combined_with_initial": [
         false,
-        "Line 30:\nmust not be empty"
+        "Line 30, editable region 1:\nmust not be empty"
     ],
     "combined_with_reference": [
         true,
@@ -82,6 +83,7 @@
             "14": 12,
             "15": 13,
             "3": 1,
+            "33": 13,
             "34": 14,
             "35": 15,
             "36": 16,
