@@ -104,7 +104,20 @@ testOn()
 testStdin = <String>
 testStdinURL = <String>
 
-get rid of:
+OTHER OPTIONS
 
-"OurTestCase"
-preamble (NSwap, SquareSwap)
+classname: when you want the visible class name not to be the 
+  same as the name of the overall exercise. E.g.: MonkeyTraverse.
+
+show_class_decl: set to False if you don't want the user to
+  see the class declaration. E.g.: SquareSwap.
+
+epilogue: show a message or explanation after problem is completed.
+ E.g.: PercentScore, SquareOf
+
+dependencies: require student to complete some other websheet before
+ this one, that will be compiled alongside it. E.g.: TigerBook.
+ If you don't want to require students to complete it but want to
+ give them reference code for free, you can use \hide instead, e.g.: CountingSort
+
+imports: a list of import statements that will be made (visible to all). e.g.: CME

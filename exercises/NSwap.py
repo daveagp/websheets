@@ -21,21 +21,18 @@ public static void main(String[] args) {
 }
 """
 
-tester_preamble = r"""
-class OurTestCase extends BasicTestCase {
-   OurTestCase(String... S ) {super("main", new Object[]{S});}
-   protected void describe() {
-   System.out.print("Running your code on a test case");
-}
-}
-"""
-
 tests = r"""
-  new OurTestCase("red", "green", "blue").execute();
-  new OurTestCase("fuschia", "turquoise", "sienna", "vermilion").execute();
-  new OurTestCase("a", "b", "c", "d", "e", "f", "g", "h").execute();
-  new OurTestCase("monocolor").execute();
-//   test("fourSwap", "fuschia", "turquoise", "sienna", "vermilion");
+HTMLdescription = "Running with <tt>colors[] = {\"red\", \"green\", \"blue\"}</tt>";
+testMain("red", "green", "blue");
+
+HTMLdescription = "Running with <tt>colors[] = {\"fuschia\", \"turquoise\", \"sienna\", \"vermilion\"}</tt>";
+testMain("fuschia", "turquoise", "sienna", "vermilion");
+
+HTMLdescription = "Running with <tt>colors[] = {\"a\", \"b\", \"c\", \"d\", \"e\", \"f\", \"g\", \"h\"}</tt>"; 
+testMain("a", "b", "c", "d", "e", "f", "g", "h");
+
+HTMLdescription = "Running with <tt>colors[] = {\"monocolor\"}</tt>";
+testMain("monocolor");
 """
 
 description = r"""

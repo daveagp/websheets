@@ -30,23 +30,12 @@ right = tmp;      // complete the swap using saved value
 }
 """
 
-tester_preamble = r"""
-class OurTestCase extends BasicTestCase {
-   OurTestCase(String s1, String s2, String s3, String s4) {super("squareSwap", new Object[]{s1, s2, s3, s4});}
-   protected void describe() {
-   System.out.println("We set "
-   +code("top = " + repr(args[0]))+", "
-   +code("bottom = " + repr(args[1]))+", "
-   +code("left = "+repr(args[2]))+", "
-   +"and "+code("right = "+repr(args[3]))+". Then we ran your code");
-}
-}
-"""
-
 tests = r"""
-  new OurTestCase("red", "green", "blue", "yellow").execute();
-  new OurTestCase("fuschia", "turquoise", "sienna", "vermilion").execute();
-//   test("fourSwap", "fuschia", "turquoise", "sienna", "vermilion");
+HTMLdescription = "We set <tt>top = red, bottom = green, left = blue, right = yellow</tt> and ran your code";
+test("squareSwap", "red", "green", "blue", "yellow");
+
+HTMLdescription = "We set <tt>top = fuschia, bottom = turquoise, left = sienna, right = vermilion</tt> and ran your code";
+test("squareSwap", "fuschia", "turquoise", "sienna", "vermilion");
 """
 
 description = r"""

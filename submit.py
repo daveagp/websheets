@@ -51,8 +51,6 @@ def submit_and_log(websheet_name, student, client_request, meta):
     with open("GenericTester.java") as file:
         GTjava = "".join(file)
 
-    #print(repr(student_solution[1]))
-
     dump = {
         "reference." + classname : reference_solution,
         "student." + classname : student_solution[1],
@@ -60,7 +58,8 @@ def submit_and_log(websheet_name, student, client_request, meta):
         "framework.GenericTester" : GTjava,
         }
 
-    #print(student_solution[1])
+    #print(cgi.escape(student_solution[1]))
+    #print(cgi.escape(reference_solution))
 
     for dep in websheet.dependencies:
       depws = Websheet.Websheet.from_filesystem(dep)

@@ -204,9 +204,9 @@ class Websheet:
         mandatory_fields = ["classname", "source_code", "tests", "description"]
 
         # optional fields AND default values
-        optional_fields = {"tester_preamble": None, "show_class_decl": True,
-                           "epilogue": None, "dependencies": [], "imports": [],
-                           "lang": "Java", "slug": None}
+        optional_fields = {"show_class_decl": True, "lang": "Java", "slug": None,
+                           "epilogue": None, "dependencies": [], "imports": []}
+                           
         if "lang" in field_dict:
             optional_fields["show_class_decl"] = False
 
