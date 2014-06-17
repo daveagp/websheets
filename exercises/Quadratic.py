@@ -4,8 +4,7 @@ Given command-line arguments
 <code>b</code> and <code>c</code>, print out the 
 roots of <code>x<sup>2</sup> + bx + c = 0</code>. They are given by
 the formula
-<div style='text-align:center'>
-<img style='width:150px' src='exercises/Quadratic.png'></div>
+$$\Large (-b \pm \sqrt{b^2-4c})/2$$
 If the <b>discriminant</b> <code>b<sup>2</sup>-4c</code> is 
 negative, instead print out <code>There are no roots</code>.
 When there are two roots, print the <b>smaller</b> one first.

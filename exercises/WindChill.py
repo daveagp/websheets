@@ -3,9 +3,7 @@ Your program will be given two command-line arguments: <code>t</code>, represent
 (in Fahrenheit), and <code>v</code>, representing the wind speed 
 (in miles per hour). It should print the wind chill <code>w</code> using the 
 following formula:
-<div style='text-align: center; margin-top: 0.5em'>
-<img src='exercises/WindChill.png'>
-</div>
+$$\LARGE w = 35.74 + 0.6215 \times t + (0.4275 \times t - 35.75) v ^ {0.16}$$
 Use <code>Math.pow</code> to compute the exponent.
 <i>Source</i>: <a href="http://www.nws.noaa.gov/om/windchill/index.shtml">National Weather Service</a>
 """

@@ -3,23 +3,29 @@ WRITING NEW WEBSHEET EXERCISES
 The simplest kind of websheet consists of 
 - a program that you wrote
   plus areas you want to blank out for the student to fill in
-- tests
 - an html description of the exercise
+- tests
+
+There are a few other options you can use in special situations.
 
 WRITING THE PROGRAM AND INDICATING BLANKS
 
 For composing exercises, use the delimeters \[ ... ]\ to indicate a 
 part of the reference solution that should be left blank for the student
 to fill in. It should take one of two forms:
-(1) starting and ending on the same line
+(1) starting \[ and ending ]\ on the same line
 OR
-(2) starting with \[ on a line by itself and ending with ]\ on a line by itself
+(2) starting with 
+\[
+on a line by itself and ending with 
+]\
+on a line by itself
 
 In the latter case (2/multi-line), additional whitespace on the lines
 containing the delimiters \[ and ]\ is currently ignored, although it
 could be meaningful in a later version where Python is used.
 
-Example: here's a refernce solution and template with two blanks for the 
+Example: here's a reference solution and template with two blanks for the 
 student to fill in.
 
 public class Square {
@@ -60,3 +66,45 @@ blanked-out (\[...]\): UI (empty blank), reference solution, inserted in stu.s.
 "show" of blanked-out: UI (read-write)
 \fake[ ... ]\:         UI (read-only)
 \hide[ ... ]\:                           reference solution, student solution
+
+HTML DESCRIPTIONS
+
+You can include LaTeX using $inline format$ or $$big centered display format$$.
+See for example Distance and Lambert. 
+This is just MathJaX and not much fanciness on our part.
+
+To refer to another websheet (say, HelloWorld), the easiest approach is
+<a href="?group=HelloWorld">HelloWorld</a>.
+
+We recommend using IPE or some other editor to make pdf images and then 
+to convert them with render.sh. See FourSwap or FourChargeClient.
+
+TESTS (documentation in progress)
+
+testing API:
+
+cloneForStudent = <boolean>
+construct(null, "Person", "", "Tony");
+construct("stdlibpack", "Queue", "<Integer>");
+dontRunReference = <boolean>
+expectException = <boolean>
+testConstructor("0000 ");
+HTMLdescription = <String>
+quietOnPass = <boolean>
+remark(String)
+saveAs = <String>
+var(String)
+setMaxOutputBytes
+store()
+test()
+testConstructor()
+testMain()
+testNamedMain()
+testOn()
+testStdin = <String>
+testStdinURL = <String>
+
+get rid of:
+
+"OurTestCase"
+preamble (NSwap, SquareSwap)

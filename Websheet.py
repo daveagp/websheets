@@ -644,6 +644,9 @@ if __name__ == "__main__":
         user_poschunks = json.loads(user_input)
         print(json.dumps(websheet.combine_with_template(user_poschunks, "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
 
+    elif sys.argv[1] == "list":
+        print(json.dumps(Websheet.list_filesystem()))
+
     elif sys.argv[1] == "testing_ui":
         print(json.dumps(Websheet.from_filesystem(sys.argv[2]).testing_ui()))
 
@@ -667,9 +670,6 @@ if __name__ == "__main__":
         for slug in Websheet.list_filesystem():
             print(slug)
             Websheet.from_filesystem(slug).regression_ui()
-
-    elif sys.argv[1] == "list":
-        print(json.dumps(Websheet.list_filesystem()))
 
     else:
         print("Invalid command for Websheet")
