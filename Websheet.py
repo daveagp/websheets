@@ -204,7 +204,8 @@ class Websheet:
         mandatory_fields = ["classname", "source_code", "tests", "description"]
 
         # optional fields AND default values
-        optional_fields = {"show_class_decl": True, "lang": "Java", "slug": None,
+        optional_fields = {"show_class_decl": True,
+                           "lang": "Java", "slug": None,
                            "epilogue": None, "dependencies": [], "imports": []}
                            
         if "lang" in field_dict:
@@ -288,6 +289,30 @@ class Websheet:
             if chunk.type == ChunkType.blank:
                 self.input_count += 1
 
+    # when combining chunks, ensure multi-line delimiters match up
+    # and aren't duplicated
+    @staticmethod
+    def smart_concat(oldtext, newtext):
+        if oldtext.endswith("\n") != newtext.startswith("\n"):
+            raise Exception("smart_concat inconsistency: "
+                            + repr([oldtext, newtext]))            
+        if oldtext.endswith("\n"):
+            return oldtext + newtext[1:]
+        else:
+            return oldtext + newtext
+
+    # same as previous for list-of-strings, which is used like a
+    # Java StringBuilder
+    @staticmethod
+    def smart_append(stringlist, newtext):
+        if stringlist[-1].endswith("\n") != newtext.startswith("\n"):
+            raise Exception("smart_append inconsistency: "
+                            + repr([oldtext, newtext]))
+        if stringlist[-1].endswith("\n"):
+            stringlist += [newtext[1:]]
+        else:
+            stringlist += [newtext]
+
     def combine_with_template(self, student_code, package = None):
         """
         student_code: a list of chunks, one for each blank region in the UI
@@ -300,27 +325,27 @@ class Websheet:
         if self.input_count != len(student_code):
             return [False, "Internal error! Wrong number of inputs"]
 
-        r = [] # resulting text of combined solution, to be joined later
+        r = ["\n"] # resulting text of combined solution, to be joined later
         linemap = {}
         ui_lines = 1 # user interface lines
         cs_lines = 1 # combined solution lines
         ui_endswith_newline = True
         cs_endswith_newline = True
 
-        def add_text(text, to_ui, to_ss):
+        def add_text(text, to_ui, to_cs):
             nonlocal r, linemap, ui_lines, cs_lines
             nonlocal ui_endswith_newline, cs_endswith_newline
 
-            #print([text, to_ui, to_ss])
+            #print([text, to_ui, to_cs])
             
             # adjustment: when a chunk ends with a newline and is followed
             # by a chunk starting with a newline, that's only one line
             if to_ui and ui_endswith_newline and text.startswith("\n"):
                 ui_lines -= 1
-            if to_ss and cs_endswith_newline and text.startswith("\n"):
+            if to_cs and cs_endswith_newline and text.startswith("\n"):
                 cs_lines -= 1
 
-            if to_ui and to_ss:
+            if to_ui and to_cs:
                 for i in range(text.count("\n")):
                     linemap[cs_lines+i+1] = ui_lines+i+1
 
@@ -328,11 +353,8 @@ class Websheet:
                 ui_lines += text.count("\n")
                 ui_endswith_newline = text.endswith("\n")
 
-            if to_ss:
-                if cs_endswith_newline and text.startswith("\n"):
-                    r.append(text[1:])
-                else:
-                    r.append(text)
+            if to_cs:
+                Websheet.smart_append(r, text)
 
                 cs_lines += text.count("\n")
                 cs_endswith_newline = text.endswith("\n")
@@ -340,8 +362,8 @@ class Websheet:
         last_line_with_blank = -1
         blank_count_on_line = -1
 
-        add_text('\n' if package is None else 'package '+package+';\n',
-                 False, True)
+        if package is not None:
+            add_text('\npackage '+package+';\n', False, True)
 
         blanks_processed = 0
 
@@ -417,7 +439,7 @@ class Websheet:
 
                 add_text(user_text, True, True)
                 
-        return [True, ''.join(r), linemap]
+        return [True, (''.join(r))[1:], linemap] # [1:] to elim first newline
 
     def get_reference_solution(self, package = None):
         """
@@ -432,12 +454,7 @@ class Websheet:
         for chunk in self.chunks:
             if chunk.type in {ChunkType.plain,
                               ChunkType.blank, ChunkType.hide}:
-                if r[-1].endswith("\n") != chunk.text.startswith("\n"):
-                    raise Exception("Sanity check failed: " + repr([r[-1], chunk.text]))
-                if r[-1].endswith("\n"):
-                    r.append(chunk.text[1:])
-                else:
-                    r.append(chunk.text)
+                Websheet.smart_append(r, chunk.text)
         
         return ''.join(r)
 
@@ -466,29 +483,27 @@ class Websheet:
         or starts and ends with a newline. (The UI always assumes this.)
         """
 
-        r = ["\n"]
+        r = [""]
 
         for chunk in self.chunks:
             if chunk.type in {ChunkType.plain, ChunkType.fake}:
-                if (r[-1].endswith("\n")):
-                    if not r[0].startswith("\n"):
-                        raise Exception("Sanity check failed!")
-                    r[-1] += chunk.text[1:]
-                else:
-                    r[-1] += chunk.text
+                # smart_concat gets confused when arg 1 is empty
+                if r[-1] == "": r[-1] = chunk.text
+                else: r[-1] = Websheet.smart_concat(r[-1], chunk.text)
             elif chunk.type == ChunkType.blank:
                 r += [chunk.attr["show"]]
                 r += [""]
 
-        # absorb newlines into the editable part
+        # absorb duplicated newlines/spaces into the editable part
         for i in range(len(r)-1):
             if r[i].endswith("\n") or r[i+1].startswith("\n"):
                 if not (r[i].endswith("\n") and r[i+1].startswith("\n")):
                     raise Exception("Sanity check failed!")
+            if r[i].endswith("\n"):
                 if (i%2 == 0): r[i] = r[i][:-1]
                 else: r[i+1] = r[i+1][1:]
 
-        # remove trailing newlines from last read-only region and start of first
+        # remove trailing newlines from last read-only region & start of first
         while r[-1].endswith("\n"): r[-1] = r[-1][:-1]
         if not (r[0].startswith("\n")):
             #print(repr(r))
@@ -543,27 +558,36 @@ self.classname + " to = new " + self.classname + "();\n" +
 
     @staticmethod
     def from_filesystem(slug):
-        return Websheet.from_module(getattr(__import__("exercises." + slug), slug))
+        return Websheet.from_module(getattr(__import__("exercises." + slug),
+                                            slug))
 
     @staticmethod
     def list_filesystem():
         r = []
         for file in os.listdir("exercises"):
-            if file.endswith(".py") and not file.startswith("_"): r.append(file[:-3])
+            if file.endswith(".py") and not file.startswith("_"):
+                r.append(file[:-3])
         r.sort()
         return r
 
     def testing_ui(self):
         import config
-        r = {}
-        r["json_template"] = self.get_json_template()
-        r["initial_snippets"] = self.get_initial_snippets()
-        r["reference_snippets"] = self.get_reference_snippets()
-        r["reference_solution"] = self.get_reference_solution("reference")
-        r["combined_with_initial"] = self.combine_with_template(r["initial_snippets"], "combined.initial")
-        r["combined_with_reference"] = self.combine_with_template(r["reference_snippets"], "combined.reference")
-        r["daveagp"] = config.load_submission("daveagp@gmail.com", self.slug, maxId = 876)
-        r["combined_with_daveagp"] = self.combine_with_template(r["daveagp"], "combined.daveagp")
+        r = {
+            "json_template": self.get_json_template(),
+            "initial_snippets": self.get_initial_snippets(),
+            "reference_snippets": self.get_reference_snippets(),
+            "reference_solution": self.get_reference_solution("reference"),
+            "daveagp": config.load_submission("daveagp@gmail.com",
+                                              self.slug, maxId = 876)
+            }
+        r["combined_with_initial"] = (
+            self.combine_with_template(r["initial_snippets"],
+                                       "combined.initial"))
+        r["combined_with_reference"] = (
+            self.combine_with_template(r["reference_snippets"],
+                                       "combined.reference"))
+        r["combined_with_daveagp"] = (
+            self.combine_with_template(r["daveagp"], "combined.daveagp"))
         return json.loads(json.dumps(r)) # to remove things like numeric keys
 
     def regression_ui(self):
@@ -616,7 +640,8 @@ self.classname + " to = new " + self.classname + "();\n" +
 
     def regression_save(self):
         outf=open("_regression_/"+self.slug+".json", 'w')
-        print(json.dumps(self.testing_ui(),indent=4, separators=(',', ': '), sort_keys=True),
+        print(json.dumps(self.testing_ui(),
+                         indent=4, separators=(',', ': '), sort_keys=True),
               file=outf)
         outf.close()
 
@@ -635,14 +660,17 @@ if __name__ == "__main__":
     # call Websheet.py get_html_template MaxThree
     elif sys.argv[1] == "get_html_template":
         websheet = Websheet.from_filesystem(sys.argv[2])
-        print(json.dumps({"code":websheet.get_json_template(),"description":websheet.description}))
+        print(json.dumps({"code":websheet.get_json_template(),
+                          "description":websheet.description}))
 
-    # call Websheet.py combine_with_template MaxThree stu and input [{code: " int ", from: ..., to: ...}, ...]
+    # call Websheet.py combine_with_template MaxThree stu, input [" int ",...]
     elif sys.argv[1] == "combine_with_template":
         websheet = Websheet.from_filesystem(sys.argv[2])
         user_input = input() # assume json all on one line
         user_poschunks = json.loads(user_input)
-        print(json.dumps(websheet.combine_with_template(user_poschunks, "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
+        print(json.dumps(websheet.combine_with_template(
+            user_poschunks,
+            "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
 
     elif sys.argv[1] == "list":
         print(json.dumps(Websheet.list_filesystem()))
@@ -652,7 +680,8 @@ if __name__ == "__main__":
 
     elif sys.argv[1] == "testall_ui":
         wslist = Websheet.list_filesystem()
-        print(json.dumps({slug: Websheet.from_filesystem(slug).testing_ui() for slug in wslist}
+        print(json.dumps({slug: Websheet.from_filesystem(slug).testing_ui()
+                          for slug in wslist}
                          ,indent=4, separators=(',', ': '))) # pretty!
 
     elif sys.argv[1] == "regression_save":
