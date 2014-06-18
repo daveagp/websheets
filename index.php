@@ -12,7 +12,7 @@ include_once('include.php');
     src="CodeMirror/addon/selection/mark-selection.js"></script>
    <script type="text/javascript" 
     src="CodeMirror/addon/edit/matchbrackets.js"></script>
-   <script type="text/javascript" src="websheet.js?3"></script>
+   <script type="text/javascript" src="websheet.js?4"></script>
    <script type="text/x-mathjax-config"> 
       MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]} });
    </script>
@@ -22,12 +22,12 @@ include_once('include.php');
 
    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
    <link rel="stylesheet" href="CodeMirror/theme/neat.css">
-   <link rel="stylesheet" href="websheet.css?7">
+   <link rel="stylesheet" href="websheet.css?8">
   
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700'
     rel='stylesheet' type='text/css'>
 
-   <script type="text/javascript" src="index.js?6"></script>
+   <script type="text/javascript" src="index.js?7"></script>
 
 <!-- start of php interactions -->
    <script type='text/javascript'>

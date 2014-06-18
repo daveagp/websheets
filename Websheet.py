@@ -539,7 +539,6 @@ class Websheet:
 "protected void runTests() {" +
 self.tests +
 "\n}" +
-("" if self.tester_preamble is None else self.tester_preamble) +
 " public static void main(String[] args) {" +
 self.classname + " to = new " + self.classname + "();\n" + 
 "to.genericMain(args);\n" + 

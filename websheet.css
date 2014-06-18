@@ -48,7 +48,7 @@ div.CodeMirror-cursors {
     border-top: 1px solid #DDD;
     }
 
-pre { /* for long outputs */
+#results pre { /* for long outputs */
    max-height: 18em;
    overflow-y: auto;
 }
