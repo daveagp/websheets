@@ -10,10 +10,15 @@ Right now there are two mirrors:
  http://www.cs.princeton.edu/~cos126/websheets/index.php (Java 7)
  http://cscircles.cemc.uwaterloo.ca/websheets/index.php (Java 8)
 
-Note that you can link to a particular exercise with
+You can link to a particular exercise with
 .../index.php#NameAge
 or a group of exercises with 
 .../index.php?group=HelloWorld+NameAge+NextYear#NameAge
+
+MANUAL
+
+To read about how to write new exercises, visit manual.html, mirrored at
+http://cscircles.cemc.uwaterloo.ca/websheets/manual.html
 
 BASIC INSTALLATION
 
