@@ -14,7 +14,7 @@ programming practice tool, grouped by topic.
 $categories = <<<EOT
 [
  ["Intro and Cmd Line Args", 
-  ["HelloWorld", "NameAge", "NextYear", "SquareOf", "SquareSwap"]],
+  ["HelloWorld", "TwoPlusTwo", "NameAge", "NextYear", "SquareOf", "SquareSwap"]],
  ["Data Types",
   ["Eggsactly", "PercentScore", "PizzaCalculator", "WindChill", "Distance", "ThreeSort"]],
  ["Loops and Conditionals",
@@ -91,7 +91,7 @@ foreach ($categorized_exercises as $c_ex => $whatevs)
 ?>
 
 <p>
-You can also view the <a href="https://github.com/daveagp/websheets">Websheets source code</a>.
+You can also view the <a href="https://github.com/daveagp/websheets">Websheets source code</a> or <a href="manual.html">manual</a>.
 </body>
 
 

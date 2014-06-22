@@ -4,13 +4,38 @@
    <link rel="stylesheet" href="websheet.css?7">
    <script type="text/javascript" 
     src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+ <script type='text/javascript'>
+var observeNew = function(root, options, callback) {
+  var mo = new MutationObserver( 
+    function (events) {
+      for (var i=0; i<events.length; i++) 
+        for (var j=0; j<events[i].addedNodes.length; j++) 
+          callback(events[i].addedNodes[j]);
+    }
+  );
+  mo.observe(root, options);
+  $(function() {mo.disconnect;});
+};
+
+// expand shortcut for double-links
+observeNew(document, {childList: true, subtree: true}, function (elt) {
+  if (elt.nodeName=="SPAN" && elt.classList.contains("EG")) {
+    var slug = elt.getAttribute("data-slug");
+    var html = 
+"<a href='https://github.com/daveagp/websheets/blob/master/exercises/"+slug+
+".py'><tt>"+slug+".py</tt></a> and its <a href='index.php?group="+slug+
+"'>websheet</a>";
+    $(elt).html(html);
+  }
+});
+ </script>
 </head>
 <body>
  <div id="page">
  <h1>Websheets Manual</h1>
  This manual describes how to write new exercises. It doesn't 
- cover installation &mdash; see the README or the 
- <a href="https://github.com/daveagp/websheets">git repository</a> instead.
+ cover installation &mdash; for that, see the README or the 
+ <a href="https://github.com/daveagp/websheets">git repository</a>.
 
 <h2>Format Overview</h2>
 
@@ -50,37 +75,38 @@ Reviewing the above, you must define the fields
 
 <ul>
 <li><tt>source_code</tt>, a correct reference Java program with 
-some areas <tt>\[</tt> blanked out <tt>]\</tt> to be filled in by the student, 
+some areas <tt>\[</tt> blanked out <tt>]\</tt> to be filled in by the student 
+<ul><li>anything not between <tt>\[...]\</tt> delimiters is read-only (try it!)</ul>
 <li><tt>tests</tt>, a snippet of Java code calling the testing API, 
 which compares the behaviour of the student's solution and the reference solution
 <li><tt>description</tt>, an HTML fragment that will be shown to the student,
 that explains what they should do.
 </ul>
 
-<p>Note: there are a few other optional fields beyond these three.
-
 <p>
+There are a few other optional fields beyond these three.
 Here are the sections of this manual, which describe how to write each 
 component in more detail:
  <ul id='sections'>
  </ul>
  <script type='text/javascript'>
-$(function() { // do this on load
-  var toc = "";
-  $("h2, h3").each(function(i, header) {
-    if ($(header).is("h2") && toc != "") toc += "</ul>";
-    toc += "<li><a href='#sect"+i+"'>"+$(header).html()+"</a></li>";
-    if ($(header).is("h2")) toc += "<ul>";
-    $(header).prepend("<a id='sect"+i+"'></a>");
-  });
-  toc += "</ul>";
-  console.log(toc);
-  $("#sections").html(toc);
+// build table of contents
+var numSections = 0;
+observeNew(window.page, {childList: true}, function (elt) {
+  if (elt.nodeName=="H2" || elt.nodeName=="H3") {
+    var appendTo = $("ul#sections"); // if H2
+    if (elt.nodeName=="H3")
+      appendTo = $("ul#sections > li:last-child > ul");
+    appendTo.append("<li><a href='#sect"+numSections+"'>"
+             +$(elt).html()+"</a><ul></ul></li>");
+    $(elt).prepend("<a id='sect"+numSections+"'></a>");
+    numSections++;
+  }
 });
  </script>
 
 Of course, looking at existing examples is the most thorough way to understand
-what's going on, once you're familiar with the main concepts in this manual.
+what's going on, once you're familiar with the main concepts.
 
 <h2><tt>source_code</tt>: The reference solution and blank locations</h2>
 
@@ -88,7 +114,7 @@ When writing a websheet, normally you will start by writing
 the <tt>source_code</tt> as a correct solution to the problem. (Note that 
 you can either write in <tt>public class ExerciseName</tt> like 
 <a href="https://github.com/daveagp/websheets/blob/master/exercises/HelloWorld.py"><tt>HelloWorld.py</tt></a>
-or leave it out, like <tt>TwoPlusTwo</tt> above.)
+or let it be filled in implicitly, like <tt>TwoPlusTwo</tt> above.)
 
 <p>
 Once you fill in a working program, you need to decide on what parts
@@ -106,8 +132,7 @@ Try typing some stuff in the blanks and see how they resize to accomodate unlimi
 <p>
 Both kinds of blanks are indicated by using <tt>\[</tt> to denote the start of the blank,
 and <tt>]\</tt> to denote the end of the blank. The interior region will be left blank and editable for
-the user, while anything not between <tt>\[...]\</tt> delimiters will be read-only. (E.g., 
-recall the <a href='#eg4'><tt>TwoPlusTwo</tt></a> example.)
+the user.
 
 <p>
 The rules for how these delimiters must appear in <tt>source_code</tt> are:
@@ -125,7 +150,7 @@ defines both kinds of blanks.
 <p>
 (In the multi-line case, additional whitespace on the lines
 containing the delimiters is currently ignored, although it
-could be meaningful in a later version where Python is used and 
+could be meaningful in a later version, say where Python is used and 
 we want to force indentation of a region.)
 
 <h3>Hidden code, fake code, default contents for blanks</h3>
@@ -139,8 +164,8 @@ from the student's UI. It will be included in both the reference
 solution and the student's combined solution that gets executed upon submission.
 For examples, see
 <ul>
-<li><tt>NSwap</tt>, where it is used in-line to hide a call to <tt>.clone()</tt>
-<li><tt>CountingSort</tt>, where it is used multi-line to include an inner class
+<li><span class='EG' data-slug='NSwap'></span>, where it is used in-line to hide a call to <tt>.clone()</tt>
+<li><span class='EG' data-slug='CountingSort'></span>, where it is used multi-line to include an inner class
 </ul>
 
 <p>
@@ -148,8 +173,8 @@ You can use <tt>\fake[...]\</tt> to display read-only text in the user interface
 that looks like it is part of the program, but that won't actually be included.
 For examples, see
 <ul>
-<li><tt>NSwap</tt>, where it is used in-line to show pseudocode in the middle of a program
-<li><tt>SquareSwap</tt>, where it is used similarly, but to contain multiple lines
+<li><span class='EG' data-slug='NSwap'></span>, where it is used in-line to show pseudocode in the middle of a program
+<li><span class='EG' data-slug='SquareSwap'></span>, where it is used similarly, but to contain multiple lines
 </ul>
 
 <p>
@@ -158,7 +183,7 @@ You can use <tt>\show:</tt> to have a blank initially populated with some text.
 change <tt>\[ blanked-out text ]\</tt> to <tt>\[ blanked-out text \show: default text here ]\</tt>.
 For example, see
 <ul>
-<li><tt>Vector</tt>, where it is used in multi-line syntax to give a strawman constructor
+<li><span class='EG' data-slug='Vector'></span>, where it is used in multi-line syntax to give a strawman constructor
 <li>(No current example uses the in-line syntax.)
 </ul>
 
@@ -172,10 +197,10 @@ table td, table th {
 <tr><td></td><td>in UI?</td><td>in reference solution?</td><td>in executed/tested combined student solution?</td></tr>
 <tr><th>plain text</th>            <td>yes (read-only)</td>   <td>yes</td> <td>yes</td>
 </tr><tr>
-<th>blanked-out <tt>\[...]\)</tt></th> <td>yes (editable, initially blank)</td> 
+<th>blanked-out <tt>\[...]\</tt></th> <td>yes (editable, initially blank)</td> 
 <td>yes</td> <td>yes (edited student text spliced in)</td>
 </tr><tr>
-<th><tt>\show:</tt> of blanked-out:</th> <td>yes (editable)</td> <td>no</td> <td>yes (edited student text spliced in)</td>
+<th><tt>\show:</tt> of blanked-out</th> <td>yes (editable)</td> <td>no</td> <td>yes (edited student text spliced in)</td>
 </tr><tr>
 <th><tt>\fake[ ... ]\</tt></th>         <td>yes (read-only)</td><td>no</td><td>no</td>
 </tr><tr>
@@ -183,7 +208,7 @@ table td, table th {
 </tr>
 </table>
 
-<h2><tt>description</tt>: The Exercise Description, in HTML</h2>
+<h2><tt>description</tt>: The exercise description, in HTML</h2>
 
 You can use as few or as many HTML elements as you like in describing the
 exercise. The simplest descriptions are just text, using <tt>&lt;p&gt;</tt> to separate
@@ -192,25 +217,23 @@ paragraphs, and sometimes using <tt>&lt;tt&gt;</tt> and <tt>&lt;pre&gt;</tt> to 
 <p>
 <b>LaTeX.</b> All websheets have MathJaX processing turned on. This means that you can
 include LaTeX using $inline format$ or $$big centered display format$$.
-Look at <a href="https://github.com/daveagp/websheets/blob/master/exercises/Distance.py"><tt>Distance.py</tt></a>
- and the resulting <a href="index.php?group=Distance"</a><tt>Distance</tt> websheet</a>
+Look at <span class='EG' data-slug='Distance'></span>
 for examples of both.
 
 <p>
 <b>Links.</b> Sometimes you'll want to add a link to another websheet inside 
 of the description. One way to do this nicely is to write a link with a URL like
 <pre>&lt;a href="?group=SquareSwap"&gt;SquareSwap&lt;/a&gt;</pre>
-Look at <a href="https://github.com/daveagp/websheets/blob/master/exercises/NSwap.py"><tt>NSwap.py</tt></a>
- and the resulting <a href="index.php?group=NSwap"</a><tt>NSwap</tt> websheet</a>
-for example.
+E.g. see <span class='EG' data-slug='NSwap'></span>.
 
 <p>
 <b>Diagrams.</b>
 You can use any software and any formats you like, but the example exercises 
 using diagrams 
-(<a href="index.php?group=SquareSwap+FourChargeClient"</a><tt>SquareSwap</tt> and <tt>FourChargeClient</tt></a>)
+(e.g.
+<a href="index.php?group=SquareSwap+FourChargeClient"</a><tt>SquareSwap</tt> and <tt>FourChargeClient</tt></a>)
 were created using <a href="http://ipe7.sourceforge.net/">IPE</a> (which uses PDFs as an editable format)
-and rasterized using  <a href="https://github.com/daveagp/websheets/blob/master/exercises/render.sh"><tt>render.sh</tt></a>.
+and rasterized to PNG using  <a href="https://github.com/daveagp/websheets/blob/master/exercises/render.sh"><tt>render.sh</tt></a>.
 
 <h2><tt>tests</tt>: What the grader should test (subject to change!)</h2>
 
@@ -268,7 +291,7 @@ testStdin = {String}
 testStdinURL = {String}
 </pre>
 
-<h2>Optional Websheet Fields</h2>
+<h2>Optional websheet fields</h2>
 Here are a couple of other fields that are available for use in websheets.
 
 <dl>
@@ -277,8 +300,7 @@ Here are a couple of other fields that are available for use in websheets.
   same as the name of the overall exercise (the Python module name,
   referred to internally as the slug).</dd>
 <dd>
-E.g. <a href="https://github.com/daveagp/websheets/blob/master/exercises/MonkeyAddStart.py"><tt>MonkeyAddStart.py</tt></a>
-and <a href="index.php?group=MonkeyAddStart">websheet</a>.
+E.g. <span class='EG' data-slug='MonkeyAddStart'></span>.
 </dd>
 
 <dt><tt>show_class_decl</tt></dt>
@@ -286,39 +308,34 @@ and <a href="index.php?group=MonkeyAddStart">websheet</a>.
 set to <tt>False</tt> if you don't want the user to
   see the class declaration.</dd>
 <dd>
-E.g. <a href="https://github.com/daveagp/websheets/blob/master/exercises/SquareSwap.py"><tt>SquareSwap.py</tt></a>
-and <a href="index.php?group=SquareSwap">websheet</a>.
+E.g. <span class='EG' data-slug='SquareSwap'></span>.
 </dd>
 
 <dt><tt>epilogue</tt></dt>
 <dd>show a message or explanation after problem is completed.</dd>
 <dd>
-E.g. <a href="https://github.com/daveagp/websheets/blob/master/exercises/PercentScore.py"><tt>PercentScore.py</tt></a>
-and <a href="index.php?group=PercentScore">websheet</a>.
+E.g. <span class='EG' data-slug='PercentScore'></span>.
 </dd>
 
 <dt><tt>dependencies</tt></dt>
 <dd> require student to complete some other websheet before
  this one; student's solution to the dependency will be made available when compiling executing this one.</dd>
 <dd>
-E.g. <a href="https://github.com/daveagp/websheets/blob/master/exercises/TigerBook.py"><tt>TigerBook.py</tt></a>
-and <a href="index.php?group=TigerBook">websheet</a>.
+E.g. <span class='EG' data-slug='TigerBook'></span>.
 </dd>
 <dd>
 Note: if instead you want to give student extra reference code without requiring them
 to actually complete the dependency, you can use <tt>\hide</tt> instead:
 </dd>
 <dd>
-E.g. <a href="https://github.com/daveagp/websheets/blob/master/exercises/CountingSort.py"><tt>CountingSort.py</tt></a>
-and <a href="index.php?group=CountingSort">websheet</a>.
+E.g. <span class='EG' data-slug='CountingSort'></span>.
 </dd>
 
 <dt><tt>imports</tt></dt>
 <dd>a list of classes to import (will be made visible in UI and added to reference solution)
 </dd>
 <dd>
-E.g. <a href="https://github.com/daveagp/websheets/blob/master/exercises/CME.py"><tt>CME.py</tt></a>
-and <a href="index.php?group=CME">websheet</a>.
+E.g. <span class='EG' data-slug='CME'></span>.
 </dd>
 
 </dl>
