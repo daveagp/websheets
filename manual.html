@@ -77,10 +77,10 @@ Reviewing the above, you must define the fields
 <li><tt>source_code</tt>, a correct reference Java program with 
 some areas <tt>\[</tt> blanked out <tt>]\</tt> to be filled in by the student 
 <ul><li>anything not between <tt>\[...]\</tt> delimiters is read-only (try it!)</ul>
-<li><tt>tests</tt>, a snippet of Java code calling the testing API, 
-which compares the behaviour of the student's solution and the reference solution
 <li><tt>description</tt>, an HTML fragment that will be shown to the student,
 that explains what they should do.
+<li><tt>tests</tt>, a snippet of Java code calling the testing API, 
+which compares the behaviour of the student's solution and the reference solution
 </ul>
 
 <p>
@@ -339,6 +339,16 @@ E.g. <span class='EG' data-slug='CME'></span>.
 </dd>
 
 </dl>
+
+<h2>Adding new exercises to the system</h2>
+<ol>
+<li>Create a new <tt>.py</tt> file in the above format in the 
+<tt>exercises</tt> directory. (E.g., <tt>NewProblem.py</tt>)
+<li>Go visit 
+<tt><a href="index.php?group=NewProblem">index.php?group=NewProblem</a></tt>
+in your browser. Or, refresh <tt><a href="index.php">index.php</a></tt>
+and select <b>NewProblem</b> from the list of exercises.
+</ol>
 
  </div>
 </body>
