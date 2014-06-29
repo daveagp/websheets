@@ -145,12 +145,12 @@ testOn("mpThrow", "programCounter");
 expectException = true;
 testOn("mpThrow", "valueOf", "one");
 
-HTMLdescription = "Running <tt>java-introcs MPRun </tt>";
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/sample.txt";
+title = "Running <tt>java-introcs MPRun </tt>";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/sample.txt";
 test("MPRun_main");
 
-HTMLdescription = "Running <tt>java-introcs MPRun </tt>";
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/swap.txt";
+title = "Running <tt>java-introcs MPRun </tt>";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/swap.txt";
 test("MPRun_main");
 
 String program = "a = 1\nb = 2\nc = 3\ntmp = a\na = b\nb = c\nc = tmp\na println\nb println\nc println";

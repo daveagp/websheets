@@ -29,12 +29,12 @@ public static void main(String[] args) {
 }"""
 
 tests = r"""
-testStdin = "2.0 8";
+stdin = "2.0 8";
 testMain();
-testStdin = "1.1 3";
+stdin = "1.1 3";
 testMain();
-testStdin = "-1 4";
+stdin = "-1 4";
 testMain();
-testStdin = "126 10";
+stdin = "126 10";
 testMain();
 """

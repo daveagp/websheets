@@ -235,7 +235,7 @@ using diagrams
 were created using <a href="http://ipe7.sourceforge.net/">IPE</a> (which uses PDFs as an editable format)
 and rasterized to PNG using  <a href="https://github.com/daveagp/websheets/blob/master/exercises/render.sh"><tt>render.sh</tt></a>.
 
-<h2><tt>tests</tt>: What the grader should test (subject to change!)</h2>
+<h2><tt>tests</tt>: What the grader should test</h2>
 
 The <tt>tests</tt> contains a snippet of Java code that makes calls to
 our testing API. These API calls cause the automatic grader to dynamically
@@ -262,37 +262,273 @@ You can even define
 <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html">anonymous</a>
 classes if you need to define methods or classes, although no current examples do this.
 
-<p>
-The testing API still needs to be refactored (should be done by mid-July). So 
-this is not yet fully documented, as it is subject to major changes.
-However, as of time of writing, here are the different things that
-are part of current tests:
+<h3>Basics: testing static methods</h3>
+
+The testing methods <tt>testMain()</tt>, 
+<tt>test()</tt> for instance methods, 
+<tt>testConstructor()</tt> for constructors,
+and <tt>testOn()</tt> for instance methods 
+are used to execute 
+student code and execute reference code and compare the results. It handles
+things like comparing return values, capturing and comparing printed output,
+catching and comparing exceptions, and looking for changes to arguments 
+automatically. 
+
+<dl>
+<dt><tt>testMain(String... args)</tt></dt>
+<dd>call <tt>main</tt> on these arguments.</dd>
+<dd>E.g. see <span class='EG' data-slug='ModularSqrt'></span></dd>
+
+<dt><tt>test(String methodName, Object... args)</tt></dt>
+<dd>call a <i>static</i> method named <tt>methodName</tt> on this list of arguments</dd>
+<dd>
+E.g. see <span class='EG' data-slug='Boxed'></span>
+</dd>
+<dd>note: if there's exactly one argument, which is an array, Java requires you use
+    <pre>test(methodName, (Object) /* your array here */)</pre>
+  due to inherent ambiguity in varargs
+</dd>
+</dl>
+
+<h3>Basics: testing instance methods</h3>
+
+For testing instance methods, you'll generally call a constructor defined by
+the student, and then call an instance method. The typical approach involves
+3 steps, like this sample from
+<span class='EG' data-slug='Clicker'></span>:
 
 <pre>
-cloneForStudent = {boolean}
-construct(null, "Person", "", "Tony");
-construct("stdlibpack", "Queue", "&lt;Integer&gt;");
-dontRunReference = {boolean}
-expectException = {boolean}
-testConstructor();
-HTMLdescription = {String}
-quietOnPass = {boolean}
-remark(String)
-saveAs = {String}
-var(String)
-setMaxOutputBytes
-store()
-test()
-testConstructor()
-testMain()
-testNamedMain()
-testOn()
-testStdin = {String}
-testStdinURL = {String}
+saveAs = "attendance"; // (1)
+testConstructor(); // (2)
+testOn("attendance", "curr"); // (3). i.e. attendance.curr() 
 </pre>
 
+This means, 
+<ul>
+<li>(2) call the zero-argument constructor defined by the student,
+<li>(1) save the result as a variable named <tt>attendance</tt>, 
+<li>(3) call the instance method curr with no arguments on <tt>attendance</tt>
+ object.
+</ul>
+
+<dl>
+<dt><tt>saveAs = <i>String</i></tt>&nbsp; (default <tt>null</tt>)</dt>
+<dd>
+  save the value returned by the next test as a named object. 
+  (implementation note: we maintain two parallel namespaces for student 
+   and reference solutions.) 
+</dd>
+<dd>
+<i>Note</i>: 
+you can save anything, not just constructor calls. 
+E.g. in <span class='EG' data-slug='Vector'></span>,
+  we save a method's return value:
+<pre>
+saveAs = "scaled";
+testOn("x", "times", 10.0);
+</pre>
+</dd>
+
+<dt><tt>testConstructor(Object... args)</tt></dt>
+<dd>call the constructor with this list of arguments</dd>
+
+<dt><tt>testOn(String instanceName, String methodName, Object... args)</tt></dt>
+<dd>
+on the named instance, call the named instance method with this list of arguments
+</dd>
+</dl>
+Here is one more tool used in conjunction with <tt>saveAs</tt>.
+<dl>
+<dt>
+<tt>var(String)</tt>
+</dt>
+<dd>
+once an object is saved, you may want to pass it an argument to a method, 
+rather
+than just calling its instance methods. 
+For example in <span class='EG' data-slug='Vector'></span>, after constructing
+  two objects <tt>x</tt> and <tt>y</tt>,
+   we call <tt>x.plus(y)</tt> like so:
+    <pre>testOn("x", "plus", var("y"));</pre>
+  basically, the <tt>var()</tt> wrapper is needed to distinguish the saved variable y 
+from the string literal <tt>"y"</tt>
+</dd>
+</dl>
+
+<h3>Basics: exceptions and standard input</h3>
+
+<dl>
+<dt><tt>expectException = <i>boolean</i></tt>&nbsp; (default <tt>false</tt>)
+</dt>
+<dd> indicates that
+the student code should throw an exception on the following test.
+  (it will catch whatever exception the reference code throws, and
+  expect the student code to throw the same class of exception)
+</dd>
+<dd>
+E.g., <span class='EG' data-slug='BinaryInteger'></span>.
+</dd>
+
+<dt>
+<tt>stdin = <i>String</i></tt>&nbsp; (default <tt>null</tt>)
+</dt>
+<dd>
+for the next test, set the contents of 
+standard input to the following <tt>String</tt>
+</dd>
+<dd>
+E.g., <span class='EG' data-slug='MaxMin'></span>.
+</dd>
+
+<dt>
+<tt>stdinURL = <i>String</i></tt>&nbsp; (default <tt>null</tt>)
+</dt>
+<dd>
+same as <tt>stdin</tt>, but fetch this webpage and use its contents. 
+Useful when there is a long data set posted online, and you prefer not to
+copy a long text into the websheet definition
+</dd>
+<dd>
+E.g., <span class='EG' data-slug='QMerge'></span>.
+</dd>
+<dd>note: use simple string literals only. 
+e.g. <tt>stdURL = "http://goo.gl/" + "robots.txt";</tt>
+is bad, it will confuse the prefetcher that grabs the data before starting
+  the sandbox.
+</dd>
+</dl>
+
+<h3>More testing API methods</h3>
+
+<dl>
+
+<dt><tt>remark(String s)</tt></dt>
+<dd>Print out a remark to the user explaining what the 
+tests are doing. <tt>s</tt> should be valid HTML. c.f. <tt>title = </tt> which replaces the automatically-generated test description.
+</dd>
+<dd>
+E.g., <span class='EG' data-slug='MonkeyAddEnd'></span>.
+</dd>
+
+<dt><tt>store(Object o)</tt></dt>
+<dd>Copy an object to the user and reference namespace. Used
+for checking shallow copying in 
+<span class='EG' data-slug='Vector'></span>.
+</dd>
+
+<dt>
+<tt>construct(String pckg, String clss, String type_prms, Object... args)
+</tt></dt>
+<dd>
+Use this to create a new instance of some <i>other</i> class.
+It is best seen by these two examples:
+</dd>
+<dd>
+In <span class='EG' data-slug='QMerge'></span> we call
+<pre>construct("stdlibpack", "Queue", "&lt;Integer&gt;")</pre>
+to mimic a call to <tt>new Queue&lt;Integer&gt;()</tt> (the package
+<a href="https://github.com/daveagp/java_jail/tree/master/cp/stdlibpack"><tt>stdlibpack</tt></a>
+ has the COS 126 "standard" classes, and we want the <tt>Queue</tt> from
+that package)
+</dd>
+<dd>
+In <span class='EG' data-slug='TigerBook'></span> we call
+<pre>construct(null, "Person", "", "Tony")</pre>
+to mimic a call to <tt>new Person("Tony")</tt>. Note <tt>Person</tt> is 
+in the <tt>dependencies</tt> of that websheet. Leaving <tt>pckg</tt> as 
+<tt>null</tt> means that the student's code uses the <tt>Person</tt> from
+the student package while the reference uses the one from the reference 
+package.
+</dd>
+<dd><i>Note:</i> because <tt>construct</tt> is implemented using 
+the same infrastructure as the <tt>test*</tt> methods, 
+it will reset all options to their defaults.</dd>
+
+<dt><tt>testNamedMain(String methodToCall, String fakeClassName, String... args)</tt></dt>
+<dd>
+Call some hidden internal method, but pretend you
+are calling <tt>main(args)</tt> on some other testing class.
+Used in
+<span class='EG' data-slug='TigerBook'></span>.
+</dd>
+</dl>
+
+<h3>More options</h3>
+
+<dl>
+<dt><tt>title = <i>String</i>&nbsp;</tt> (default <tt>null</tt>)</dt>
+<dd>
+<i>replace</i> the automatically-generated description <i>of the 
+next test</i> with 
+the given HTML. <br>
+c.f. <tt>remark()</tt> which adds <i>extra</i> 
+commentary before the next test
+</dd>
+<dd>E.g. <span class='EG' data-slug='SquareSwap'></span>.</dd>
+<dd>E.g. <span class='EG' data-slug='MiniPro2'></span>.</dd>
+
+<dt><tt>quietOnPass = <i>boolean</i></tt>&nbsp; (default <tt>false</tt>)</dt>
+<dd>
+Don't show the next test unless the student fails it. Especially useful if you
+have a lot of tests.
+</dd>
+<dd>E.g. <span class='EG' data-slug='MonkeyTraverse'></span>.</dd>
+<dd>E.g. <span class='EG' data-slug='RegularExercise'></span>.</dd>
+
+<dt><tt>maxOutputBytes = <i>int</i></tt>&nbsp; (default <tt>10000</tt>) </dt>
+<dd>Change the maximum number of bytes the student code can print
+per test before it is terminated.</dd>
+<dd>E.g. <span class='EG' data-slug='FrequencyTable'></span>.</dd>
+<dd>E.g. <span class='EG' data-slug='QMerge'></span>.</dd>
+
+<dt><tt>dontRunReference = <i>boolean</i></tt>&nbsp; (default <tt>false</tt>)</dt>
+<dd>Don't run the reference solution. Instead, rely on either
+template code or hidden code that will determine if the student
+passes, and which will throw an exception if they failed, but not
+if they passed.</dd>
+<dd>E.g. <span class='EG' data-slug='FJSort'></span>.</dd>
+<dd>E.g. <span class='EG' data-slug='FTPLimiter'></span>.</dd>
+
+<dt><tt>cloneForStudent = <i>boolean</i></tt>&nbsp; (default <tt>true</tt>)</dt>
+<dd>Before passing arguments to the student, clone them. So if the 
+student mutates the arguments, it doesn't affect the grader.</dd>
+<dd>This is turned off to check shallow copying in <span class='EG' data-slug='Vector'></span>.</dd>
+
+<dt><tt>cloneForReference = <i>boolean</i></tt>&nbsp; (default <tt>true</tt>)</dt>
+<dd>Same as above, but for reference code. No current example.</dd>
+
+<dt><tt>realTolerance = <i>double</i></tt>&nbsp; (default <tt>1E-4</tt>)</dt>
+<dd>Relative error accepted for outputs. (Except if reference answer is 0,
+this is the absolute error accepted.) No current example.</dd>
+
+<dt><tt>ignoreRealFormatting = <i>boolean</i></tt>&nbsp; (default <tt>true</tt>)</dt>
+<dd>If <tt>false</tt>, ignore <tt>realTolerance</tt>,
+also don't accept <tt>5.00</tt> as the same as <tt>5.0</tt>. No current example.</dd>
+
+<dt><tt>ignoreTrailingSpaces = <i>boolean</i></tt>&nbsp; (default <tt>true</tt>)</dt>
+<dd>Ignore trailing spaces at the end of each line. No current example.
+</dd>
+
+</dl>
+
+<h3>More tools</h3>
+<dt><tt>defaultOptions</tt></dt>
+<dd>To set an option permanently (as opposed to just for one test),
+use syntax like
+<pre>defaultOptions.quietOnPass = true;</pre>
+This works for the above section and the variables mentioned earlied
+like <tt>expectException</tt>.
+E.g, see <span class='EG' data-slug='RegularExercise'></span>.</dd>
+</dd>
+
+<dt><tt>randgen</tt></dt>
+<dd>
+This is a <tt><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Random.html">Random</a></tt> instance
+just made available for convenience. E.g., see 
+ <span class='EG' data-slug='AgeChecker'></span>.</dd>
+
 <h2>Optional websheet fields</h2>
-Here are a couple of other fields that are available for use in websheets.
+Here are a couple of other fields that are available for use in websheets
 
 <dl>
 <dt><tt>classname</tt></dt>
@@ -319,7 +555,8 @@ E.g. <span class='EG' data-slug='PercentScore'></span>.
 
 <dt><tt>dependencies</tt></dt>
 <dd> require student to complete some other websheet before
- this one; student's solution to the dependency will be made available when compiling executing this one.</dd>
+ this one; the student's most recent correct solution to the dependency 
+ will be made available when compiling executing this one.</dd>
 <dd>
 E.g. <span class='EG' data-slug='TigerBook'></span>.
 </dd>

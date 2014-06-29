@@ -9,7 +9,63 @@ import java.util.Timer;
 import java.util.TimerTask;
 import javax.json.*;
 
-public abstract class GenericTester {
+class Options { 
+    // would make more sense as protected, but doesn't work with reflection below
+    protected String title;
+    protected Boolean quietOnPass;
+    protected String stdin;
+    protected String stdinURL;
+    protected String saveAs;
+    protected Boolean expectException;
+    protected Boolean cloneForStudent;
+    protected Boolean cloneForReference;
+    protected Boolean ignoreTrailingSpaces;
+    protected Boolean ignoreRealFormatting;
+    protected Double realTolerance;
+    protected Integer maxOutputBytes;
+    protected Boolean dontRunReference;
+
+    static Options defaultOptions;
+    static Options nullOptions;
+    static {
+        nullOptions = new Options();
+        defaultOptions = new Options();
+        defaultOptions.quietOnPass = false;
+        defaultOptions.expectException = false;
+        defaultOptions.cloneForStudent = true;
+        defaultOptions.cloneForReference = true;
+        defaultOptions.ignoreTrailingSpaces = true;
+        defaultOptions.ignoreRealFormatting = true;
+        defaultOptions.realTolerance = 1E-4;
+        defaultOptions.maxOutputBytes = 10000;
+        defaultOptions.dontRunReference = false;
+        // the remaining String fields have default value equal to null
+    }
+
+    void copyFrom(Options o, boolean overwriteNonNull) {
+        if (overwriteNonNull || this.title == null) this.title = o.title;
+        if (overwriteNonNull || this.quietOnPass == null) this.quietOnPass = o.quietOnPass;
+        if (overwriteNonNull || this.stdin == null) this.stdin = o.stdin;
+        if (overwriteNonNull || this.stdinURL == null) this.stdinURL = o.stdinURL;
+        if (overwriteNonNull || this.saveAs == null) this.saveAs = o.saveAs;
+        if (overwriteNonNull || this.expectException == null) this.expectException = o.expectException;
+        if (overwriteNonNull || this.cloneForStudent == null) this.cloneForStudent = o.cloneForStudent;
+        if (overwriteNonNull || this.cloneForReference == null) this.cloneForReference = o.cloneForReference;
+        if (overwriteNonNull || this.ignoreTrailingSpaces == null) this.ignoreTrailingSpaces = o.ignoreTrailingSpaces;
+        if (overwriteNonNull || this.ignoreRealFormatting == null) this.ignoreRealFormatting = o.ignoreRealFormatting;
+        if (overwriteNonNull || this.realTolerance == null) this.realTolerance = o.realTolerance;
+        if (overwriteNonNull || this.maxOutputBytes == null) this.maxOutputBytes = o.maxOutputBytes;
+        if (overwriteNonNull || this.dontRunReference == null) this.dontRunReference = o.dontRunReference;
+    }
+    
+    // replace any null field with value from defaultOptions
+    void fillWithDefaults() { copyFrom(defaultOptions, false); }
+
+    // set all options to null
+    void clear() { copyFrom(nullOptions, true); }
+}
+
+public abstract class GenericTester extends Options {
 
     public static String classToString(Class<?> clazz) {
         if (clazz.isArray()) return classToString(clazz.getComponentType())+"[]";
@@ -107,13 +163,6 @@ public abstract class GenericTester {
         return a.equals(b);
     }
 
-    // only works for int[] so far
-    public static String typerepr(Object O) {
-	if (O instanceof int[]) return "int[]";
-	if (O instanceof String[]) return "String[]";
-	return "???";
-    }
-
     public static String repr(Object O) {
         if (O instanceof NamedObject) {
             return ((NamedObject)O).name;
@@ -125,8 +174,7 @@ public abstract class GenericTester {
 	    return "null";
 	}
 	else if (O.getClass().isArray()) {
-	    String tmp = //"new " + typerepr(O) +" "+
-                       "{";
+	    String tmp = "{";
 	    for (int i=0; i<Array.getLength(O); i++) {
 		if (i != 0) tmp += ", ";
 		tmp += repr(Array.get(O, i));
@@ -141,16 +189,6 @@ public abstract class GenericTester {
     public static String rtrim(String S) {
         return RTRIMEND.matcher(S).replaceAll("");
     }
-
-    /*
-    private static Pattern RTRIMLINE = Pattern.compile(" +\n");
-
-    // remove all trailing whitespaces from every line
-    public static String rtrimLines(String S) {
-        String tmp = RTRIMLINE.matcher(S).replaceAll("\n");
-        return RTRIMEND.matcher(tmp).replaceAll("");
-    }
-    */
 
     private static class FailTestException extends RuntimeException {
         FailTestException(String msg) {
@@ -167,14 +205,9 @@ public abstract class GenericTester {
         }
     }
     
-    static BasicTestCase currentlyExecutingTestCase;
-
-    public static boolean quietOnPass = false;
-    
     protected class BasicTestCase {
         final protected String methodName;
         final protected Object[] args;
-	final String saveAs;
         final String apparentName;
         final String thisName;
         final String packaje;
@@ -191,19 +224,15 @@ public abstract class GenericTester {
             this(packaje, methodName, args, apparentName, null);
         }
         protected BasicTestCase(String packaje, String methodName, Object[] args, String apparentName, String thisName) {
-            currentlyExecutingTestCase = this;
             this.methodName = methodName;
             this.args = args;
             this.packaje = packaje;
-	    this.saveAs = GenericTester.this.saveAs;
-	    GenericTester.this.saveAs = null; //reset
             this.thisName = thisName;
             this.apparentName = apparentName;
         }
         protected void describe() {
-            if (HTMLdescription != null) {
-                graderOut.print(HTMLdescription);
-                HTMLdescription = null;
+            if (title != null) {
+                graderOut.print(title);
             }
             else {
                 String tmp = "";
@@ -229,20 +258,19 @@ public abstract class GenericTester {
                 }
                 graderOut.println(code(tmp));
             }
-            if (testStdinURL != null) {
-                String[] urlSplit = testStdinURL.split("/");
-                graderOut.println("<code> &lt; <a target=\"_blank\" href=\""+testStdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>");                
-                //testStdin = new In(testStdinURL).readAll();
-                testStdin = testerStdin.getJsonObject("fetched_urls").
-                    getString(testStdinURL);
-                testStdinURL = null;
-                suppressStdinDescription = true;
+            if (stdinURL != null) {
+                String[] urlSplit = stdinURL.split("/");
+                graderOut.println("<code> &lt; <a target=\"_blank\" href=\""+stdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>");                
+                //stdin = new In(stdinURL).readAll();
+                stdin = testerStdin.getJsonObject("fetched_urls").
+                    getString(stdinURL);
             }
 	    describeStdin();
         }
 	protected void describeStdin() {
-	    if (testStdin != null && !suppressStdinDescription) {
-		graderOut.println(" with standard input"+pre(testStdin));
+            // don't show when "java Foo < input.txt" form is used
+	    if (stdin != null && stdinURL == null) {
+		graderOut.println(" with standard input"+pre(stdin));
 	    }
 	}
 
@@ -347,11 +375,12 @@ public abstract class GenericTester {
 
 
         public void execute() {
+            ((Options)(GenericTester.this)).fillWithDefaults();
             if (quietOnPass) {
                 gbaos = new ByteArrayOutputStream();
                 graderOut = new PrintStream(gbaos);
             }
-            boolean showHellip = testStdin == null;
+            boolean showHellip = stdin == null;
             graderOut.println("<div class='testcase-desc'>");
             describe();
             
@@ -372,7 +401,6 @@ public abstract class GenericTester {
             }
             else
                 test();
-	    cleanup();
             if (quietOnPass) {
                 graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));//orig_graderOut;
                 try {
@@ -384,12 +412,8 @@ public abstract class GenericTester {
                     throw new RuntimeException(e.toString());
                 }                
             }
+            ((Options)(GenericTester.this)).clear();
         }
-	public void cleanup() {
-	    suppressStdinDescription = false;
-            currentlyExecutingTestCase = null;
-            expectException = false;
-	}
     }
 
     // descendants must override this
@@ -403,13 +427,6 @@ public abstract class GenericTester {
     private InputStream orig_stdin = System.in;
     private PrintStream orig_stdout = System.out;
     private ByteArrayOutputStream baos;
-
-    static int maxOutputBytes = 10000;
-    public void setMaxOutputBytes(int limit) {
-        maxOutputBytes = limit;
-    }
-
-    public static boolean dontRunReference = false;
 
     protected void startStdoutCapture() {
         baos = new ByteArrayOutputStream() {
@@ -434,25 +451,6 @@ public abstract class GenericTester {
         }
     }
 
-    // ignore trailing space characters on every line
-    public boolean ignoreTrailingSpaces = true;
-
-    // see equalsApprox methods for more info
-    public boolean ignoreRealFormatting = true;
-
-    // accept replacements for double tokens that are pretty close
-    // only has any meaning if ignoreRealFormatting is true
-    public double realTolerance = 1E-4;
-
-    public String testStdin = null;
-    public String testStdinURL = null;
-    public String HTMLdescription = null;
-    public String saveAs = null;
-    public boolean suppressStdinDescription = false;
-    public boolean expectException = false;
-
-    public boolean cloneForStudent = true;
-    public boolean cloneForReference = true;
 
     TreeMap<String,Object> studentObjects = new TreeMap<>();
     TreeMap<String,Object> referenceObjects = new TreeMap<>();
@@ -764,16 +762,14 @@ public abstract class GenericTester {
         boolean constructors = referenceM instanceof Constructor;
 
         Capturer ref = null, stu = null;
-	String currStdin = testStdin;
-	testStdin = null;
         Object[] argsPassedToRef = lookupNamedObjects(args, referenceObjects);
         if (cloneForReference) argsPassedToRef = (Object[]) semicopy(argsPassedToRef);
         Object[] argsPassedToStu = lookupNamedObjects(args, studentObjects);
         if (cloneForStudent) argsPassedToStu = (Object[]) semicopy(argsPassedToStu);
         Throwable referenceException = null;
         Throwable studentException = null;
-	if (currStdin != null)
-	    StdIn.setString(currStdin);
+	if (stdin != null)
+	    StdIn.setString(stdin);
 
         if (referenceM == storePlaceholder) {
             ref = new StoreCapturer(argsPassedToRef[0]);
@@ -819,8 +815,8 @@ public abstract class GenericTester {
             }
             
             
-            if (currStdin != null)
-                StdIn.setString(currStdin);
+            if (stdin != null)
+                StdIn.setString(stdin);
             try {
                 if (methods) {                
                     stu = new InvokeCapturer((Method)studentM, thisName==null?null:studentObjects.get(thisName), argsPassedToStu);
@@ -909,9 +905,9 @@ public abstract class GenericTester {
             }
         }
 
-        if (currentlyExecutingTestCase.saveAs != null) {
-            studentObjects.put(currentlyExecutingTestCase.saveAs, stu.retval);
-            referenceObjects.put(currentlyExecutingTestCase.saveAs, ref.retval);
+        if (saveAs != null) {
+            studentObjects.put(saveAs, stu.retval);
+            referenceObjects.put(saveAs, ref.retval);
         }
         
         String mutationCommentary = checkForArgMutations(args, argsPassedToRef, argsPassedToStu);
@@ -987,9 +983,8 @@ public abstract class GenericTester {
         new BasicTestCase(realNameOfMain, new Object[] {argStrings}, "main") {
             protected void describe() {
 
-                if (HTMLdescription != null) {
-                    graderOut.print(HTMLdescription);
-                    HTMLdescription = null;
+                if (title != null) {
+                    graderOut.print(title);
                 }
                 else {
                     graderOut.print("Testing "); // can't be saved as an object
@@ -999,14 +994,12 @@ public abstract class GenericTester {
                     graderOut.print(tmp);
                 }
 
-                if (testStdinURL != null) {
-                    String[] urlSplit = testStdinURL.split("/");
-                    graderOut.println("<code> &lt; <a target=\"_blank\" href=\""+testStdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>");
-                    //testStdin = new In(testStdinURL).readAll();
-                    testStdin = testerStdin.getJsonObject("fetched_urls").
-                        getString(testStdinURL);
-                    testStdinURL = null;
-                    suppressStdinDescription = true;
+                if (stdinURL != null) {
+                    String[] urlSplit = stdinURL.split("/");
+                    graderOut.println("<code> &lt; <a target=\"_blank\" href=\""+stdinURL+"\">"+urlSplit[urlSplit.length-1]+"</a></code>");
+                    //stdin = new In(stdinURL).readAll();
+                    stdin = testerStdin.getJsonObject("fetched_urls").
+                        getString(stdinURL);
                 }
                 describeStdin();
             }}

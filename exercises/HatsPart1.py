@@ -91,12 +91,12 @@ test("isD", (Object)new int[]{9, 8, 7, 6, 5, 4, 3, 2, 1});
 test("isD", (Object)new int[]{1});
 test("isD", (Object)new int[]{2, 1});
 test("isD", (Object)new int[]{1, 2});
-testStdin = "9\n9 8 7 6 5 4 3 2 1\n3 7 6 9 8 2 1 5 4";
+stdin = "9\n9 8 7 6 5 4 3 2 1\n3 7 6 9 8 2 1 5 4";
 testMain();
-testStdin = "6\n1 2 6 4 3 5\n6 1 5 4 3 2";
+stdin = "6\n1 2 6 4 3 5\n6 1 5 4 3 2";
 testMain();
-testStdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Hats/5perms9.txt";
+stdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Hats/5perms9.txt";
 testMain();
-testStdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Hats/1000perms15.txt";
+stdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Hats/1000perms15.txt";
 testMain();
 """

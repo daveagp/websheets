@@ -168,84 +168,84 @@ public static void MP2Run_main() {
 """
 
 tests = r"""
-HTMLdescription = "Running <tt>java-introcs MP2Run </tt>";
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/math.txt";
+title = "Running <tt>java-introcs MP2Run </tt>";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/math.txt";
 test("MP2Run_main");
 
-HTMLdescription = "Running <tt>java-introcs MP2Run </tt>";
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/absL.txt";
+title = "Running <tt>java-introcs MP2Run </tt>";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/absL.txt";
 test("MP2Run_main");
 
-HTMLdescription = "Running <tt>java-introcs MP2Run </tt>";
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/absR.txt";
+title = "Running <tt>java-introcs MP2Run </tt>";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/absR.txt";
 test("MP2Run_main");
 
-HTMLdescription = "Running <tt>java-introcs MP2Run </tt>";
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/sum10.txt";
+title = "Running <tt>java-introcs MP2Run </tt>";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/sum10.txt";
 test("MP2Run_main");
 
-HTMLdescription = "Running <tt>java-introcs MP2Run </tt>";
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/gcf.txt";
+title = "Running <tt>java-introcs MP2Run </tt>";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring14/cos126/docs/data/MiniPro/gcf.txt";
 test("MP2Run_main");
 
-HTMLdescription = "Running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\ny = 3\nx += y\nx println\ny println";
+title = "Running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\ny = 3\nx += y\nx println\ny println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing += with variable: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\ny = 3\nx -= y\nx println\ny println";
+title = "Testing += with variable: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\ny = 3\nx -= y\nx println\ny println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing -= with variable: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\ny = 3\nx *= y\nx println\ny println";
+title = "Testing -= with variable: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\ny = 3\nx *= y\nx println\ny println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing *= with variable: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\ny = 3\nx *= y\nx println\ny println";
+title = "Testing *= with variable: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\ny = 3\nx *= y\nx println\ny println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing += with int: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\nx += 3\nx println";
+title = "Testing += with int: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\nx += 3\nx println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing -= with int: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\nx += 3\nx println";
+title = "Testing -= with int: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\nx += 3\nx println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing *= with int: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\nx += 3\nx println";
+title = "Testing *= with int: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\nx += 3\nx println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing pos?jump with +ve LHS: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\nx pos?jump 2\nx println\nx println\nx println";
+title = "Testing pos?jump with +ve LHS: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\nx pos?jump 2\nx println\nx println\nx println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing pos?jump with 0 LHS: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 0\nx pos?jump 2\nx println\nx println\nx println";
+title = "Testing pos?jump with 0 LHS: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 0\nx pos?jump 2\nx println\nx println\nx println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing pos?jump with -ve LHS: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = -2\nx pos?jump 2\nx println\nx println\nx println";
+title = "Testing pos?jump with -ve LHS: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = -2\nx pos?jump 2\nx println\nx println\nx println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing pos?jump with +ve LHS, var RHS: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\nx pos?jump x\nx println\nx println\nx println";
+title = "Testing pos?jump with +ve LHS, var RHS: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\nx pos?jump x\nx println\nx println\nx println";
 test("MP2Run_main");
 
-HTMLdescription = "Testing pos?jump to before start: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\nx pos?jump -126\n100 print";
+title = "Testing pos?jump to before start: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\nx pos?jump -126\n100 print";
 test("MP2Run_main");
 
-HTMLdescription = "Testing pos?jump to just before start: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\nx pos?jump -2\n100 print";
+title = "Testing pos?jump to just before start: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\nx pos?jump -2\n100 print";
 test("MP2Run_main");
 
-HTMLdescription = "Testing pos?jump to just after end: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\nx pos?jump 2\n100 print";
+title = "Testing pos?jump to just after end: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\nx pos?jump 2\n100 print";
 test("MP2Run_main");
 
-HTMLdescription = "Testing pos?jump to after end: running <tt>java-introcs MP2Run</tt> ";
-testStdin = "x = 2\nx pos?jump 126\n100 print";
+title = "Testing pos?jump to after end: running <tt>java-introcs MP2Run</tt> ";
+stdin = "x = 2\nx pos?jump 126\n100 print";
 test("MP2Run_main");
 
 """

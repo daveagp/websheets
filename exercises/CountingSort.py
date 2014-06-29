@@ -99,12 +99,12 @@ public static class Clicker {
 #dependencies = ["Clicker"]
 
 tests = r"""
-testStdin = "0 2 4 3 2 2 9 8 1 0";
+stdin = "0 2 4 3 2 2 9 8 1 0";
 testMain();
-testStdin = "6";
+stdin = "6";
 testMain();
-testStdin = "3 4 5 5 5 4 3 4 4 5 3 4 3 5 4";
+stdin = "3 4 5 5 5 4 3 4 4 5 3 4 3 5 4";
 testMain();
-testStdin = "0 1 3 6 0 0 7 4 3 5 6 7 8 7 4 3 2 2 3 4 5 6 8 9 8 5 1 1 1 1 2 2 3 6 8 7 9 0 0 5";
+stdin = "0 1 3 6 0 0 7 4 3 5 6 7 8 7 4 3 2 2 3 4 5 6 8 9 8 5 1 1 1 1 2 2 3 6 8 7 9 0 0 5";
 testMain();
 """

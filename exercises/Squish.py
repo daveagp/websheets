@@ -23,14 +23,14 @@ public static void main(String[] args) {
 """
 
 tests = r"""
-testStdin = "3 4 4 5 6 7 7 8 3 4 5 6 5 5 5 5 5 3";
+stdin = "3 4 4 5 6 7 7 8 3 4 5 6 5 5 5 5 5 3";
 testMain();
-testStdin = "1 2 2 1 5 1 1 7 7 7 7 1 1 1 1 1 1 1 1 1";
+stdin = "1 2 2 1 5 1 1 7 7 7 7 1 1 1 1 1 1 1 1 1";
 testMain();
-testStdin = "3";
+stdin = "3";
 testMain();
-testStdin = "3 3 3 3 3";
+stdin = "3 3 3 3 3";
 testMain();
-testStdin = "1 1 2 5 8 13 21 0 -0 -5";
+stdin = "1 1 2 5 8 13 21 0 -0 -5";
 testMain();
 """

@@ -515,14 +515,14 @@ class Websheet:
     def prefetch_urls(self, stringify = False):
         """
         Go through the "tests" field. Look for anything of the form
-        testStdinURL = "...";
+        stdinURL = "...";
         and prefetch their data from the web. Return a dict whose keys
         are those urls and whose values are their contents (bytes objects)
         If stringify is True, the bytes objects are converted into strings
         (containing only unicode code points 0-255)
         """
         result = {} # empty dict
-        for match in re.finditer(r'testStdinURL *= *"(.*)";', self.tests):
+        for match in re.finditer(r'stdinURL *= *"(.*)";', self.tests):
             from urllib.request import urlopen
             url = match.group(1)
             result[url] = urlopen(url).read()

@@ -79,10 +79,10 @@ public static void main(String[] args) {
 """
 
 tests = r"""
-testStdin = "6\nBob Sedgewick rs 1\nKevin Wayne wayne 4\nDonna Gabai dgabai 5\nDavid Pritchard dp6 6\nJudith Israel jlisrael 3\nAlan Turing turing 4";
+stdin = "6\nBob Sedgewick rs 1\nKevin Wayne wayne 4\nDonna Gabai dgabai 5\nDavid Pritchard dp6 6\nJudith Israel jlisrael 3\nAlan Turing turing 4";
 testMain();
-testStdinURL = "http://introcs.cs.princeton.edu/java/15inout/students.txt";
+stdinURL = "http://introcs.cs.princeton.edu/java/15inout/students.txt";
 testMain();
-testStdin = "1\nJoe Student joestu 0\nYour program should only have read 1 student for this input";
+stdin = "1\nJoe Student joestu 0\nYour program should only have read 1 student for this input";
 testMain();
 """

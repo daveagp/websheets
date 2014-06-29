@@ -59,7 +59,7 @@ testOn("mc", "threeKongs");
 testOn("mc", "printAll");
 
 quietOnPass = true;
-HTMLdescription = "Calling <tt>mc.printAll()</tt> <b>again</b> to see if list was destroyed.";
+title = "Calling <tt>mc.printAll()</tt> <b>again</b> to see if list was destroyed.";
 testOn("mc", "printAll");
 """
 

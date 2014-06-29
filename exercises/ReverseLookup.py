@@ -34,11 +34,11 @@ public static void main(String[] args) {
 """
 
 tests = r"""
-testStdin = "1 one\n2 two\n3 three";
+stdin = "1 one\n2 two\n3 three";
 testMain();
-testStdin = "115 Time\n538 Magnetism\n577 Ecology\n664 Food_technology";
+stdin = "115 Time\n538 Magnetism\n577 Ecology\n664 Food_technology";
 testMain();
 expectException = true;
-testStdin = "1 Uninvertible\n2 Uninvertible";
+stdin = "1 Uninvertible\n2 Uninvertible";
 testMain();
 """

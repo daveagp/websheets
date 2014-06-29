@@ -88,9 +88,9 @@ source_code = r"""\[
 tests = r"""
 test("score", (Object)new int[]{7, 14, 20, 12, 15, 16});
 test("score", (Object)new int[]{10, 16, 10, 20, 14, 10});
-testStdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Food/german.txt";
+stdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Food/german.txt";
 testMain();
-testStdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Food/na.txt";
+stdinURL = "http://www.cs.princeton.edu/~cos126/docs/data/Food/na.txt";
 testMain();
 test("score", (Object)new int[]{15, 5, 10});
 test("score", (Object)new int[]{7, 7, 7});
@@ -99,13 +99,13 @@ test("score", (Object)new int[]{4, 5, 10, 12});
 test("score", (Object)new int[]{4, 5, 8, 12});
 test("score", (Object)new int[]{20, 19, 20, 19, 20});
 test("score", (Object)new int[]{1, 2, 1, 2, 1});
-testStdin = "1 3\nPangaea 8 8 8";
+stdin = "1 3\nPangaea 8 8 8";
 testMain();
-testStdin = "6 3\nLMH 1 2 3\nLHM 4 6 5\nMLH 8 7 9\nMHL 11 12 10\nHLM 15 13 14\nHML 18 17 16";
+stdin = "6 3\nLMH 1 2 3\nLHM 4 6 5\nMLH 8 7 9\nMHL 11 12 10\nHLM 15 13 14\nHML 18 17 16";
 testMain();
-testStdin = "6 3\nLLH 1 1 9\nLHL 1 9 1\nHLL 9 1 1\nLHH 1 9 9\n HLH 9 1 9\nHHL 9 9 1";
+stdin = "6 3\nLLH 1 1 9\nLHL 1 9 1\nHLL 9 1 1\nLHH 1 9 9\n HLH 9 1 9\nHHL 9 9 1";
 testMain();
-testStdin = "2 3\noneLand 1 1 1\ntwentyStan 20 20 20";
+stdin = "2 3\noneLand 1 1 1\ntwentyStan 20 20 20";
 testMain();
-testStdin = "4 4\nmaxRepeat 18 18 7 5\nminRepeat 6 6 12 19\nbothRepeat 4 4 12 12\nfours 4 4 4 4";
+stdin = "4 4\nmaxRepeat 18 18 7 5\nminRepeat 6 6 12 19\nbothRepeat 4 4 12 12\nfours 4 4 4 4";
 """

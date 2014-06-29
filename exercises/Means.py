@@ -21,11 +21,11 @@ Harmonic mean: 2.190
 </pre>"""
 
 tests = r"""
-testStdin = "1.0 2.0 3.0 4.0 5.0";
+stdin = "1.0 2.0 3.0 4.0 5.0";
 testMain(5);
-testStdin = "4 8 15 16 23 42\nThese are the numbers from LOST\n(Your program should not read this, only the N numbers.)"; 
+stdin = "4 8 15 16 23 42\nThese are the numbers from LOST\n(Your program should not read this, only the N numbers.)"; 
 testMain(6);
-testStdin = "126 126 126";
+stdin = "126 126 126";
 testMain(3);
 """
 

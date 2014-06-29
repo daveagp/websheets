@@ -26,12 +26,12 @@ public class MaxMin {
 }"""
 
 tests = r"""
-testStdin = "23 45 17 56 32\n89 10 53 32 34\n16";
+stdin = "23 45 17 56 32\n89 10 53 32 34\n16";
 testMain();
-testStdin = "1 2 3 4 5";
+stdin = "1 2 3 4 5";
 testMain();
-testStdin = "-1 -2 -3 -4 -5";
+stdin = "-1 -2 -3 -4 -5";
 testMain();
-testStdin = "126";
+stdin = "126";
 testMain();
 """

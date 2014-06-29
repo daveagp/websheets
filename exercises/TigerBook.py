@@ -14,7 +14,7 @@ This websheet is intended as a practice exam. However, in a real exam,
 </ul>
 We recommend doing this practice in a timed environment; give yourself 90 minutes.
 <p>
-<b>You have to solve the <b>Person</b> websheet before this one will work.</b> (But in a real exam, you don't necessarily need
+<b>You have to solve the <a href='?group=Person'>Person</a> websheet before this one will work.</b> (But in a real exam, you don't necessarily need
 to complete one part to get credit for the next.)
 """
 
@@ -130,13 +130,13 @@ testOn("personFound", "listMessages");
 expectException = true;
 saveAs = "nobody";
 testOn("t", "lookup", "tony-the-tiger");
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/data/TigerBook/friendly.txt";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/data/TigerBook/friendly.txt";
 testNamedMain("exampleClientMain", "ExampleClient");
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/data/TigerBook/mutual.txt";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/data/TigerBook/mutual.txt";
 testNamedMain("exampleClientMain", "ExampleClient");
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/data/TigerBook/networking.txt";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/data/TigerBook/networking.txt";
 testNamedMain("exampleClientMain", "ExampleClient");
-testStdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/data/TigerBook/monologue.txt";
+stdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/data/TigerBook/monologue.txt";
 testNamedMain("exampleClientMain", "ExampleClient");
 """
 

@@ -31,10 +31,10 @@ right = tmp;      // complete the swap using saved value
 """
 
 tests = r"""
-HTMLdescription = "We set <tt>top = red, bottom = green, left = blue, right = yellow</tt> and ran your code";
+title = "We set <tt>top = red, bottom = green, left = blue, right = yellow</tt> and ran your code";
 test("squareSwap", "red", "green", "blue", "yellow");
 
-HTMLdescription = "We set <tt>top = fuschia, bottom = turquoise, left = sienna, right = vermilion</tt> and ran your code";
+title = "We set <tt>top = fuschia, bottom = turquoise, left = sienna, right = vermilion</tt> and ran your code";
 test("squareSwap", "fuschia", "turquoise", "sienna", "vermilion");
 """
 

@@ -22,16 +22,16 @@ public static void main(String[] args) {
 """
 
 tests = r"""
-HTMLdescription = "Running with <tt>colors[] = {\"red\", \"green\", \"blue\"}</tt>";
+title = "Running with <tt>colors[] = {\"red\", \"green\", \"blue\"}</tt>";
 testMain("red", "green", "blue");
 
-HTMLdescription = "Running with <tt>colors[] = {\"fuschia\", \"turquoise\", \"sienna\", \"vermilion\"}</tt>";
+title = "Running with <tt>colors[] = {\"fuschia\", \"turquoise\", \"sienna\", \"vermilion\"}</tt>";
 testMain("fuschia", "turquoise", "sienna", "vermilion");
 
-HTMLdescription = "Running with <tt>colors[] = {\"a\", \"b\", \"c\", \"d\", \"e\", \"f\", \"g\", \"h\"}</tt>"; 
+title = "Running with <tt>colors[] = {\"a\", \"b\", \"c\", \"d\", \"e\", \"f\", \"g\", \"h\"}</tt>"; 
 testMain("a", "b", "c", "d", "e", "f", "g", "h");
 
-HTMLdescription = "Running with <tt>colors[] = {\"monocolor\"}</tt>";
+title = "Running with <tt>colors[] = {\"monocolor\"}</tt>";
 testMain("monocolor");
 """
 

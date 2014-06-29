@@ -75,14 +75,14 @@ testOn("q", "dequeue");
 testOn("q", "dequeue");
 testOn("q", "dequeue");
 testOn("q", "isEmpty");
-testStdin = "3 7 8 2 4 5 2 4 1";
+stdin = "3 7 8 2 4 5 2 4 1";
 testMain();
-testStdin = "3 7 8 2 4 5 2 4 1";
+stdin = "3 7 8 2 4 5 2 4 1";
 testMain();
-testStdinURL = "http://www.cs.princeton.edu/~cos126/websheets/data/100rand126.txt";
+stdinURL = "http://www.cs.princeton.edu/~cos126/websheets/data/100rand126.txt";
 testMain();
-setMaxOutputBytes(100000);
-testStdinURL = "http://www.cs.princeton.edu/~cos126/websheets/data/10000rand.txt";
+maxOutputBytes = 100000;
+stdinURL = "http://www.cs.princeton.edu/~cos126/websheets/data/10000rand.txt";
 testMain();
 """
 
