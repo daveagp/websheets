@@ -533,8 +533,8 @@ class Websheet:
         return (
 "package tester;\n" +
 "import java.util.Random;\n" +
-"import static framework.GenericTester.*;\n" +
-"public class " + self.classname + " extends framework.GenericTester {\n" +
+"import static websheets.Grader.*;\n" +
+"public class " + self.classname + " extends websheets.Grader {\n" +
 "{className=\"" + self.classname + "\";}" +
 "protected void runTests() {" +
 self.tests +

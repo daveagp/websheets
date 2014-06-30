@@ -136,19 +136,21 @@ public class Vector {
 """
 
 tests = r"""
-cloneForStudent = false;
+
+defaultOptions.cloneForStudent = false;
 double[] nums = new double[]{3, -4};
 saveAs = "nums";
 store(nums);
 saveAs = "velocity";
 testConstructor(var("nums"));
+defaultOptions.cloneForStudent = true;
+
 testOn("velocity", "cartesian", 0);
 testOn("velocity", "cartesian", 1);
 remark("Setting <tt>nums[0] = 100</tt> to check for aliasing&hellip;");
 nums[0] = 100;
 testOn("velocity", "cartesian", 0);
 
-cloneForStudent = true;
 
 testOn("velocity", "magnitude");
 testOn("velocity", "toString");

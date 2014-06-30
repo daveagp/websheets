@@ -43,7 +43,7 @@ tests = r"""
 testMain("REGEX", "GREE", "XRXG", "XX");
 test("main", (Object)new String[]{"", "R", "G", "E", "X"});
 String[] letters = {"R","G","E","X"};
-quietOnPass = true;
+defaultOptions.quietOnPass = true;
 for (String a : letters) for (String b : letters)
 test("main", (Object)new String[]{a+b});
 for (String a : letters) for (String b : letters)

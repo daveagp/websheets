@@ -231,7 +231,8 @@ E.g. see <span class='EG' data-slug='NSwap'></span>.
 You can use any software and any formats you like, but the example exercises 
 using diagrams 
 (e.g.
-<a href="index.php?group=SquareSwap+FourChargeClient"</a><tt>SquareSwap</tt> and <tt>FourChargeClient</tt></a>)
+<span class='EG' data-slug='SquareSwap'></span>,
+<span class='EG' data-slug='FourChargeClient'></span>)
 were created using <a href="http://ipe7.sourceforge.net/">IPE</a> (which uses PDFs as an editable format)
 and rasterized to PNG using  <a href="https://github.com/daveagp/websheets/blob/master/exercises/render.sh"><tt>render.sh</tt></a>.
 
@@ -257,14 +258,14 @@ you could write
 for (char ch='A'; ch<='Z'; ch++) testMain(""+ch+ch);
 </pre>
 
-You can even define 
+You could even define 
 <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/localclasses.html">local</a> or
 <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/anonymousclasses.html">anonymous</a>
-classes if you need to define methods or classes, although no current examples do this.
+classes if you want (although no current examples do this).
 
 <h3>Basics: testing static methods</h3>
 
-The testing methods <tt>testMain()</tt>, 
+The testing methods <tt>testMain()</tt> for testing <tt>main</tt>, 
 <tt>test()</tt> for instance methods, 
 <tt>testConstructor()</tt> for constructors,
 and <tt>testOn()</tt> for instance methods 
@@ -299,8 +300,8 @@ the student, and then call an instance method. The typical approach involves
 
 <pre>
 saveAs = "attendance"; // (1)
-testConstructor(); // (2)
-testOn("attendance", "curr"); // (3). i.e. attendance.curr() 
+testConstructor(); // (2) i.e. attendance = new Clicker();
+testOn("attendance", "curr"); // (3) i.e. attendance.curr(); 
 </pre>
 
 This means, 
@@ -350,7 +351,7 @@ For example in <span class='EG' data-slug='Vector'></span>, after constructing
   two objects <tt>x</tt> and <tt>y</tt>,
    we call <tt>x.plus(y)</tt> like so:
     <pre>testOn("x", "plus", var("y"));</pre>
-  basically, the <tt>var()</tt> wrapper is needed to distinguish the saved variable y 
+  basically, the <tt>var()</tt> wrapper is needed to distinguish the saved variable <tt>y</tt> 
 from the string literal <tt>"y"</tt>
 </dd>
 </dl>
@@ -434,15 +435,12 @@ that package)
 <dd>
 In <span class='EG' data-slug='TigerBook'></span> we call
 <pre>construct(null, "Person", "", "Tony")</pre>
-to mimic a call to <tt>new Person("Tony")</tt>. Note <tt>Person</tt> is 
+to mimic a call to <tt>new Person("Tony")</tt> &mdash; <tt>Person</tt> is 
 in the <tt>dependencies</tt> of that websheet. Leaving <tt>pckg</tt> as 
 <tt>null</tt> means that the student's code uses the <tt>Person</tt> from
 the student package while the reference uses the one from the reference 
 package.
 </dd>
-<dd><i>Note:</i> because <tt>construct</tt> is implemented using 
-the same infrastructure as the <tt>test*</tt> methods, 
-it will reset all options to their defaults.</dd>
 
 <dt><tt>testNamedMain(String methodToCall, String fakeClassName, String... args)</tt></dt>
 <dd>
@@ -451,9 +449,15 @@ are calling <tt>main(args)</tt> on some other testing class.
 Used in
 <span class='EG' data-slug='TigerBook'></span>.
 </dd>
+
 </dl>
 
-<h3>More options</h3>
+<i>Note:</i> <tt>store()</tt>, <tt>construct()</tt>
+and <tt>testNamedMain()</tt> will 
+reset all options to their defaults,
+like the basic <tt>test&hellip;()</tt> methods.</dd>
+
+<h3>More test options</h3>
 
 <dl>
 <dt><tt>title = <i>String</i>&nbsp;</tt> (default <tt>null</tt>)</dt>
@@ -488,6 +492,8 @@ passes, and which will throw an exception if they failed, but not
 if they passed.</dd>
 <dd>E.g. <span class='EG' data-slug='FJSort'></span>.</dd>
 <dd>E.g. <span class='EG' data-slug='FTPLimiter'></span>.</dd>
+<dd>Note that <i>hidden code </i> can make thrown exceptions look a bit nicer by using
+<tt>websheets.Grader.FailException</tt> like <tt>FTPLimiter</tt>.
 
 <dt><tt>cloneForStudent = <i>boolean</i></tt>&nbsp; (default <tt>true</tt>)</dt>
 <dd>Before passing arguments to the student, clone them. So if the 
@@ -511,13 +517,11 @@ also don't accept <tt>5.00</tt> as the same as <tt>5.0</tt>. No current example.
 
 </dl>
 
-<h3>More tools</h3>
+<h3>More testing tools</h3>
 <dt><tt>defaultOptions</tt></dt>
 <dd>To set an option permanently (as opposed to just for one test),
 use syntax like
 <pre>defaultOptions.quietOnPass = true;</pre>
-This works for the above section and the variables mentioned earlied
-like <tt>expectException</tt>.
 E.g, see <span class='EG' data-slug='RegularExercise'></span>.</dd>
 </dd>
 

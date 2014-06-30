@@ -48,15 +48,14 @@ def submit_and_log(websheet_name, student, client_request, meta):
         
     reference_solution = websheet.get_reference_solution("reference")
 
-    with open("GenericTester.java") as file:
-        GTjava = "".join(file)
-
     dump = {
         "reference." + classname : reference_solution,
         "student." + classname : student_solution[1],
-        "tester." + classname : websheet.make_tester(),
-        "framework.GenericTester" : GTjava,
+        "tester." + classname : websheet.make_tester()
         }
+
+    for clazz in ["Grader", "Options", "Utils"]:
+      dump["websheets."+clazz] = "".join(open(clazz+".java"))
 
     #print(cgi.escape(student_solution[1]))
     #print(cgi.escape(reference_solution))

@@ -75,7 +75,7 @@ static int NUMFILES = 20;
         static void done() {
            while (!errored && left > 0) Thread.yield();
            if (successes < NUMFILES) error("Did not download all files.");
-           if (errored) {throw new framework.GenericTester.FailException(err);}
+           if (errored) {throw new websheets.Grader.FailException(err);}
         }
     }
 ]\

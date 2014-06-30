@@ -19,7 +19,7 @@ tests = r"""
 """
 
 description = r"""
-<p><i>This is a more complex version of the <b>NameAge</b> exercise.</i></p>
+<p><i>This is a more complex version of the <a href='?group=NameAge'>NameAge</a> exercise.</i></p>
 Using <code>Integer.parseInt()</code>, 
 complete the code so that <code>java NextYear Trey 3</code> prints out 
 <pre>Next year, Trey will be 4 years old.</pre>
