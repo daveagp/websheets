@@ -112,7 +112,7 @@ def submit_and_log(websheet_name, student, client_request, meta):
 
     compileResult = json.dumps(compileObj)
     
-    runUser = run_java("traceprinter/ramtools/RAMRun tester." + classname + " " +student, compileResult)
+    runUser = run_java("traceprinter/ramtools/RAMRun tester." + classname, compileResult)
     #runUser = run_java("tester." + classname + " " + student)
 
     #print(runUser.stdout)

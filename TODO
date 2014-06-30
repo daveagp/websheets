@@ -1,21 +1,14 @@
-allow blank at top for header
+add ability to disable viewing reference solution
 
-when using dependencies, uncaught exceptions may translate
-improperly if they're not from the current file
+add ability to have private_exercises folder
+
+allow blank at top for header
 
 parsons problems? should be doable using on("changes") and
 "origin" object of each change (one "drag", one "paste", with
 complementary text/removed)
 
 check API (e.g. CombinationLock check private inst vars)
-
-add ability for public remarks in tests
-
-add ability to have private_exercises folder
-
-add ability to disable reference solution
-
-spacing around fake and hide is not as easy as it could be
 
 randomization!
 

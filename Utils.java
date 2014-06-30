@@ -170,7 +170,7 @@ public class Utils {
             || qualname.startsWith("stdlibpack.");
     }
 
-    // is this a complex object?
+    // is this a stdlib object?
     public static boolean inStdlib(Object o) {
         String qualname = o.getClass().toString();
         return qualname.startsWith("stdlibpack.");

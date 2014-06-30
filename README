@@ -17,7 +17,7 @@ or a group of exercises with
 
 MANUAL
 
-To read about how to write new exercises, visit manual.html, mirrored at
+To read about how to write new exercises, read manual.html, mirrored at
 http://cscircles.cemc.uwaterloo.ca/websheets/manual.html
 
 BASIC INSTALLATION
@@ -106,14 +106,17 @@ Please check that
  http://your.website/url/to/websheets/ws-config.json
 is inaccessible; .htaccess tries to do this, but you should confirm it works.
 
-FILES LISTING
+PARTIAL FILES LISTING
 
 ws-config.example.json - copy this to ws-config.json and fill it in
 websheet.{css,js} - create/render the partially read-only codemirror area
 index.{php,js} - browser for multiple websheets
+bytopic.php - lists problems by topic
 load.{php,py} - (for ajax) load a problem to show
 submit.{php,py} - (for ajax) submit an attempt
 include.php - authentication used by all php files
-Websheet.py - Python model of a Websheet, command-line tools to use with them
-config.py - Python to interact with safeexec and database
-GenericTester.java - grader template runs & compares student/reference code
+Websheet.py - Python model of a Websheet, to extract views and merge with student submission
+config.py - Python to interact with safeexec and database used by all .py files
+Grader.java - grader template runs & compares student/reference code
+Utils.java - static helper functions for grader
+Options.java - per-test options that websheets can set
