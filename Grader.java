@@ -330,7 +330,7 @@ public abstract class Grader extends Options {
             else
                 test();
             if (quietOnPass) {
-                graderOut = realStdout;
+                graderOut = realStdOut;
                 try {
                     String content = gbaos.toString("UTF-8");
                     // print it out only if failed
@@ -364,7 +364,7 @@ public abstract class Grader extends Options {
     String endStdoutCapture() {
         try {
             String content = baos.toString("UTF-8");
-            System.setOut(realStdout);
+            System.setOut(realStdOut);
 	    StdOut.resync();
             return content;
         }
@@ -632,7 +632,7 @@ public abstract class Grader extends Options {
         
         
         if (!dontRunReference && ref.stdout.length() > 0) {
-            String reason = describeOutputDifference(stu.stdout, ref.stdout, Grader.this);
+            String reason = describeOutputDifference(stu.stdout, ref.stdout, (Options)(Grader.this));
             if (reason != null)
                 throw new FailTestException(reason);
             
@@ -708,6 +708,7 @@ public abstract class Grader extends Options {
         }
     }
 
+    // each class that inherits from Grader will basically use this for main()
     protected void genericMain(String[] args) {
         JsonReader jr = Json.createReader(System.in);
         testerStdin = jr.readObject();
@@ -730,7 +731,7 @@ public abstract class Grader extends Options {
             }
             catch (FailTestException e) {
                 if (quietOnPass) {
-                    graderOut = realStdout;
+                    graderOut = realStdOut;
                     try {
                         String content = gbaos.toString("UTF-8");
                         if (content.indexOf("class='pass-test'")<0)

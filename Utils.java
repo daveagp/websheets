@@ -205,7 +205,7 @@ public class Utils {
     }    
 
     // are they different? return null if not, html description if so
-    public String describeOutputDifference(String stu, String ref, Options o) {
+    public static String describeOutputDifference(String stu, String ref, Options o) {
         String[] stulines = stu.split("\n", -1);
         String[] reflines = ref.split("\n", -1);
         int samelines = 0;
