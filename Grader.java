@@ -1,11 +1,9 @@
 package websheets;
+
 import java.util.*;
 import java.lang.reflect.*;
 import java.io.*;
 import stdlibpack.*;
-import java.util.Date;
-import java.util.Timer;
-import java.util.TimerTask;
 import javax.json.*;
 
 import static websheets.Utils.*;
@@ -109,15 +107,15 @@ public abstract class Grader extends Options {
     // instance variables
 
     protected String className; // descendants should define this in constructor
-    PrintStream graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
-    ByteArrayOutputStream gbaos = null;
-    JsonObject testerStdin;
-    Class<?> studentC, referenceC;    
-    InputStream orig_stdin = System.in;
-    PrintStream orig_stdout = System.out;
-    ByteArrayOutputStream baos;
-    TreeMap<String,Object> studentObjects = new TreeMap<>();
-    TreeMap<String,Object> referenceObjects = new TreeMap<>();
+
+    PrintStream realStdOut = System.out; // or, new PrintStream(new FileOutputStream(FileDescriptor.out));
+    PrintStream graderOut = realStdOut; // always points to there UNLESS quietOnPass
+    ByteArrayOutputStream baos; // for capturing student output
+    ByteArrayOutputStream gbaos = null; // for capturing grader-generated html
+    JsonObject testerStdin; // we read all the stdin as a json object 
+    Class<?> studentC, referenceC; // Class instance for student solution, reference solution
+    TreeMap<String, Object> studentObjects = new TreeMap<>(); // used with saveAs and var()
+    TreeMap<String, Object> referenceObjects = new TreeMap<>(); // used with saveAs and var()
 
     // exception-related classes for internal use
 
@@ -302,6 +300,7 @@ public abstract class Grader extends Options {
         void execute() {
             ((Options)(Grader.this)).fillWithDefaults();
             if (quietOnPass) {
+                // save the grader output to hide or show as appropriate
                 gbaos = new ByteArrayOutputStream();
                 graderOut = new PrintStream(gbaos);
             }
@@ -331,9 +330,10 @@ public abstract class Grader extends Options {
             else
                 test();
             if (quietOnPass) {
-                graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));//orig_graderOut;
+                graderOut = realStdout;
                 try {
                     String content = gbaos.toString("UTF-8");
+                    // print it out only if failed
                     if (content.indexOf("class='pass-test'")<0)
                         graderOut.print(content);
                 }
@@ -364,7 +364,7 @@ public abstract class Grader extends Options {
     String endStdoutCapture() {
         try {
             String content = baos.toString("UTF-8");
-            System.setOut(orig_stdout);
+            System.setOut(realStdout);
 	    StdOut.resync();
             return content;
         }
@@ -373,6 +373,7 @@ public abstract class Grader extends Options {
         }
     }
 
+    // for var() and saveAs
     class NamedObject {
 	final String name;
 	NamedObject(String S) {name = S;}
@@ -382,74 +383,6 @@ public abstract class Grader extends Options {
         public String toString() {return name;}
     }
 
-    // are they different? return null if not, html description if so
-    String describeOutputDifference(String stu, String ref) {
-        String[] stulines = stu.split("\n", -1);
-        String[] reflines = ref.split("\n", -1);
-        int samelines = 0;
-        while (samelines < Math.min(stulines.length, reflines.length)
-               && equalsApprox(rtrimConditional(stulines[samelines], Grader.this),
-                               rtrimConditional(reflines[samelines], Grader.this),
-                               Grader.this))
-            samelines++;
-
-        // were they the same?
-        if (samelines == stulines.length && samelines == reflines.length)
-            return null; // yup!
-
-        // two special cases
-        if (samelines == stulines.length - 1 && samelines == reflines.length
-            && rtrimConditional(stulines[stulines.length - 1], Grader.this).equals(""))
-            return "Your program printed this output:" + pre(stu)
-                + " which is almost correct but <i>an extra newline character was printed at the end</i>.";
-
-        if (samelines == reflines.length - 1 && samelines == stulines.length
-            && rtrimConditional(reflines[reflines.length - 1], Grader.this).equals(""))
-            return "Your program printed this output:" + pre(stu)
-                + " which is almost correct but <i>a newline character is missing at the end</i>.";
-        
-        // general case
-        final int samelines2 = samelines; // woo java 8!
-        final StringBuilder sb = new StringBuilder();
-
-        class DescriptionLoop {
-            void handle(String[] lines) {
-                if (lines.length == 1) { 
-                    if (lines[0].equals(""))
-                        sb.append("<pre><i>(no output)</i></pre>");
-                    else
-                        sb.append("<pre>"+esc(lines[0])+"</pre>");
-                    return;
-                }
-                sb.append("<pre><span class='before-diff-line'>");
-                for (int i=0; i<lines.length; i++) {
-                    if (i==samelines2) sb.append("</span><span class='diff-line'>");
-                    sb.append(esc(lines[i]));
-                    if (i==samelines2) sb.append("</span><span class='after-diff-line'>");
-                    if (i != lines.length-1 || lines.length == 1) 
-                        sb.append("<br>"); // wasn't student output for i==length-1, but add it to fix pre appearance
-                }
-                sb.append("</span></pre>");
-            }
-        };
-        DescriptionLoop dl = new DescriptionLoop();
-
-        boolean stured = samelines < stulines.length - 1
-            || samelines == stulines.length - 1 && !rtrim(stulines[stulines.length-1]).equals("");
-        boolean refred = samelines < reflines.length - 1
-            || samelines == reflines.length - 1 && !rtrim(reflines[reflines.length-1]).equals("");
-        
-        sb.append("Your program printed this output" + 
-                  (stured ? " (first difference in red)" : "")
-                  + ":");
-        dl.handle(stulines);
-        sb.append("It was supposed to print this output" + 
-                  ((samelines < reflines.length) ? " (first difference in red)" : "")
-                  + ":");
-        dl.handle(reflines);
-        return sb.toString();
-    }
-    
     abstract class Capturer {
         String stdout;
         boolean crashed;
@@ -699,7 +632,7 @@ public abstract class Grader extends Options {
         
         
         if (!dontRunReference && ref.stdout.length() > 0) {
-            String reason = describeOutputDifference(stu.stdout, ref.stdout);
+            String reason = describeOutputDifference(stu.stdout, ref.stdout, Grader.this);
             if (reason != null)
                 throw new FailTestException(reason);
             
@@ -797,7 +730,7 @@ public abstract class Grader extends Options {
             }
             catch (FailTestException e) {
                 if (quietOnPass) {
-                    graderOut = new PrintStream(new FileOutputStream(FileDescriptor.out));
+                    graderOut = realStdout;
                     try {
                         String content = gbaos.toString("UTF-8");
                         if (content.indexOf("class='pass-test'")<0)

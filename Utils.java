@@ -1,5 +1,7 @@
 package websheets;
 
+// a bunch of public static methods without side-effects
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -156,7 +158,6 @@ public class Utils {
         }
         if (opaque(O)) return O;
 
-        //if (O instanceof NamedObject) return dict.get(((NamedObject)O).name);
         throw new RuntimeException("Don't know how to semicopy "+O.toString()+O.getClass());
     }
 
@@ -202,4 +203,72 @@ public class Utils {
 
         return a.equals(b);
     }    
+
+    // are they different? return null if not, html description if so
+    public String describeOutputDifference(String stu, String ref, Options o) {
+        String[] stulines = stu.split("\n", -1);
+        String[] reflines = ref.split("\n", -1);
+        int samelines = 0;
+        while (samelines < Math.min(stulines.length, reflines.length)
+               && equalsApprox(rtrimConditional(stulines[samelines], o),
+                               rtrimConditional(reflines[samelines], o),
+                               o))
+            samelines++;
+
+        // were they the same?
+        if (samelines == stulines.length && samelines == reflines.length)
+            return null; // yup!
+
+        // two special cases
+        if (samelines == stulines.length - 1 && samelines == reflines.length
+            && rtrimConditional(stulines[stulines.length - 1], o).equals(""))
+            return "Your program printed this output:" + pre(stu)
+                + " which is almost correct but <i>an extra newline character was printed at the end</i>.";
+
+        if (samelines == reflines.length - 1 && samelines == stulines.length
+            && rtrimConditional(reflines[reflines.length - 1], o).equals(""))
+            return "Your program printed this output:" + pre(stu)
+                + " which is almost correct but <i>a newline character is missing at the end</i>.";
+        
+        // general case
+        final int samelines2 = samelines; // woo java 8! wouldn't have to do this since samelines is effectively final
+        final StringBuilder sb = new StringBuilder();
+
+        class DescriptionLoop {
+            void handle(String[] lines) {
+                if (lines.length == 1) { 
+                    if (lines[0].equals(""))
+                        sb.append("<pre><i>(no output)</i></pre>");
+                    else
+                        sb.append("<pre>"+esc(lines[0])+"</pre>");
+                    return;
+                }
+                sb.append("<pre><span class='before-diff-line'>");
+                for (int i=0; i<lines.length; i++) {
+                    if (i==samelines2) sb.append("</span><span class='diff-line'>");
+                    sb.append(esc(lines[i]));
+                    if (i==samelines2) sb.append("</span><span class='after-diff-line'>");
+                    if (i != lines.length-1 || lines.length == 1) 
+                        sb.append("<br>"); // wasn't student output for i==length-1, but add it to fix pre appearance
+                }
+                sb.append("</span></pre>");
+            }
+        };
+        DescriptionLoop dl = new DescriptionLoop();
+
+        boolean stured = samelines < stulines.length - 1
+            || samelines == stulines.length - 1 && !rtrim(stulines[stulines.length-1]).equals("");
+        boolean refred = samelines < reflines.length - 1
+            || samelines == reflines.length - 1 && !rtrim(reflines[reflines.length-1]).equals("");
+        
+        sb.append("Your program printed this output" + 
+                  (stured ? " (first difference in red)" : "")
+                  + ":");
+        dl.handle(stulines);
+        sb.append("It was supposed to print this output" + 
+                  ((samelines < reflines.length) ? " (first difference in red)" : "")
+                  + ":");
+        dl.handle(reflines);
+        return sb.toString();
+    }
 }
