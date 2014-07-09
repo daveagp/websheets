@@ -287,7 +287,11 @@ E.g. see <span class='EG' data-slug='Boxed'></span>
 </dd>
 <dd>note: if there's exactly one argument, which is an array, Java requires you use
     <pre>test(methodName, (Object) /* your array here */)</pre>
-  due to inherent ambiguity in varargs
+  due to inherent ambiguity in varargs.
+E.g. see <span class='EG' data-slug='Summer'></span>. The ambiguity doesn't 
+exist if there are multiple arguments of which some are arrays, e.g. see 
+<span class='EG' data-slug='Find'></span>.
+
 </dd>
 </dl>
 
@@ -405,10 +409,17 @@ is bad, it will confuse the prefetcher that grabs the data before starting
 
 <dt><tt>remark(String s)</tt></dt>
 <dd>Print out a remark to the user explaining what the 
-tests are doing. <tt>s</tt> should be valid HTML. c.f. <tt>title = </tt> which replaces the automatically-generated test description.
+tests are doing. Useful when you still want them to see the 
+automatically-generated description of the test, but you also want to
+explain more context to the student.
+<tt>s</tt> should be valid HTML. 
+<br>c.f. <tt>title = </tt> which replaces the automatically-generated test description.
 </dd>
 <dd>
 E.g., <span class='EG' data-slug='MonkeyAddEnd'></span>.
+</dd>
+<dd>
+E.g., <span class='EG' data-slug='Vector'></span>.
 </dd>
 
 <dt><tt>store(Object o)</tt></dt>
@@ -421,7 +432,15 @@ for checking shallow copying in
 <tt>construct(String pckg, String clss, String type_prms, Object... args)
 </tt></dt>
 <dd>
-Use this to create a new instance of some <i>other</i> class.
+Use this to create a new instance of some <i>other</i> class. <tt>pckg</tt> 
+should be a fully qualified package or <tt>null</tt> to use student/reference
+code; <tt>clss</tt> should be a simple class name; <tt>type_prms</tt> 
+should be <tt>""</tt> if you are not constructing a generic, or 
+a list of type arguments for a generic if you are (this is just shown 
+to the student in the description of the test since generic erasure happens 
+at runtime);
+and
+<tt>args</tt> are the consturctor arguments.
 It is best seen by these two examples:
 </dd>
 <dd>
@@ -447,7 +466,11 @@ package.
 Call some hidden internal method, but pretend you
 are calling <tt>main(args)</tt> on some other testing class.
 Used in
-<span class='EG' data-slug='TigerBook'></span>.
+<span class='EG' data-slug='TigerBook'></span> at
+<tt>testNamedMain("exampleClientMain", "ExampleClient");</tt>
+to run the hidden method
+<tt>exampleClientMain</tt> but to tell the student we are running 
+<tt>java ExampleClient</tt>.
 </dd>
 
 </dl>
@@ -464,7 +487,10 @@ like the basic <tt>test&hellip;()</tt> methods.</dd>
 <dd>
 <i>replace</i> the automatically-generated description <i>of the 
 next test</i> with 
-the given HTML. <br>
+the given HTML. Useful if you are using a lot of fake or hidden code
+and the automatically-generated description the student would see
+ in testing would
+make no sense.<br>
 c.f. <tt>remark()</tt> which adds <i>extra</i> 
 commentary before the next test
 </dd>
@@ -529,7 +555,7 @@ E.g, see <span class='EG' data-slug='RegularExercise'></span>.</dd>
 <dd>
 This is a <tt><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Random.html">Random</a></tt> instance
 just made available for convenience. E.g., see 
- <span class='EG' data-slug='AgeChecker'></span>.</dd>
+ <span class='EG' data-slug='AgeChecker'></span> which calls <tt>randgen.<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Random.html#nextInt(int)">nextInt</a>(100)</tt> to generate a random number from 0 to 99.</dd>
 
 <h2>Optional websheet fields</h2>
 Here are a couple of other fields that are available for use in websheets
