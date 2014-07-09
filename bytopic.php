@@ -16,7 +16,7 @@ $categories = <<<EOT
  ["Intro and Cmd Line Args", 
   ["HelloWorld", "TwoPlusTwo", "NameAge", "NextYear", "SquareOf", "SquareSwap"]],
  ["Data Types",
-  ["Eggsactly", "PercentScore", "PizzaCalculator", "WindChill", "Distance", "ThreeSort"]],
+  ["Eggsactly", "PercentScore", "PizzaCalculator", "WindChill", "Distance", "ThreeSort", "AboveAverage"]],
  ["Loops and Conditionals",
   ["Flag", "AgeChecker", "SquareCensus", "Quadratic", "ModularSqrt"]],
  ["Arrays",
