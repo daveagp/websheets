@@ -12,7 +12,7 @@ except:
     db_enabled = False
 
 # if you are using safeexec, securely running java should be something like this:
-def compute_java_prefix():
+def java_prefix():
     if (config_jo == []): return "error: ws-config.json doesn't exist"
     jail = config_jo["java_jail-abspath"]
     safeexec = config_jo["safeexec-executable-abspath"]    
@@ -23,13 +23,14 @@ def compute_java_prefix():
 
 # at princeton, they use "sandbox" instead
 if socket.gethostname().endswith("princeton.edu"):
-    def compute_java_prefix():
-        java = "/usr/bin/java -cp .:/n/fs/htdocs/class/courses/cos126/java_jail/cp:/n/fs/htdocs/class/courses/cos126/java_jail/cp/javax.json-1.0.jar -Xmx512M "
-        return "sandbox -M -i /n/fs/htdocs/class/courses/cos126/java_jail/cp "+java
+    def java_prefix():
+        cos126 = "/n/fs/htdocs/cos126/" # wapps directory
+        java = "/usr/bin/java -cp java_jail/cp:java_jail/cp/javax.json-1.0.jar -Xmx512M "
+
+        return "sandbox -M -i "+cos126+"java_jail/cp "+java
 
 # in either case "java_prefix" is like the 'java' binary,
 # ready to accept the class name and cmd line args
-java_prefix = compute_java_prefix()
 
 def execute(command, the_stdin):
     proc = Popen(command.split(" "), stdin=PIPE, stdout=PIPE, stderr=PIPE)
@@ -42,7 +43,7 @@ def execute(command, the_stdin):
                   returncode = proc.returncode)
     
 def run_java(command, the_stdin = ""):
-    return execute(java_prefix + command, the_stdin)
+    return execute(java_prefix() + command, the_stdin)
 
 # database stuff
 def connect():
