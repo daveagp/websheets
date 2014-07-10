@@ -414,18 +414,18 @@ class Websheet:
 
                 # defer blank multi-line region errors to runtime
                 modified_blank = False
-                if user_text.strip() == "" and "\n" in user_text:
-                    # avoid creating 'unreachable' code
-                    # extra brace to work inside of class{ ... }
-                    msg = ('{if (0==0)'+
-                           ' throw new websheets.Grader.BlankException();}')
-                    # keep same number of lines
-                    user_text = '\n' + msg + '\n'*(user_text.count('\n')-1)
-                    modified_blank = True
+                #if user_text.strip() == "" and "\n" in user_text:
+                #    # avoid creating 'unreachable' code
+                #    # extra brace to work inside of class{ ... }
+                #    msg = ('{if (0==0)'+
+                #           ' throw new websheets.Grader.BlankException();}')
+                #    # keep same number of lines
+                #    user_text = '\n' + msg + '\n'*(user_text.count('\n')-1)
+                #    modified_blank = True
 
                 valid = is_valid_substitute(chunk.text, user_text)
 
-                if not valid[0] and not modified_blank:
+                if not valid[0]:# and not modified_blank:
                     # not valid substitute.
                     # report error that makes sense for ui user sees
                     match = re.search(
