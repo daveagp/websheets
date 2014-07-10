@@ -271,4 +271,9 @@ public class Utils {
         dl.handle(reflines);
         return sb.toString();
     }
+
+    public static <T> T failBecauseBlank() {
+        throw new Grader.BlankException();
+    }
+    
 }
