@@ -412,11 +412,11 @@ class Websheet:
 
                 is_valid_substitute = java_syntax.is_valid_substitute
                 
-                if user_text.strip() == "":
-                    msg = ('websheets.Utils.failBecauseBlank()')
-                    user_text = user_text[0] + msg + user_text[-1]
-                    if not is_valid_substitute(chunk.text, user_text)[0]:
-                        user_text = user_text[:-1] + ';' + user_text[-1]
+                #if user_text.strip() == "":
+                #    msg = ('websheets.Utils.failBecauseBlank()')
+                #    user_text = user_text[0] + msg + user_text[-1]
+                #    if not is_valid_substitute(chunk.text, user_text)[0]:
+                #        user_text = user_text[:-1] + ';' + user_text[-1]
 
                 valid = is_valid_substitute(chunk.text, user_text)
 
