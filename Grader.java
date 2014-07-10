@@ -101,7 +101,7 @@ public abstract class Grader extends Options {
             super(msg);
         }
     }
-    static class BlankException extends RuntimeException {
+    public static class BlankException extends RuntimeException {
         public String toString() {
             return "You left this blank empty, please fill it in.";
         }
