@@ -80,13 +80,6 @@ public class Vector {
         for (int i = 0; i < N; i++)
             sum = sum + (this.data[i] * that.data[i]);
         return sum;
-\show:
-        return 0; // fill this in!
-
-
-
-
-        
 ]\
         // remark: is used with "this" in the magnitude() method
     }
@@ -112,13 +105,6 @@ public class Vector {
             if (i < N-1) s+= ", "; 
         }
         return s + ")";
-\show:
-        return ""; // fill this in!
-
-
-
-
-        
 ]\
     }
 

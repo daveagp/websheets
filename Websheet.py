@@ -415,8 +415,9 @@ class Websheet:
                 # defer blank multi-line region errors to runtime
                 modified_blank = False
                 if user_text.strip() == "" and "\n" in user_text:
-                    msg = ('websheets.Utils.failBecauseBlank();')
-                    user_text = user_text[0] + msg + user_text[-1]
+                    msg = 'throw new websheets.Grader.BlankException();'
+                    # keep same number of lines
+                    user_text = '\n' + msg + '\n'*(user_text.count('\n')-1)
                     modified_blank = True
 
                 valid = is_valid_substitute(chunk.text, user_text)
