@@ -411,16 +411,17 @@ class Websheet:
                     blank_count_on_line = 1
 
                 is_valid_substitute = java_syntax.is_valid_substitute
-                
-                #if user_text.strip() == "":
-                #    msg = ('websheets.Utils.failBecauseBlank()')
-                #    user_text = user_text[0] + msg + user_text[-1]
-                #    if not is_valid_substitute(chunk.text, user_text)[0]:
-                #        user_text = user_text[:-1] + ';' + user_text[-1]
+
+                # defer blank multi-line region errors to runtime
+                modified_blank = False
+                if user_text.strip() == "" and "\n" in user_text:
+                    msg = ('websheets.Utils.failBecauseBlank();')
+                    user_text = user_text[0] + msg + user_text[-1]
+                    modified_blank = True
 
                 valid = is_valid_substitute(chunk.text, user_text)
 
-                if not valid[0]:
+                if not valid[0] and not modified_blank:
                     # not valid substitute.
                     # report error that makes sense for ui user sees
                     match = re.search(
