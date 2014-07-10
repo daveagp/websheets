@@ -415,7 +415,7 @@ class Websheet:
                 # defer blank multi-line region errors to runtime
                 modified_blank = False
                 if user_text.strip() == "" and "\n" in user_text:
-                    msg = 'throw new websheets.Grader.BlankException();'
+                    msg = '{throw new websheets.Grader.BlankException();}'
                     # keep same number of lines
                     user_text = '\n' + msg + '\n'*(user_text.count('\n')-1)
                     modified_blank = True
