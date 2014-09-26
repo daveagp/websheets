@@ -33,7 +33,11 @@ def submit_and_log(websheet_name, student, client_request, meta):
     if student_solution[0] == False:
         if student_solution[1] == "Internal error! Wrong number of inputs":
           return("Internal Error (Wrong number of snippets)", "Error: wrong number of snippets")
-        errmsg = student_solution[1].split('\n')[1]
+        errmsg = student_solution[1].split('\n')
+        if len(errmsg) > 1:
+          errmsg = errmsg[1]
+        else:
+          errmsg = errmsg[0]
         return("Pre-syntax Error",
                "<div class='pre-syntax-error'>Syntax error:" + 
                "<pre>\n"+cgi.escape(student_solution[1])+"</pre></div>") # error text
