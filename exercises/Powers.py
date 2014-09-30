@@ -1,7 +1,7 @@
 description = r"""
 Write a program <code>Powers</code> that takes in two numbers from standard input:
 a double <code>k</code> and an integer <code>N</code>. It should print out the
-first <code>k</code> powers of <code>N</code> (using the format given in the template).
+first <code>N</code> powers of <code>k</code> (using the format given in the template).
 For example running with standard input <code>2.0 5</code> should output
 <pre>
 2.0000
