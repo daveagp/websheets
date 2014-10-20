@@ -16,12 +16,12 @@ public static void main(String[] args) {
    // check for increasing
    boolean increasing = true;
    for (int i=0; i<n-1; i++) // one shorter than usual
-      increasing = increasing && (vals[i] > vals[i+1]);
+      increasing = increasing && (vals[i] < vals[i+1]);
 
    // check for decreasing
    boolean decreasing = true;
    for (int i=0; i<n-1; i++) // one shorter than usual
-      decreasing = decreasing && (vals[i] < vals[i+1]);
+      decreasing = decreasing && (vals[i] > vals[i+1]);
 
    System.out.println(increasing || decreasing);
 ]\
