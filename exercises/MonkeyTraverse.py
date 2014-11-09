@@ -6,7 +6,7 @@ starting with the first one. It should print each name on a separate line.
 source_code = r"""
 public class MonkeyChain {
     // structure of items in list
-    class Node {
+    private class Node {
         // each node knows "next" node
         Node next;
         // and stores a value

@@ -8,7 +8,7 @@ at the <b>end</b> of the list.
 
 source_code = r"""
 // structure of items in list
-class Node {
+private class Node {
    // each node knows "next" node
    Node next;
    // and stores a value
