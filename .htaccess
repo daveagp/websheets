@@ -7,6 +7,12 @@ Order Deny,Allow
 Deny from All
 </Files>
 
+# pass to index.php bu default
+<FilesMatch "^$">
+Allow from All
+</FilesMatch>
+DirectoryIndex index.php index.html
+
 # allow images, icons, pdfs
 <FilesMatch "\.(jpe?g|gif|png|ico|pdf)$">
 Allow from All
@@ -26,4 +32,5 @@ Allow from All
 <FilesMatch "\.txt$">
 Allow from All
 </FilesMatch>
+
 
