@@ -12,6 +12,9 @@ def pre(s, specialBlank = False):
 def tt(s):
   return "<code>" + cgi.escape(s) + "</code>"
 
+def execute(command, stdin):
+  return config.execute(command, stdin, output_encoding='Latin-1')
+
 def grade(reference_solution, student_solution, translate_line, websheet):
     cpp_compiler = config.config_jo["cpp_compiler"]
 
@@ -49,8 +52,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
 
     # build reference
     os.chdir(jail + refdir)
-#    refcompile = config.execute("make " + websheet.slug, "")
-    refcompile = config.execute(compile_list + compile_args, "")
+    refcompile = execute(compile_list + compile_args, "")
     if (refcompile.stderr != "" or refcompile.returncode != 0
         or not os.path.isfile(jail + refdir + websheet.slug + suffix)):
         return ("Internal Error (Compiling Reference)",
@@ -61,7 +63,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
 
     # build student
     os.chdir(jail + studir)
-    stucompile = config.execute(compile_list + compile_args, "")
+    stucompile = execute(compile_list + compile_args, "")
       
     result = "<div>Compiling: saving your code as "+tt(websheet.slug+".cpp")
     result += " and calling "+tt(" ".join(["compile"] + compile_args))
@@ -112,7 +114,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         compile_list += [newslug + ".cpp", "-o", newslug + suffix]
 
         os.chdir(jail + refdir)
-        refcompile = config.execute(compile_list, "")
+        refcompile = execute(compile_list, "")
 
         if (refcompile.stderr != "" or refcompile.returncode != 0
             or not os.path.isfile(jail + refdir + websheet.slug + suffix)):
@@ -152,7 +154,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         cpp.write(reftester)
         cpp.close()
         os.chdir(jail + refdir)
-        refcompile = config.execute(compile_list, "")
+        refcompile = execute(compile_list, "")
 
         if (refcompile.stderr != "" or refcompile.returncode != 0
             or not os.path.isfile(jail + refdir + newslug)):
@@ -167,7 +169,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         cpp.write(stutester)
         cpp.close()
         os.chdir(jail + studir)
-        stucompile = config.execute(compile_list, "")
+        stucompile = execute(compile_list, "")
 
         if (stucompile.stderr != "" or stucompile.returncode != 0
             or not os.path.isfile(jail + refdir + newslug)):
@@ -211,7 +213,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
       cmd += ["--exec", exename]
       cmd += args
 
-      runref = config.execute(cmd, stdin)
+      runref = execute(cmd, stdin)
 
       if runref.returncode != 0 or not runref.stderr.startswith("OK"):
         result += "<div>Reference solution crashed!"
@@ -228,7 +230,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
       cmd += ["--exec", exename]
       cmd += args
 
-      runstu = config.execute(cmd, stdin)
+      runstu = execute(cmd, stdin)
       if runstu.returncode != 0 or not runstu.stderr.startswith("OK"):
         result += "<div>Crashed! "
         errmsg = runstu.stderr
