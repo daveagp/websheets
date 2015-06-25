@@ -1,6 +1,11 @@
-<?php
+<?php // security stuff first
 include_once('auth.php');
-?><html>
+
+if (!array_key_exists("folder", $_GET)) $_GET['folder'] = '';
+if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
+  die('Illegal characters in requested folder name.'); 
+?>
+<html>
 <head>
    <title>Websheets</title>
    <link rel="icon" type="image/png" href="favicon.png">
@@ -30,25 +35,13 @@ include_once('auth.php');
   
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700'
     rel='stylesheet' type='text/css'>
-<script type='text/javascript'> 
-   websheets.authinfo = <?php echo json_encode($GLOBALS['WS_AUTHINFO']); ?>;
+   <script type='text/javascript'> 
    websheets.urlbase = "./";
    websheets.require_login = true;
-   websheets.sheets = 
-      <?php
-      if (!array_key_exists('group', $_GET)) 
-         echo passthru("./Websheet.py list") . ";\n";
-      else {
-         $g = $_GET['group'];
-         if (1 != preg_match('~^([\w-]+(/| ))*[\w-]+$~', $g))
-            echo "['hello']; alert('Bad group');";
-         else echo passthru("./Websheet.py list $g") . ";";
-      }
-   echo " websheets.subfolders = ";
-      $g = "";
-      if (array_key_exists('group', $_GET)) $g = $_GET['group']; 
-      echo passthru("./Websheet.py list-folders $g") . ";\n";
-?>
+   websheets.current_folder = <?php echo json_encode($_GET['folder']); ?>;
+   websheets.authinfo = <?php echo json_encode($GLOBALS['WS_AUTHINFO']); ?>;
+   websheets.sheets = <?php echo passthru("./Websheet.py list ".$_GET['folder']); ?>;
+   websheets.subfolders = <?php echo passthru("./Websheet.py list-folders ".$_GET['folder']); ?>;
    </script>
 </head>
 <body>
@@ -63,20 +56,19 @@ include_once('auth.php');
     Visit the <a href="https://github.com/daveagp/websheets">source code</a> 
     on GitHub. -->
     
-    <p>
-    <span>
+    <div class='selectdiv'>
+    <span class='selectspan'>
     Select an exercise:
     <select name="selectSheet" id="selectSheet">
     </select>
     </span>
     <span id="subfoldering" style='margin-left:30px; display: none;'>
-    Change group?
+        Current folder: <span id="currfolder"></span>. 
+        <button name="enterSubfolder" id="enterSubfolder">Change folder:</button>
     <select name="selectSubfolder" id="selectSubfolder">
     </select>
-    <button name="enterSubfolder" id="enterSubfolder">
-    Change
-    </button>
     </span>
+    </div>
     
   </div> <!-- menu-bar -->
 

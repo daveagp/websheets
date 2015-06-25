@@ -611,7 +611,7 @@ self.classname + " to = new " + self.classname + "();\n" +
         r = []
         for file in os.listdir(os.path.join("exercises", directory)):
             if file.endswith(".py") and not file.startswith("_"):
-                r.append(os.path.join(directory, file[:-3]))
+                r.append(file[:-3])
         r.sort()
         return r
 
