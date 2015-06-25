@@ -15,6 +15,7 @@ a more full solution could be done by extending the java_syntax module.
 import re
 import sys
 import os
+import os.path
 import exercises
 import json
 from java_syntax import java_syntax
@@ -82,7 +83,7 @@ class Websheet:
         source = re.sub(r"(.)\]\\$", r"\1]\ ", source, flags=re.MULTILINE)
 
         # analogous thing at start of line, although no websheets so far use it
-        source = re.sub(r"^\[\\(.)", r" \[\1", source, flags=re.MULTILINE)
+#        source = re.sub(r"^\\\[(.)", r" \[\1", source, flags=re.MULTILINE)
 
         delim_expr = '|'.join(re.escape(d) for d in delim)
 
@@ -179,7 +180,8 @@ class Websheet:
                 if result[i].text[-1] != '\n': return err("has bad end")
             if (i > 0 and
                 ((result[i-1].text[-1] == "\n") !=
-                 (result[i].text[0] == "\n"))):
+                 (result[i].text[0] == "\n"))
+                and not (result[i-1].text[-1] == "\n" and result[i].text[0] == " ")):
                 return err("joins incorrectly with previous chunk")
             if "show" in result[i].attr:
                 if (("\n" in result[i].attr["show"])
@@ -201,12 +203,30 @@ class Websheet:
         will appear anyway as fields, but just with default values.
         """
 
-        mandatory_fields = ["classname", "source_code", "tests", "description"]
+        if field_dict["lang"] in {"multichoice", "shortanswer"}:
+            field_dict["source_code"] = None
+            field_dict["tests"] = None
+            field_dict["nocode"] = True
+
+        mandatory_fields = ["classname", "source_code", "tests", "description", "dbslug"]
 
         # optional fields AND default values
         optional_fields = {"show_class_decl": True,
                            "lang": "Java", "slug": None,
-                           "epilogue": None, "dependencies": [], "imports": []}
+                           "example": False,
+                           "mode": None,
+                           "epilogue": None, 
+                           "dependencies": [], 
+                           "imports": [],
+                           "attempts_until_ref": 1000000,
+                           "verboten": (),
+                           "choices": [],
+                           "nocode": False,
+                           "answer": None,
+                           "cppflags_add": [],
+                           "cppflags_remove": [],
+                           "cppflags_replace": None
+        }
                            
         if "lang" in field_dict:
             optional_fields["show_class_decl"] = False
@@ -227,6 +247,9 @@ class Websheet:
                 field not in mandatory_fields and
                 field not in optional_fields): 
                 raise Exception("Unknown field" + field)
+
+        if self.nocode:
+            return
 
         # normalize so starts, ends with newline if not already present
         if not self.source_code.startswith("\n"):
@@ -252,7 +275,7 @@ class Websheet:
         # hide class declaration if requested.
         # note! for this to work, comments should go inside of class decl.
         
-        if not self.show_class_decl:
+        if self.lang == "Java" and not self.show_class_decl:
             # hide thing at start
             self.source_code = re.sub( 
                 "^public class "+self.classname+r" *\{ *$",
@@ -273,14 +296,15 @@ class Websheet:
 
         self.chunks = chunkify_result[1]
 
-        if len(self.imports) > 0:
-            import_text = "\n" + "".join("import "+i+";\n"
-                                         for i in self.imports)
-            self.chunks = ([Chunk(import_text, ChunkType.plain)]
-                           + self.chunks)
+        if self.lang == "Java":
+            if len(self.imports) > 0:
+                import_text = "\n" + "".join("import "+i+";\n"
+                                             for i in self.imports)
+                self.chunks = ([Chunk(import_text, ChunkType.plain)]
+                               + self.chunks)
 
-        self.chunks = ([Chunk("\nimport stdlibpack.*;\n", ChunkType.hide)]
-                       + self.chunks)
+            self.chunks = ([Chunk("\nimport stdlibpack.*;\n", ChunkType.hide)]
+                           + self.chunks)
 
         #print(repr(self.chunks))
         
@@ -305,10 +329,10 @@ class Websheet:
     # Java StringBuilder
     @staticmethod
     def smart_append(stringlist, newtext):
-        if stringlist[-1].endswith("\n") != newtext.startswith("\n"):
+        if not stringlist[-1].endswith("\n") and newtext.startswith("\n"):
             raise Exception("smart_append inconsistency: "
-                            + repr([oldtext, newtext]))
-        if stringlist[-1].endswith("\n"):
+                            + repr([stringlist, newtext]))
+        if stringlist[-1].endswith("\n") and newtext.startswith("\n"):
             stringlist += [newtext[1:]]
         else:
             stringlist += [newtext]
@@ -362,7 +386,7 @@ class Websheet:
         last_line_with_blank = -1
         blank_count_on_line = -1
 
-        if package is not None:
+        if self.lang == "Java" and package is not None:
             add_text('\npackage '+package+';\n', False, True)
 
         blanks_processed = 0
@@ -461,7 +485,7 @@ class Websheet:
         """
         r = []
 
-        r += ['\n' if package is None else 'package '+package+';\n']
+        r += ['\n' if self.lang != "Java" or package is None else 'package '+package+';\n']
 
         for chunk in self.chunks:
             if chunk.type in {ChunkType.plain,
@@ -475,6 +499,7 @@ class Websheet:
         Get snippets of reference solution in a format that
         they can be displayed in the UI
         """
+        if self.nocode: return None
         return [chunk.text for chunk in self.chunks
                 if chunk.type == ChunkType.blank]
         
@@ -483,6 +508,7 @@ class Websheet:
         Get contents of blank areas as they would appear to someone
         opening a problem for the first time.
         """
+        if self.nocode: return None
         return [chunk.attr["show"] for chunk in self.chunks
                 if chunk.type == ChunkType.blank]
          
@@ -495,6 +521,8 @@ class Websheet:
         or starts and ends with a newline. (The UI always assumes this.)
         """
 
+        if self.nocode: return None
+
         r = [""]
 
         for chunk in self.chunks:
@@ -506,12 +534,13 @@ class Websheet:
                 r += [chunk.attr["show"]]
                 r += [""]
 
-        # absorb duplicated newlines/spaces into the editable part
+        # absorb duplicated newlines into the editable part
         for i in range(len(r)-1):
             if r[i].endswith("\n") or r[i+1].startswith("\n"):
-                if not (r[i].endswith("\n") and r[i+1].startswith("\n")):
-                    raise Exception("Sanity check failed!")
-            if r[i].endswith("\n"):
+                if (not (r[i].endswith("\n") and r[i+1].startswith("\n"))
+                    and not (i%2 == 0 and r[i].endswith("\n") and r[i+1].startswith(" "))):
+                        raise Exception("Sanity check failed!")
+            if r[i].endswith("\n") and r[i+1].startswith("\n"):
                 if (i%2 == 0): r[i] = r[i][:-1]
                 else: r[i+1] = r[i+1][1:]
 
@@ -523,6 +552,11 @@ class Websheet:
         r[0] = r[0][1:]
         
         return r
+
+    def cppflags(self, defaultflags):
+        if self.cppflags_replace is not None:
+            return self.cppflags_replace
+        return self.cppflags_add + [i for i in defaultflags if i not in self.cppflags_remove]
 
     def prefetch_urls(self, stringify = False):
         """
@@ -559,27 +593,61 @@ self.classname + " to = new " + self.classname + "();\n" +
 
 
     @staticmethod
-    def from_module(module):
-        # convert module to a dict
+    def from_filesystem(slug):
+        import importlib.machinery
+        loader = importlib.machinery.SourceFileLoader(slug,
+                                                      os.path.join("exercises", slug+".py"))
+        module = loader.load_module(slug)
+
         dicted = {attname: getattr(module, attname) for attname in dir(module)}
         if "classname" not in dicted:
-            dicted["classname"] = module.__name__.split(".")[-1]
-        dicted["slug"] = module.__name__.split(".")[-1]
+            dicted["classname"] = slug.split("/")[-1]
+        dicted["slug"] = slug.split("/")[-1]
+        dicted["dbslug"] = slug
         return Websheet(dicted)
 
     @staticmethod
-    def from_filesystem(slug):
-        return Websheet.from_module(getattr(__import__("exercises." + slug),
-                                            slug))
-
-    @staticmethod
-    def list_filesystem():
+    def list_exercises_in(directory = ""):
         r = []
-        for file in os.listdir("exercises"):
+        for file in os.listdir(os.path.join("exercises", directory)):
             if file.endswith(".py") and not file.startswith("_"):
-                r.append(file[:-3])
+                r.append(os.path.join(directory, file[:-3]))
         r.sort()
         return r
+
+    @staticmethod
+    def list_subgroups_in(group):
+        r = []
+        for file in os.listdir(os.path.join("exercises", group)):
+            if (os.path.isdir(os.path.join("exercises", group, file)) 
+                and not file.startswith("_")
+                and not os.path.isfile(os.path.join("exercises", group, file, "HIDDEN"))):
+                r.append(os.path.join(group, file))
+        r.sort()
+        return r
+
+    @staticmethod
+    def list_filesystem(searchitems):
+        r = []
+        if searchitems == []: searchitems = [""]
+        for item in searchitems: 
+            if os.path.isfile(os.path.join("exercises", item+".py")):
+                r += [item]
+            elif os.path.isdir(os.path.join("exercises", item)):
+                r += Websheet.list_exercises_in(item)
+            else:
+                r += [item+"/NOT_FOUND"]
+
+        return r
+
+    def list_folders(searchitems):
+        if searchitems == []: searchitems = [""]
+        for item in searchitems:
+            # look for first folder.
+            if os.path.isdir(os.path.join("exercises", item)):
+                parent = [] if item=="" else [os.path.dirname(item)]
+                return parent + Websheet.list_subgroups_in(item)
+        return []
 
     def testing_ui(self):
         import config
@@ -656,6 +724,19 @@ self.classname + " to = new " + self.classname + "();\n" +
               file=outf)
         outf.close()
 
+    def get_nocode_question(self):
+        if self.lang=="multichoice":
+            return {"type": "multichoice",
+                    "choices": [c[0] for c in self.choices]}
+        elif self.lang=="shortanswer":
+            return {"type": "shortanswer"}                    
+            
+    def evaluate_nocode_submission(self, user_state):
+        if self.lang=="multichoice":
+            return user_state == [c[1] for c in self.choices]
+        elif self.lang=="shortanswer":
+            return user_state.strip() == self.answer
+
 if __name__ == "__main__":
 
     # call Websheet.py get_reference_solution MaxThree
@@ -684,7 +765,13 @@ if __name__ == "__main__":
             "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
 
     elif sys.argv[1] == "list":
-        print(json.dumps(Websheet.list_filesystem()))
+        found = Websheet.list_filesystem(sys.argv[2:])
+        if found == []:
+            found = ["FOLDER_IS_EMPTY"]
+        print(json.dumps(found))
+
+    elif sys.argv[1] == "list-folders":
+        print(json.dumps(Websheet.list_folders(sys.argv[2:])))
 
     elif sys.argv[1] == "testing_ui":
         print(json.dumps(Websheet.from_filesystem(sys.argv[2]).testing_ui()))

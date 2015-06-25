@@ -1,5 +1,11 @@
 <?php
-include_once('include.php');
+include_once('auth.php');
+
+global $WS_AUTHINFO;
+if ($WS_AUTHINFO["error_div"] != "") {
+   echo json_encode($WS_AUTHINFO);
+   die();
+}
 
 if (//!array_key_exists('stdin', $_REQUEST) ||
      !array_key_exists('problem', $_REQUEST))
@@ -11,8 +17,9 @@ if (//!array_key_exists('stdin', $_REQUEST) ||
 $problem = $_REQUEST["problem"];
 
 // only accept characters that cannot cause problems
-if (!preg_match("@^[0-9a-zA-Z]+$@", $problem)) {
-  echo "Internal error, malformed problem \"$problem\"";
+$regex = "[_0-9a-zA-Z/-]+";
+if (!preg_match("@^$regex\$@", $problem)) {
+  echo "Internal error, problem name \"$problem\" doesn't match $regex";
   die;
  }
 
@@ -22,7 +29,7 @@ $descriptorspec = array(
                         2 => array("pipe", "w"),  // stderr
                         );
 
-$process = proc_open("./load.py " . $problem . " " . WS_USERNAME, $descriptorspec, $pipes);
+$process = proc_open("./load.py " . $problem . " " . $WS_AUTHINFO['username'], $descriptorspec, $pipes);
 
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";

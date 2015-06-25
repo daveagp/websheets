@@ -1,5 +1,5 @@
 <?php
-include_once('include.php');
+include_once('auth.php');
 
 if (!array_key_exists('stdin', $_REQUEST)
     || !array_key_exists('problem', $_REQUEST))
@@ -10,14 +10,14 @@ if (!array_key_exists('stdin', $_REQUEST)
 
 $client_request = json_decode($_REQUEST["stdin"]);
 if ($client_request == FALSE) {
-  echo "Intenral error, request did not receive a json on stdin";
+  echo "Internal error, request did not receive a json on stdin";
   die;
  }
 
 $problem = $_REQUEST["problem"];
 
 // only accept characters that cannot cause problems
-if (!preg_match("@^[0-9a-zA-Z]+$@", $problem)) {
+if (!preg_match("@^[0-9a-zA-Z_/-]+$@", $problem)) {
   echo "Internal error, malformed problem \"$problem\"";
   die;
  }
@@ -29,9 +29,10 @@ $descriptorspec = array(
                         );
 
 $stdin = json_encode(array("client_request" => $client_request,
-                           "php_data" => array("user"=>WS_USERNAME, 
+                           "authinfo" => $WS_AUTHINFO,
+                           "php_data" => array("user"=>$WS_AUTHINFO['username'],
                                                "problem"=>$problem,
-                                               "meta"=>array("authdomain"=>WS_AUTHDOMAIN, 
+                                               "meta"=>array("authdomain"=>$WS_AUTHINFO['domain'],
                                                              "ip"=>$_SERVER['REMOTE_ADDR']))));
 
 $process = proc_open("./submit.py", $descriptorspec, $pipes);
