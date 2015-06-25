@@ -18,7 +18,7 @@ def java_prefix():
     safeexec = config_jo["safeexec-executable-abspath"]    
 
     java = ["/java/bin/java", "-cp", ".:javax.json-1.0.jar", "-Xmx128M"] # java within jail, using default java_jail config
-    safeexec_args = ["--chroot_dir ", jail, "--exec_dir", "/cp", "--env_vars", "''",
+    safeexec_args = ["--chroot_dir", jail, "--exec_dir", "/cp", "--env_vars", "",
                      "--nproc", "100", "--mem", "10000000", "--nfile", "100", "--gid", "1000", "--clock", "5", "--exec"]
     return [safeexec] + safeexec_args + java
 
