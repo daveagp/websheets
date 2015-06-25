@@ -8,6 +8,9 @@
  "db-password": "...",
  "db-database": "...",
 
+ "cpp_compiler":"g++",
+ "comment":"or put clang++, or path to one of these",
+
  "hybridauth-base_url":
          "http://your-website.../websheets/hybridauth/hybridauth/index.php",
 
