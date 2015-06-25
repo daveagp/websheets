@@ -58,7 +58,7 @@ include_once('auth.php');
 
 <!--    <p>
     This is an experimental system. 
-    <a href="mailto:dp6@cs.princeton.edu">Contact us</a> 
+    <a href="mailto:daveagp@gmail.com">Contact us</a> 
     if you find bugs or have feedback.     
     <a href="bytopic.php">See all problems by topic.</a>
     Visit the <a href="https://github.com/daveagp/websheets">source code</a> 
