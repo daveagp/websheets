@@ -11,13 +11,15 @@ sometimes produces:
 """
 import config, json, cgi
 
-cpp_compiler = "clang++-3.5"
-default_cppflags = [
-  "-Wall", "-Wvla", "-Wshadow", "-Wunreachable-code",
+cpp_compiler = config.config_jo["cpp_compiler"]
+
+# following http://bits.usc.edu/cs103/compile/
+default_cppflags = ["-g",
+  "-Wall", "-Wshadow", "-Wunreachable-code",
   "-Wconversion",
-  "-Wno-shorten-64-to-32", "-Wno-sign-conversion",
-  "-Wno-sign-compare", "-Wno-write-strings",
-  "-g"]
+  "-Wno-sign-compare", "-Wno-write-strings"]
+if cpp_compiler.startswith("clang"):
+  default_cppflags += ["-Wvla", "-Wno-shorten-64-to-32", "-Wno-sign-conversion"]
 
 void_functions = []
 
