@@ -78,11 +78,20 @@ There are some optional things you can do once the basics are working:
    makes less escaping necessary and because we use Python as a system
    to glue everything together.
 
+4. The C++ backend can basically use the same 'java_jail' jail except
+    (a) you need to add a subdirectory "scratch" with apache write permission
+    (b) you need to add libraries libstdc++.so.6 & libgcc_s.so.1 to the jail
+
+
 THANKS
 
 Thanks to the COS 126 staff at Princeton for offering feedback when using
 this tool from Fall 2013 to Spring 2014: 
 Donna Gabai, Maia Ginsburg, Bob Sedgewick and Doug Clark.
+
+Thanks to Mark Redekopp at U. Southern California for great feedback when
+the C++ backend was developed.
+
 
 DB TECHNICAL DETAILS
 
