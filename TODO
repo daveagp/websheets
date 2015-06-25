@@ -1,6 +1,22 @@
-add ability to disable viewing reference solution
+Embedding instructions
 
-add ability to have private_exercises folder
+Organize cs103 exercises vs examples
+
+Fix java "bytopic" page
+
+hosted creation of exercises. 
+  editor. 
+  sharability options.
+
+hosted exercise scores / review hw-usc.{php,py}
+  authenticating student of a teacher?
+
+saner "you're not logged in" message / options
+
+reference solution options:
+ always, never, after success, after N tries
+
+make homework exercises hidden (incl. from github) 
 
 allow blank at top for header
 
