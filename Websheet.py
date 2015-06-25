@@ -203,7 +203,7 @@ class Websheet:
         will appear anyway as fields, but just with default values.
         """
 
-        if field_dict["lang"] in {"multichoice", "shortanswer"}:
+        if "lang" in field_dict and field_dict["lang"] in {"multichoice", "shortanswer"}:
             field_dict["source_code"] = None
             field_dict["tests"] = None
             field_dict["nocode"] = True

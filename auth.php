@@ -9,22 +9,20 @@ authenticates user. processes $_REQUEST variables:
 - ajax_uid_intended: optional. signals this is an ajax request. if auth'ed
   user not equal to this, signal an error (if no other errors)
 
-defines 2 global associative arrays.
+output: defines 2 global associative arrays.
 
-WS_AUTHINFO contains info:
+WS_AUTHINFO contains info that can be made PUBLIC to the user and which can be converted to JSON:
 
 ["logged_in"] : boolean
 ["username"] : email address, or "anonymous"
 ["domain"] : currently logged-in domain: Facebook/Google/Princeton/etc or "n/a"
 ["providers"] : list of known providers
 ["error_div"] : html error message or empty string if none.
+["error_plaintext"] : text version of same
+["required_username_suffix"] : blank if n/a, or required login domain, used for error message UI
  (e.g., cant load config file, user has wrong domain, ajax user expired etc)
 
-it can be converted to json for use by other programs.
-it should contain information that can be safely sent to the user.
-
-WS_CONFIG is the contents of ws-config.json
-it should not be sent to the user.
+WS_CONFIG is the contents of ws-config.json and MUST BE KEPT PRIVATE since it will have things like database credentials
 
    */
 
@@ -57,30 +55,32 @@ else {
     }      
 }
 
-ini_set('session.cookie_lifetime', 90*60);
-ini_set('session.gc_maxlifetime', 90*60); // expires after 90 unused minutes
-session_start();
+// someone who is logged in, should not be required to log in for this long
+// main reason is to avoid hitting rate limit on authentication server
+$cookie_renew_seconds = 60*90; // 90 minutes, length of a class
 
+// server-side cookie management
+ini_set('session.gc_maxlifetime', $cookie_renew_seconds); // expires after 90 unused minutes
+session_start();
 $now = time();
 if (isset($_SESSION['discard_after']) && $now > $_SESSION['discard_after']){
    // this session has worn out its welcome; 
    // kill it and start a brand new one
    session_unset();
    session_destroy();
-   //   session_set_cookie_params ( 60*60 ); // 1 hour
    session_start();
 }
+$_SESSION['discard_after'] = $now + $cookie_renew_seconds;
 
+// client-side cookie management
+// just in case their clock is screwed up, let them keep it forever so server can reject them 
 $params = session_get_cookie_params();
-// tell client how long to keep it
-setcookie(session_name(), session_id(), $now+90*60, $params['path'], 
-          $params['domain'], $params['secure'], isset($params['httponly']));
-// tell auth.php how long to keep it
-$_SESSION['discard_after'] = $now + 90*60;
-
+setcookie(session_name(), session_id(), 0, $params['path'], 
+        $params['domain'], $params['secure'], isset($params['httponly']));
+// old approach: ini_set('session.cookie_lifetime', 0);
 
 if ($error != "") {
-  $WS_AUTHINFO["providers"] = [];  
+  $WS_AUTHINFO["providers"] = array();  
 }
 else {
    if (array_key_exists("required_username_suffix", $WS_CONFIG)) {
@@ -129,7 +129,7 @@ else {
   
   // now call the hybridauth library
   require_once( dirname(__FILE__)
-                ."/../hybridauth/hybridauth/Hybrid/Auth.php" ); 
+                ."/hybridauth/hybridauth/Hybrid/Auth.php" ); 
   $hybridauth = new Hybrid_Auth( $ha_config );
 
   if (!array_key_exists('auth', $_REQUEST))
@@ -173,18 +173,20 @@ else {
              $user_profile = $adapter->getUserProfile(); 
              $un = $user_profile->emailVerified;
 
-             $rus = $WS_CONFIG["required_username_suffix"];
-             
-             // logged in with invalid account.
-             // this usually can't happen if you use Google's "hd" option
-             if (!(substr($un, -strlen($rus)) === $rus))  {
-                $error = "You need to log in with your an email address ending
+             if (array_key_exists("required_username_suffix", $WS_CONFIG)) {
+               $rus = $WS_CONFIG["required_username_suffix"];
+               
+               // logged in with invalid account.
+               // this usually can't happen if you use Google's "hd" option
+               if (!(substr($un, -strlen($rus)) === $rus))  {
+                 $error = "You need to log in with your an email address ending
  in $rus. You logged in as $un instead. Please 
 <a href='javascript:websheets.auth_reload(\"logout\")'>log out</a>. 
 In case of problems you may need to visit $authdomain in a new tab/window 
 and sign out."; 
-                $hybridauth->logoutAllProviders();
-                break;
+                 $hybridauth->logoutAllProviders();
+                 break;
+               }
              }
 
              //if (rand(0, 10)<8) throw new Exception(); //for testing
@@ -200,7 +202,7 @@ and sign out.";
     }
   }     
   
-  // some schools will want to use their own authentication
+  // some schools will want to use their own authentication. example:
   if (substr($_SERVER['SERVER_NAME'], -13)=='princeton.edu') {
     $WS_AUTHINFO['providers'][] = "Princeton";
     
@@ -225,7 +227,7 @@ and sign out.";
   }
 
 // pass the list of authentication services to the next php file
-  if ($WS_AUTHINFO["providers"] == []) {
+  if ($WS_AUTHINFO["providers"] == array()) {
      $error = "No authentication providers are configured.";
   }
 }
@@ -241,6 +243,7 @@ if (!$WS_AUTHINFO["logged_in"]) {
    setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 }
 
+// check if an ajax request was not authenticatable by the expected user
 if ($error == "" && array_key_exists("ajax_uid_intended", $_REQUEST)) {
    $aui = $_REQUEST["ajax_uid_intended"];
    if (!$WS_AUTHINFO["logged_in"] && $aui != "anonymous") {
@@ -263,24 +266,11 @@ on another window as <tt>".$WS_AUTHINFO["username"]."</tt>.";
 }
 
 $WS_AUTHINFO["error_div"] = "";
+$WS_AUTHINFO["error_plaintext"] = $error;
 
 if (strlen($error) != 0) {
-   $WS_AUTHINFO["error_div"] = "<div class='ws-error-div'>
-<i>$error</i>
+   $WS_AUTHINFO["error_div"] = "<div class='ws-error-div'><i>$error</i>
    <script type='text/javascript'>
-   $(function(){alert('Error! Please see status message.');});</script>
-</div>";
-   $WS_AUTHINFO["usc_status"] = "<span><i>$error</i></span>";
+   $(function(){alert('Error! Please see status message.');});</script></div>";
 }
-else {
-   $WS_AUTHINFO["error_div"] = "";
-   $authp = $WS_AUTHINFO["logged_in"] ? 'logout' : 'Google';
-   $text = $WS_AUTHINFO["logged_in"] ? 
-      ("Logout from <b>".$WS_AUTHINFO['username']."</b>")
-      : 'Login to @usc account via Google';
-   $WS_AUTHINFO["usc_status"] = 
-      "<a class='usc-auth-status' " . 
-      "href=\"javascript:websheets.auth_reload('$authp')\">$text</a>";
-}
-
 
