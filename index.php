@@ -19,8 +19,8 @@ if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
    <script type="text/javascript">
    "use strict";
    </script>
-   <script type="text/javascript" src="websheets.js"></script>
-   <script type="text/javascript" src="index.js"></script>
+   <script type="text/javascript" src="websheets.js?1"></script>
+   <script type="text/javascript" src="index.js?1"></script>
    <script type="text/x-mathjax-config"> 
       MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]} });
    </script>
@@ -30,8 +30,8 @@ if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
 
    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
    <link rel="stylesheet" href="CodeMirror/theme/neat.css">
-   <link rel="stylesheet" href="websheets.css">
-   <link rel="stylesheet" href="index.css">
+   <link rel="stylesheet" href="websheets.css?1">
+   <link rel="stylesheet" href="index.css?1">
   
    <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700'
     rel='stylesheet' type='text/css'>
