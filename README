@@ -63,7 +63,7 @@ There are some optional things you can do once the basics are working:
    for user email authentication (they are remembered by email address). 
    With some work you can set up a custom authentication for your school
    if they have a PHP authentication system; follow the Princeton example
-   in include.php. You should also be able to use other hybridauth providers
+   in auth.php. You should also be able to use other hybridauth providers
    with a little work.
 
    You need a google "Client ID for web applications" and "Client secret"
