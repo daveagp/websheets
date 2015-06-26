@@ -9,7 +9,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         }
     
     for clazz in ["Grader", "Options", "Utils"]:
-      dump["websheets."+clazz] = "".join(open(clazz+".java"))
+      dump["websheets."+clazz] = "".join(open("grade_java_files/"+clazz+".java"))
 
     for dep in websheet.dependencies:
       depws = Websheet.Websheet.from_filesystem(dep)

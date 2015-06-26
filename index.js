@@ -13,12 +13,12 @@ $(function() {
       snippet = websheets.authinfo.error_div;
    else if (websheets.authinfo.logged_in) 
       snippet = 
-      "<p>Logged in as <b>"+websheets.authinfo.username+"</b>"+
+      "Logged in as <b>"+websheets.authinfo.username+"</b>"+
       " (logged in through "+websheets.authinfo.domain+")."+
       " Click to <a href='javascript:websheets.auth_reload(\"logout\")'>"+
       " log out</a>.";
    else {
-      snippet = '<p><b style="color:red">Not logged in, your work will '+
+      snippet = '<b style="color:red">Not logged in, your work will '+
          'not be saved.</b> ';
       pretext = 'Login '; 
       if (websheets.authinfo.required_username_suffix)
@@ -27,17 +27,18 @@ $(function() {
       if (websheets.authinfo.providers.length==1) {
          snippet += '<a href="javascript:websheets.auth_reload(\'' +
             websheets.authinfo.providers[0] + '\')">' +
-            pretext + websheets.authinfo.providers[0] + '</a>';
+            pretext + websheets.authinfo.providers[0] + '</a>.';
       }
       else {
          snippet += pretext;
          for (var i=0; i<websheets.authinfo.providers.length; i++)
-            snippet += '<a href="javascript:websheets.auth_reload(\''
+           snippet += (i>0?' or ' : '') + ' <a href="javascript:websheets.auth_reload(\''
             + websheets.authinfo.providers[i] + '\')">' +
-            websheets.authinfo.providers[i] + '</a> ';
+            websheets.authinfo.providers[i] + '</a>';
          }
+     snippet += '.';
    }
-   $(".menu-bar").prepend(snippet);
+   $(".menu-bar").prepend("<span>"+snippet+"</span>");
    
    // use variables "sheets" and "GET" defined by the php script 
    // that included this js to initialize the list of sheets

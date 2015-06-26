@@ -47,15 +47,9 @@ if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
 <body>
  <div id="page">
   <div class="menu-bar noprint">
-
-<!--    <p>
-    This is an experimental system. 
-    <a href="mailto:daveagp@gmail.com">Contact us</a> 
-    if you find bugs or have feedback.     
-    <a href="bytopic.php">See all problems by topic.</a>
-    Visit the <a href="https://github.com/daveagp/websheets">source code</a> 
-    on GitHub. -->
-    
+    <a href="mailto:daveagp@gmail.com">Report feedback</a>. 
+    <a href="https://github.com/daveagp/websheets">Get source</a>.    
+   
     <div class='selectdiv'>
     <span class='selectspan'>
     Select an exercise:

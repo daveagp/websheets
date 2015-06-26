@@ -25,3 +25,7 @@ body {
  padding:0px;
  border:none;
 }
+
+.selectdiv {
+    line-height: 2;
+}

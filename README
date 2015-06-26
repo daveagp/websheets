@@ -6,14 +6,13 @@ other licenses for subdirectories/subrepositories).
 
 MIRRORS
 
-Right now there are two mirrors:
- http://www.cs.princeton.edu/~cos126/websheets/index.php (Java 7)
- http://cscircles.cemc.uwaterloo.ca/websheets/index.php (Java 8)
+Right now there are three mirrors:
+ http://cscircles.cemc.uwaterloo.ca/websheets/ (Java 8)
+ http://bits.usc.edu/websheets/ (focuses on C++)
+ http://www.cs.princeton.edu/~cos126/websheets/index.php (old, Java 7)
 
-You can link to a particular exercise with
-.../index.php#NameAge
-or a group of exercises with 
-.../index.php?group=HelloWorld+NameAge+NextYear#NameAge
+You can link to a particular folder and/or exercise with
+.../?folder=java/04-stdin&start=Powers
 
 MANUAL
 
@@ -82,6 +81,9 @@ There are some optional things you can do once the basics are working:
     (a) you need to add a subdirectory "scratch" with apache write permission
     (b) you need to add libraries libstdc++.so.6 & libgcc_s.so.1 to the jail
 
+5. See embed.php for an example of embedding Websheets in other pages,
+   e.g. in course notes. Because of XSS restrictions we've only tested
+   this when the course notes server is the same as the websheets server.
 
 THANKS
 
@@ -115,17 +117,19 @@ Please check that
  http://your.website/url/to/websheets/ws-config.json
 is inaccessible; .htaccess tries to do this, but you should confirm it works.
 
-PARTIAL FILES LISTING
+FILES LISTING
 
 ws-config.example.json - copy this to ws-config.json and fill it in
-websheet.{css,js} - create/render the partially read-only codemirror area
-index.{php,js} - browser for multiple websheets
-bytopic.php - lists problems by topic
+manual.html - how to write Java exercises
+embed.php - example of embedding websheets in other pages
+index.{php,css,js} - main UI and problem browser
+
+websheets.{css,js} - codemirror area and action buttons
 load.{php,py} - (for ajax) load a problem to show
-submit.{php,py} - (for ajax) submit an attempt
-include.php - authentication used by all php files
-Websheet.py - Python model of a Websheet, to extract views and merge with student submission
-config.py - Python to interact with safeexec and database used by all .py files
-Grader.java - grader template runs & compares student/reference code
-Utils.java - static helper functions for grader
-Options.java - per-test options that websheets can set
+submit.{php,py}, grade_{java,cpp}.py - (for ajax) submit an attempt
+auth.php, loginout.php - authentication used by all php files
+Websheet.py - Python model of a Websheet, snippet merging tools, cmd-line util
+config.py - interact with safeexec, database, config options
+
+bytopic.php - (out of date) lists problems by topic
+hw-usc.{php,py} - used by USC
