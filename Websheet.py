@@ -16,9 +16,16 @@ import re
 import sys
 import os
 import os.path
-import exercises
 import json
 from java_syntax import java_syntax
+
+def exercise_path(qualified_slug, suffix=".py"):
+    from config import config_jo
+    if "exercises_basepath" in config_jo:
+        basepath = config_jo["exercises_basepath"]
+    else:
+        basepath = "exercises"
+    return os.path.join(basepath, qualified_slug + suffix)
 
 indent_width = 3
 
@@ -596,7 +603,7 @@ self.classname + " to = new " + self.classname + "();\n" +
     def from_filesystem(slug):
         import importlib.machinery
         loader = importlib.machinery.SourceFileLoader(slug,
-                                                      os.path.join("exercises", slug+".py"))
+                                                      exercise_path(slug))
         module = loader.load_module(slug)
 
         dicted = {attname: getattr(module, attname) for attname in dir(module)}
@@ -609,7 +616,7 @@ self.classname + " to = new " + self.classname + "();\n" +
     @staticmethod
     def list_exercises_in(directory = ""):
         r = []
-        for file in os.listdir(os.path.join("exercises", directory)):
+        for file in os.listdir(exercise_path(directory, suffix="")):
             if file.endswith(".py") and not file.startswith("_"):
                 r.append(file[:-3])
         r.sort()
@@ -618,35 +625,18 @@ self.classname + " to = new " + self.classname + "();\n" +
     @staticmethod
     def list_subgroups_in(group):
         r = []
-        for file in os.listdir(os.path.join("exercises", group)):
-            if (os.path.isdir(os.path.join("exercises", group, file)) 
+        for file in os.listdir(exercise_path(group, suffix="")):
+            if (os.path.isdir(exercise_path(os.path.join(group, file), suffix="")) 
                 and not file.startswith("_")
-                and not os.path.isfile(os.path.join("exercises", group, file, "HIDDEN"))):
+                and not os.path.isfile(exercise_path(os.path.join(group, file, "HIDDEN")))):
                 r.append(os.path.join(group, file))
         r.sort()
         return r
 
-    @staticmethod
-    def list_filesystem(searchitems):
-        r = []
-        if searchitems == []: searchitems = [""]
-        for item in searchitems: 
-            if os.path.isfile(os.path.join("exercises", item+".py")):
-                r += [item]
-            elif os.path.isdir(os.path.join("exercises", item)):
-                r += Websheet.list_exercises_in(item)
-            else:
-                r += [item+"/NOT_FOUND"]
-
-        return r
-
-    def list_folders(searchitems):
-        if searchitems == []: searchitems = [""]
-        for item in searchitems:
-            # look for first folder.
-            if os.path.isdir(os.path.join("exercises", item)):
-                parent = [] if item=="" else [os.path.dirname(item)]
-                return parent + Websheet.list_subgroups_in(item)
+    def list_folders(item):
+        if os.path.isdir(exercise_path(item, suffix="")):
+            parent = [] if item=="" else [os.path.dirname(item)]
+            return parent + Websheet.list_subgroups_in(item)
         return []
 
     def testing_ui(self):
@@ -765,19 +755,21 @@ if __name__ == "__main__":
             "student."+sys.argv[3] if len(sys.argv) > 3 else None)))
 
     elif sys.argv[1] == "list":
-        found = Websheet.list_filesystem(sys.argv[2:])
+        arg = sys.argv[2] if len(sys.argv) > 2 else "" # since we don't escape call to passthru
+        found = Websheet.list_exercises_in(arg)
         if found == []:
             found = ["FOLDER_IS_EMPTY"]
         print(json.dumps(found))
 
     elif sys.argv[1] == "list-folders":
-        print(json.dumps(Websheet.list_folders(sys.argv[2:])))
+        arg = sys.argv[2] if len(sys.argv) > 2 else "" # since we don't escape call to passthru
+        print(json.dumps(Websheet.list_folders(arg)))
 
     elif sys.argv[1] == "testing_ui":
         print(json.dumps(Websheet.from_filesystem(sys.argv[2]).testing_ui()))
 
     elif sys.argv[1] == "testall_ui":
-        wslist = Websheet.list_filesystem()
+        wslist = Websheet.list_exercises_in()
         print(json.dumps({slug: Websheet.from_filesystem(slug).testing_ui()
                           for slug in wslist}
                          ,indent=4, separators=(',', ': '))) # pretty!
