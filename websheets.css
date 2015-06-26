@@ -144,7 +144,7 @@ code, pre, tt, .wscontainer .CodeMirror, .CodeMirror * {
     background: #DDF;
 }
 
-.exercise-header:hover {
+.exercise-header.toggleable:hover {
     cursor: n-resize;
 }
 

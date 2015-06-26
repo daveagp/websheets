@@ -17,8 +17,9 @@ WS_AUTHINFO contains info that can be made PUBLIC to the user and which can be c
 ["username"] : email address, or "anonymous"
 ["domain"] : currently logged-in domain: Facebook/Google/Princeton/etc or "n/a"
 ["providers"] : list of known providers
-["error_div"] : html error message or empty string if none.
 ["error_plaintext"] : text version of same
+["error_div"] : html-formatted error message (bad server config, auth expiry) or empty string if none.
+["info_span"] : very simple user-showable summary of authentication status, for convenience
 ["required_username_suffix"] : blank if n/a, or required login domain, used for error message UI
  (e.g., cant load config file, user has wrong domain, ajax user expired etc)
 
@@ -269,8 +270,23 @@ $WS_AUTHINFO["error_div"] = "";
 $WS_AUTHINFO["error_plaintext"] = $error;
 
 if (strlen($error) != 0) {
-   $WS_AUTHINFO["error_div"] = "<div class='ws-error-div'><i>$error</i>
+   $WS_AUTHINFO["error_div"] = "<div class='ws-error-message'><i>$error</i>
    <script type='text/javascript'>
    $(function(){alert('Error! Please see status message.');});</script></div>";
+}
+
+if (strlen($error) != 0)
+   $WS_AUTHINFO["info_span"] = "<span class='ws-error-message'><i>$error</i>
+   <script type='text/javascript'>
+   $(function(){alert('Error! Please see status message.');});</script></span>";
+else if ($WS_AUTHINFO['logged_in'])
+   $WS_AUTHINFO["info_span"] = "<span>Logged in as " . $WS_AUTHINFO["username"] 
+      . " via " . $WS_AUTHINFO["domain"] 
+      . ". <a href='?auth=logout'>Log out.</a></span>";
+else {
+   $msg = "<span>Not logged in. Log in with";
+   foreach ($WS_AUTHINFO["providers"] as $i => $p)
+      $msg .= " <a href='?auth=$p'>$p</a>";
+   $WS_AUTHINFO["info_span"] = $msg . '</span>';
 }
 

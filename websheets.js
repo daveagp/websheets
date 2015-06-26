@@ -39,10 +39,12 @@ websheets.popup_reauth = function() {
    var newWindow = window.open(websheets.urlbase + 'loginout.php?auth=' + domain);
    newWindow.onload = function() { 
       newWindow.close(); 
-      $(".ws-error-div").remove();
+      $(this.div).find(".ws-error-div").remove();
    };
 };
 
+// if data is null, fetch it asynchronously
+// otherwise, it should be the json output of a 'load'
 websheets.createHere = function(slug, data) {
    var arrScripts = document.getElementsByTagName('script');
    var currScript = arrScripts[arrScripts.length - 1];
@@ -82,10 +84,37 @@ websheets.createAt = function(slug, data, containerdiv) {
    <div class="noprint after-results" style="display:none"></div> \
   </div> <!-- exercise-body --> \
   </div> <!-- container -->');
+   if (websheets.header_toggling)
+      $(containerdiv).find('.exercise-header').addClass('toggleable');
    var ws = new websheets.Websheet(slug, data, containerdiv);
    websheets.all.push(ws);
    return ws;
 };
+
+// don't pollute things with new variables
+(function() {
+   // the callback
+   var process = function (parent, child) {
+      if (child.nodeName=="DIV" && child.classList.contains("websheet-stub"))
+         websheets.createAt(child.innerHTML, null, child);
+   };
+
+   // construct observer _before_ anything is rendered
+   var mo = new MutationObserver(
+      // constructor argument: callback on MutationRecord[]
+      function (events) {
+         // for each record,
+         for (var i=0; i<events.length; i++)
+            // MutationRecord has Node "target" and Node[] "addedNodes"
+            for (var j=0; j<events[i].addedNodes.length; j++)
+               // we'll define "process(parent, child)" below
+               process(events[i].target, events[i].addedNodes[j]);
+      }
+   );
+
+   // what should we observe, and with what options?
+   mo.observe(document, {childList: true, subtree: true});
+})();
 
 websheets.Websheet = function(slug, data, div) {
    var this_ws = this; // to access in callbacks
@@ -254,13 +283,13 @@ websheets.Websheet.prototype.load = function(newslug) {
    if (newslug)
       this_ws.slug = newslug;
 
-   $.ajax(websheets.urlbase+"load.php", {
+   $.ajax(websheets.urlbase+"/load.php", {
       data: {problem: this_ws.slug,
              ajax_uid_intended: websheets.authinfo.username},
       dataType: "json",
       
       success: function(data) {
-         $(".load-error").remove();
+         $(this_ws.div).find(".load-error").remove();
          if (data.error_div) {
             $(this_ws.div).prepend(data.error_div);            
          }
@@ -269,7 +298,7 @@ websheets.Websheet.prototype.load = function(newslug) {
          }
       },      
       error: function(jqXHR, textStatus, errorThrown) {
-         $(".load-error").remove();
+         $(this_ws.div).find(".load-error").remove();
          if (textStatus == "parsererror") {
             var info = jqXHR.responseText;
             $(this_ws.div).find(".exercise-body").hide();
@@ -308,7 +337,7 @@ websheets.Websheet.prototype.submit = function() {
       user_state['snippets'] = this.wse.getUserCodeAndLocations();
    }
    
-   $.ajax(websheets.urlbase+"submit.php", {
+   $.ajax(websheets.urlbase+"/submit.php", {
       data: {stdin: JSON.stringify(user_state), problem: this_ws.slug,
             ajax_uid_intended: websheets.authinfo.username},
       dataType: "json",
@@ -677,7 +706,7 @@ websheets.WebsheetEditor = function(textarea_element, fragments, initial_snippet
       for (var i=0; i<data.length; i++) {
 	 var f = editable[i].find().from;
 	 var t = editable[i].find().to;
-         console.log(f, t);
+//         console.log(f, t);
 	 if (data[i].indexOf("\n") != -1) {
 	    f = {line: f.line+1, ch: 0};
 	    t = {line: t.line-1, ch: cm.getLine(t.line-1).length};
@@ -748,3 +777,4 @@ $(function() {
       }
    });
 });
+
