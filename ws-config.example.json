@@ -17,5 +17,10 @@
  "facebook-id": "your facebook api id",
  "facebook-secret": "your facebook api secret key",
  "google-id":"your google api id",
- "google-secret":"your google api secret key"
+ "google-secret":"your google api secret key",
+
+ "comment": "keep the 2 below only if your university uses google apps and you want to authenticate using it",
+ "google-apps-domain": "youruniversity.edu",
+ "required_username_suffix": "@youruniversity.edu"
+
 }
