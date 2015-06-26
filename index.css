@@ -1,0 +1,31 @@
+html {
+  max-width: 880px;
+  max-width: 110ch;
+  margin: 0px auto;
+  background-color: #DDD;
+  padding: 0px;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  box-shadow: gray 0px 0px 5px 0px;
+}
+
+#page {
+  background-color: white;
+  margin: 0px auto;
+  min-height: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+
+#page .wscontainer {
+ padding:0px;
+ border:none;
+}
+
+.selectdiv {
+    line-height: 2;
+}

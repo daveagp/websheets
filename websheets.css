@@ -1,19 +1,48 @@
+.wscontainer.minimized {
+  height: 40px;
+  overflow: hidden;
+}
+
+.buttonTable, .buttonTable > tbody, .buttonTable > tbody > tr,
+.buttonTable > tbody > tr > td {
+ border: none !important;
+ margin: 0px !important;
+ padding: 0px !important;
+}
+
+.buttonTable {
+    width: 100%;
+}
+
+.code {
+    display: none;
+}
+
+.wscontainer.nocode .showrefButton,
+.wscontainer.nocode .hiderefButton,
+.wscontainer.nocode .resetButton {
+    display: none;
+}
+
+.wscontainer .CodeMirror * {
+  font-size: 15px !important;
+  line-height: 20px !important;
+}
+
 .CodeMirror {
-  font-size: 16px;
-  line-height: 22px;
   border: 1px solid #eee;
   overflow-y: hidden;
-  height: auto;
+  height: auto !important;
 }
 .CodeMirror-scroll {
-  height: auto;
+  height: auto !important;
   min-height: 100px;
-  overflow-y: hidden;
-  overflow-x: auto;
+  overflow-y: hidden !important;
+  overflow-x: auto !important;
   box-sizing: border-box;
 }
 div.CodeMirror-cursors {
-  z-index: 3;
+  z-index: 3 !important;
 }
 .before-diff-line {
   color: #0A0;
@@ -25,35 +54,29 @@ div.CodeMirror-cursors {
 }
 
 
-#description {
-}
-
-#container {
-}
-
 .tempAlert {
     border-top: 1px solid red;
     border-bottom: 1px solid red;
     line-height: 20px;
 }
 
-#results div {
+.wscontainer .results div {
     padding: 3px;
     background-color: #F6F6F6;
     border-bottom: 1px solid #DDD;
     border-left: 1px solid #DDD;
     border-right: 1px solid #DDD;
     }
-#results div:first-child {
+.wscontainer .results div:first-child {
     border-top: 1px solid #DDD;
     }
 
-#results pre { /* for long outputs */
+.wscontainer .results pre { /* for long outputs */
    max-height: 18em;
    overflow-y: auto;
 }
 
-div#epilogue {
+.wscontainer div.epilogue {
     text-align: center;
     font-style: italic;
     padding: 5px 0px;
@@ -69,87 +92,84 @@ div#epilogue {
 
 @media screen {.printonly, .printonly * { display: none; } }
 
-#page.passed {
+.wscontainer.passed {
     background-color: #EFE;
 }
-#page.passed #results div {
+.wscontainer.passed .results div {
     border-color: #9E9;
     background-color: #EFE;
 }
 @media screen {
- #page.ever-passed .exercise-header {
+ .wscontainer.ever-passed .exercise-header {
      background-color: #AFA;
  }
  /* goes after the problem name */
- #page.ever-passed .exercise-header code:after {
+ .wscontainer.ever-passed .exercise-header code:after {
      content: " [\002713]"
  }
 }
-#results pre {
+.wscontainer .results pre {
     background-color: rgba(240, 240, 240, 0.5);
 }
 
-html {
-  max-width: 880px;
-  max-width: 110ch;
-  margin: 0px auto;
-  background-color: #DDD;
-  padding: 0px;
-}
-
-body {
-  margin: 0px;
-  padding: 0px;
-  box-shadow: gray 0px 0px 5px 0px;
-}
-
-#page {
+.wscontainer {
   background-color: white;
   margin: 0px auto;
-  min-height: 100%;
   padding: 10px;
   box-sizing: border-box;
   -moz-box-sizing: border-box;
+  border: 1px solid gray;
 }
 
-#page > p:first-child {
+.wscontainer > p:first-child {
   margin-top: 0px;
 }
 
-#submitButton {
-    font-size: 110%;
+.wscontainer button {
     font-weight: bold;
-    width: 500px;
-    max-width: 100%;
-
+    width: 100%;
+    font-size: 100%;
 }
 
-code, pre, tt, #submitButton, .CodeMirror {
-    font-family: 'Source Code Pro', monospace;
+code, pre, tt, .wscontainer .CodeMirror, .CodeMirror * {
+    font-family: 'Source Code Pro', monospace !important;
 }
 
 .exercise-header {
     font-size: 125%;
     font-weight: bold;
-    margin: 10px 0px 5px 0px;
+    margin: 0px;
+    margin-bottom: 5px;
     text-align: center;
     background: #DDF;
+}
+
+.exercise-header.toggleable:hover {
+    cursor: n-resize;
+}
+
+.description {
+    margin-bottom: 5px;
 }
 
 p, pre {
     margin: 5px 0px;
 }
 
-#results div.testcase-desc,
-#results div.no-bottom-line
+.wscontainer .results div.testcase-desc,
+.wscontainer .results div.no-bottom-line
  {
     border-bottom: none;
 }
 
-#results div.pass-test,
-#results div.no-top-line
- {
+.wscontainer .results div.pass-test,
+.wscontainer .results div.no-top-line
+{
     border-top: none;
+}
+
+.wscontainer:not(.show-body) .exercise-header {
+    margin: 0px;
 }
 
 /*** background colors of user input areas ***/
@@ -233,3 +253,4 @@ background: -ms-linear-gradient(left,  #ffccee 49%,#ffffff 51%); /* IE10+ */
 background: linear-gradient(to right,  #ffccee 49%,#ffffff 51%); /* W3C */
 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffccee', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 */
 }
+

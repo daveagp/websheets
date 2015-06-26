@@ -9,22 +9,25 @@ sometimes produces:
  - errmsg, the high-level description of the error (without line numbers)
  - epilogue, commentary after a submission
 """
-import config, json
+import config, json, cgi, sys, Websheet, re, os
 
 def submit_and_log(websheet_name, student, client_request, meta):
-  import sys, Websheet, re, cgi, os
-  from config import run_java
 
   config.meta = meta
 
   websheet = Websheet.Websheet.from_filesystem(websheet_name)
-  classname = websheet.classname
 
   errmsg = None
   epilogue = None
   
   def compile_and_run():
     nonlocal errmsg, epilogue
+
+    if websheet.nocode:
+      if websheet.evaluate_nocode_submission(client_request["nocode_state"]):
+        return ("Passed", "<div>Correct!</div>")
+      else:
+        return ("Failed", "<div>Not correct, please try again.</div>")
 
     user_poschunks = client_request["snippets"]
 
@@ -33,11 +36,13 @@ def submit_and_log(websheet_name, student, client_request, meta):
     if student_solution[0] == False:
         if student_solution[1] == "Internal error! Wrong number of inputs":
           return("Internal Error (Wrong number of snippets)", "Error: wrong number of snippets")
+
         errmsg = student_solution[1].split('\n')
         if len(errmsg) > 1:
           errmsg = errmsg[1]
         else:
           errmsg = errmsg[0]
+        
         return("Pre-syntax Error",
                "<div class='pre-syntax-error'>Syntax error:" + 
                "<pre>\n"+cgi.escape(student_solution[1])+"</pre></div>") # error text
@@ -52,130 +57,47 @@ def submit_and_log(websheet_name, student, client_request, meta):
         
     reference_solution = websheet.get_reference_solution("reference")
 
-    dump = {
-        "reference." + classname : reference_solution,
-        "student." + classname : student_solution[1],
-        "tester." + classname : websheet.make_tester()
-        }
+    ss = student_solution[1]
+    for i in range(len(ss)):
+      if ord(ss[i]) >= 128:
+        return("Pre-syntax Error",
+               "<div class='pre-syntax-error'>Syntax error:" + 
+               " Your code contains a non-ASCII character:<br>" + 
+               "<pre>"
+               +("&hellip;" if i>5 else "")
+               +cgi.escape(ss[max(0,i-5):i])
+               +"<b style='background:orange'>"
+               +cgi.escape(ss[i])+"</b>"
+               +cgi.escape(ss[i+1:i+6])
+               +("&hellip;" if i+5<len(ss) else "")
+               +"</pre></div>")
 
-    for clazz in ["Grader", "Options", "Utils"]:
-      dump["websheets."+clazz] = "".join(open(clazz+".java"))
+    for verboten in websheet.verboten:
+        for chunk in user_poschunks:
+          if verboten in chunk['code']:
+            return("Pre-syntax Error",
+                   "<div class='pre-syntax-error'>" + 
+                   "You can't use " + tt(verboten) + 
+                   " in this exercise.</div>")
 
     #print(cgi.escape(student_solution[1]))
     #print(cgi.escape(reference_solution))
 
-    for dep in websheet.dependencies:
-      depws = Websheet.Websheet.from_filesystem(dep)
-      submission = config.load_submission(student, dep, True)
-      if submission == False:
-        return("Dependency Error",
-               "<div class='dependency-error'><i>Dependency error</i>: " + 
-               "You need to successfully complete the <a href='javascript:loadProblem(\""+dep+"\")'><tt>"+dep+"</tt></a> websheet first (while logged in).</div>") # error text
-      submission = [{'code': x, 'from': {'line': 0, 'ch':0}, 'to': {'line': 0, 'ch': 0}} for x in submission]
-      dump["student."+dep] = depws.combine_with_template(submission, "student")[1]
-      
-      dump["reference."+dep] = depws.get_reference_solution("reference")
-      
-    compileRun = run_java("traceprinter/ramtools/CompileToBytes", json.dumps(dump))
-    compileResult = compileRun.stdout
-    if (compileResult==""):
-      return ("Internal Error (Compiling)", "<pre>\n" + 
-              cgi.escape(compileRun.stderr) +
-              "</pre>"+"<!--"+compileRun._toString()+"-->")
-    
-    compileObj = json.loads(compileResult)
+    if websheet.lang == "C++":
+      student_solution = student_solution[1]
+      if websheet.mode == "func":
+        student_solution = re.sub(r"\bmain\b", "__student_main__", student_solution)
 
-#    print(compileObj['status'])
-
-    if compileObj['status'] == 'Internal Error':
-      return ("Internal Error (Compiling)", "<pre>\n" + 
-              cgi.escape(compileObj["errmsg"]) +
-              "</pre>")
-    elif compileObj['status'] == 'Compile-time Error':
-        result = "Syntax error (could not compile):"
-        result += "<br>"
-        errorObj = compileObj['error']
-        result += '<tt>'+errorObj['filename'].split('.')[-2]+'.java</tt>, line '
-        result += str(translate_line(errorObj['row'])) + ':'
-        #result += str(errorObj['row']) + ':'
-        result += "<pre>\n"
-        #remove the safeexec bits
-        result += cgi.escape(errorObj["errmsg"]
-                             .replace("stdlibpack.", "")
-                             .replace("student.", "")
-                             )
-        result += "</pre>"
-        return ("Syntax Error", result)
-
-    #print(compileResult)
-
-    # prefetch all urls, pass them to the grader on stdin
-    compileObj["stdin"] = json.dumps({
-      "fetched_urls":websheet.prefetch_urls(True)
-      })
-
-    compileResult = json.dumps(compileObj)
-    
-    runUser = run_java("traceprinter/ramtools/RAMRun tester." + classname, compileResult)
-    #runUser = run_java("tester." + classname + " " + student)
-
-    #print(runUser.stdout)
-    RAMRunError = runUser.stdout.startswith("Error")
-    RAMRunErrmsg = runUser.stdout[:runUser.stdout.index('\n')]
-
-    runUser.stdout = runUser.stdout[runUser.stdout.index('\n')+1:]
-
-    #print(runUser.stdout)
-    #print(runUser.stderr)
-
-    if runUser.returncode != 0 or runUser.stdout.startswith("Time Limit Exceeded"):
-        errmsg = runUser.stderr.split('\n')[0]
-        result = runUser.stdout
-        result += "<div class='safeexec'>Crashed! The grader reported "
-        result += "<code>"
-        result += cgi.escape(errmsg)
-        result += "</code>"
-        result += "</div>"
-        result += "<!--" + runUser.stderr + "-->"
-        return ("Sandbox Limit", result)
-
-    if RAMRunError:
-        result += "<div class='safeexec'>Could not execute! "
-        result += "<code>"
-        result += cgi.escape(RAMRunErrmsg)
-        result += "</code>"
-        result += "</div>"
-        return ("Internal Error (RAMRun)", result)
-      
-    runtimeOutput = re.sub(
-        re.compile("(at|from) line (\d+) "),
-        lambda match: match.group(1)+" line " + translate_line(match.group(2)) + " ",
-        runUser.stdout)
-
-    #print(runtimeOutput)
-
-    def ssf(s, t, u): # substring from of s from after t to before u
-      if t not in s: raise ValueError("Can't ssf("+s+","+t+","+u+")") 
-      s = s[s.index(t)+len(t) : ]
-      return s[ : s.index(u)]
-    
-    if "<div class='error'>Runtime error:" in runtimeOutput:
-      category = "Runtime Error"
-      errmsg = ssf(runtimeOutput[runtimeOutput.index("<div class='error'>Runtime error:"):], "<pre >", "\n")
-    elif "<div class='all-passed'>" in runtimeOutput:
-      category = "Passed"
-      epilogue = websheet.epilogue
-    else:
-      category = "Failed Tests"
-      if "<div class='error'>" in runtimeOutput:
-        errmsg = ssf(runtimeOutput, "<div class='error'>", '</div>')
-      else:
-        return ("Internal Error", "<b>stderr</b><pre>" + runUser.stderr + "</pre><b>stdout</b><br>" + runUser.stdout)
-        
-    return (category, runtimeOutput)
+    if websheet.lang == "C++":
+      import grade_cpp
+      return grade_cpp.grade(reference_solution, student_solution, translate_line, websheet)
+    elif websheet.lang == "Java":
+      import grade_java
+      return grade_java.grade(reference_solution, student_solution, translate_line, websheet)
 
   try:
     category, results = compile_and_run()
+    config.uncreate_tempdirs()
   except Exception:
     category = "Internal Error (Script)"
     import traceback
@@ -196,20 +118,43 @@ def submit_and_log(websheet_name, student, client_request, meta):
 
   passed = (category == "Passed")
 
-  if (not client_request["viewing_ref"]):
-    # remove positional information
-    user_snippets = [blank["code"] for blank in client_request["snippets"]]
-    config.save_submission(student, websheet.slug, user_snippets, save_this, passed)
+  global authinfo
+  #print(authinfo)
+  if authinfo["error_div"] != "":
+    print_output["results"] = authinfo["error_div"]
+    print_output["category"] = "Auth Error" 
+    meta["logout_bug"] = True
 
-  return json.dumps(print_output,
-                    indent=4, separators=(',', ': ')) # pretty!
+  if (not client_request["viewing_ref"]):
+    if websheet.nocode:
+      user_state = client_request["nocode_state"]
+    else:
+      # remove positional information
+      user_state = [blank["code"] for blank in client_request["snippets"]]
+    config.save_submission(student, websheet.dbslug, user_state, save_this, passed)
+
+  if passed or websheet.attempts_until_ref == 0: 
+    print_output["reference_sol"] = websheet.get_reference_snippets()
+    
+  return print_output
 
 if __name__ == "__main__":
-  import sys
+
+  global authinfo
 
   stdin = json.loads(input()) # assume json all on one line
+  authinfo = stdin["authinfo"]
   student = stdin["php_data"]["user"]
   websheet_name = stdin["php_data"]["problem"]
-  print(submit_and_log(websheet_name, student, stdin["client_request"], stdin["php_data"]["meta"]))
+ 
+  meta = stdin["php_data"]["meta"]
+  
+  if "frontend_user" in stdin["client_request"]:
+    meta["frontend_user"] = stdin["client_request"]["frontend_user"]
+ 
+  data = submit_and_log(websheet_name, student, stdin["client_request"], meta) 
+
+  print(json.dumps(data, 
+                   indent=4, separators=(',', ': '))) # pretty!
   sys.exit(0)
 
