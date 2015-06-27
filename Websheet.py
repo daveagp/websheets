@@ -218,7 +218,7 @@ class Websheet:
         mandatory_fields = ["classname", "source_code", "tests", "description", "dbslug"]
 
         # optional fields AND default values
-        optional_fields = {"show_class_decl": True,
+        optional_fields = {"hide_class_decl": False,
                            "lang": "Java", "slug": None,
                            "example": False,
                            "epilogue": None, 
@@ -234,8 +234,8 @@ class Websheet:
                            "cppflags_replace": None
         }
                            
-        if "lang" in field_dict:
-            optional_fields["show_class_decl"] = False
+        if "lang" in field_dict and field_dict["lang"] != "Java":
+            optional_fields["hide_class_decl"] = True
 
         for field in mandatory_fields:
             setattr(self, field, field_dict[field])
@@ -273,7 +273,7 @@ class Websheet:
                 if needsfix: s = s[:-indent_width]
                 return s
 
-            if self.show_class_decl:
+            if not self.hide_class_decl:
                 self.source_code = indent(self.source_code)
             self.source_code = ("\npublic class " + self.classname + " {" +
                                 self.source_code+"}\n")
@@ -281,7 +281,7 @@ class Websheet:
         # hide class declaration if requested.
         # note! for this to work, comments should go inside of class decl.
         
-        if self.lang == "Java" and not self.show_class_decl:
+        if self.lang == "Java" and self.hide_class_decl:
             # hide thing at start
             self.source_code = re.sub( 
                 "^public class "+self.classname+r" *\{ *$",

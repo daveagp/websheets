@@ -46,4 +46,4 @@ that occurs when we rotate a square 90 degrees clockwise.
 <div><img style='height:150px;margin-top:5px' src='exercises/FourSwap.ipe.png'></div>
 """
 
-show_class_decl = False
+hide_class_decl = True

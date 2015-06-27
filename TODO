@@ -1,3 +1,21 @@
+new attempts_until_ref options
+attempts_until_ref and boolean (show_class_decl).. conversion from string?
+
+editor note: server should sanitize classname
+
+should test every option to see if it's still working!
+
+in practice, are examples the same as things without editable areas? 
+ except for scratch?
+
+make cppflags_add and _remove less awkward
+
+create new options:
+- comments
+- visibility:
+  -- hide/show in index.php browsing interface
+  -- hide source, show source, show source but redact reference solution
+
 Organize cs103 exercises vs examples
 - examples shouldn't show up in folder browser
 
