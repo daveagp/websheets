@@ -16,9 +16,7 @@ void stars(int n) {
 }
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 description = r"""
 Define a function <tt>stars</tt> that takes an integer argument

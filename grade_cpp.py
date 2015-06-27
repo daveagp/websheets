@@ -23,7 +23,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
                         "-Wall", "-Wshadow", "-Wunreachable-code",
                         "-Wconversion",
                         "-Wno-sign-compare", "-Wno-write-strings"]
-    if cpp_compiler.startswith("clang"): # good options, but not in g++
+    if "clang" in cpp_compiler: # good options, but not in g++
         default_cppflags += ["-Wvla", "-Wno-shorten-64-to-32", "-Wno-sign-conversion"]
 
     # create a temp directory
@@ -41,12 +41,12 @@ def grade(reference_solution, student_solution, translate_line, websheet):
     stucpp.close()
     
     suffix = ""
-    if websheet.mode == "func": suffix = ".o"
+    if websheet.lang == "C++func": suffix = ".o"
 
     compile_list = [cpp_compiler] + websheet.cppflags(default_cppflags)
     
     compile_args = []
-    if websheet.mode == "func":
+    if websheet.lang == "C++func":
       compile_args += ["-c"]      
     compile_args += [websheet.slug + ".cpp", "-o", websheet.slug + suffix]
 
@@ -102,7 +102,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         tester = student_solution 
         tester += "\n#include <iostream>\n" + returntype + "(*some_unique_identifier)(" + ', '.join(argtypes) + ") = &" + funcname + ";"
         tester += "\n" + " void even_uniquer() { " + funcname + "(" + ', '.join(literals) + ");}"
-        tester += "\n" + "int main() {}"
+        tester += "\n" + "int main() {}\n"
 
         newslug = websheet.slug + "test"
         cpp = open(jail + refdir + newslug + ".cpp", "w")
@@ -140,7 +140,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         testline = funcname + "(" + ', '.join(args) + ")"
         testmain = "\n#include <iostream>\nint main(){std::cout << std::showpoint << std::boolalpha;"
         if funcname not in void_functions: testmain += "std::cout << "
-        testmain += testline + ";}"
+        testmain += testline + ";}\n"
         stutester = student_solution + testmain
         reftester = reference_solution + testmain
         newslug = websheet.slug + "test"

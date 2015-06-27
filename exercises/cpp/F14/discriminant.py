@@ -3,17 +3,15 @@ source_code = r"""
 using namespace std;
 
 // declare the return type, function name, and arguments
- \[double]\ discriminant (double a, \[double b, double c]\) {
+\[double]\ discriminant (double a, \[double b, double c]\) {
    // return the computed value
 \[
    return b*b-4*a*c;
 ]\
-  }
+}
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 description = r"""
 Define a function <tt>discriminant(a, b, c)</tt> that takes

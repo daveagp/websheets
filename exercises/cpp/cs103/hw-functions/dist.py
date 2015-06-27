@@ -14,9 +14,7 @@ double distance(double x1, double y1, \[double x2, double y2]\) {
 }
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 description = r"""
 In this exercise, you will define a 2D vector length function, and you will

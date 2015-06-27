@@ -11,9 +11,7 @@ void exclaim(string word) {
 ]\
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 description = r"""
 Define a function <tt>exclaim</tt> that takes 

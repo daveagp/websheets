@@ -18,9 +18,7 @@ using namespace std;
 }
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 description = r"""
 Define a function <tt>streq</tt> that takes 

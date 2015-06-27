@@ -9,9 +9,7 @@ bool is_even(int x) {
 ]\
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 description = r"""
 Define a function <tt>is_even</tt> that takes an integer argument

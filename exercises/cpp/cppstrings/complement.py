@@ -13,9 +13,7 @@ to check for non-DNA characters.)
 
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 source_code = r"""
 #include <iostream>

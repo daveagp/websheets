@@ -28,9 +28,7 @@ int vowel_count(string text) {
 ]\
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 description = r"""
 <b>Note:</b> For this exercise, we'll use C++ <tt>string</tt> objects. 

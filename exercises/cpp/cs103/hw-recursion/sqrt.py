@@ -60,8 +60,6 @@ that is actually recursive: it does binary search in the specified range.
 the helper function once.
 """
 
-mode = "func"
-
 tests = [
     ["check-function", "rec_sqrt", "double", ["double"]],
     ["call-function", "rec_sqrt", ['16']],
@@ -75,6 +73,6 @@ tests = [
 
 attempts_until_ref = 0
 
-lang = "C++"
+lang = "C++func"
 
 verboten = ("#include", "for", "while")

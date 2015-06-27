@@ -43,9 +43,7 @@ bool bracket_check(string expr) {
 }
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 attempts_until_ref = 0
 

@@ -28,11 +28,9 @@ using namespace std;
 }
 """
 
-lang = "C++"
+lang = "C++func"
 
 attempts_until_ref = 0
-
-mode = "func"
 
 description = r"""
 Define a function <tt>drawSquare</tt> that takes an integer and char parameter

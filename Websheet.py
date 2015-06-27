@@ -221,7 +221,6 @@ class Websheet:
         optional_fields = {"show_class_decl": True,
                            "lang": "Java", "slug": None,
                            "example": False,
-                           "mode": None,
                            "epilogue": None, 
                            "dependencies": [], 
                            "imports": [],

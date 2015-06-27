@@ -28,9 +28,7 @@ int atoi(char* str) {
 }
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 
 description = r"""

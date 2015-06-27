@@ -20,9 +20,7 @@ using namespace std;
 }
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 description = r"""
 Define a function <tt>strcpy()</tt> that takes a 'src' character array and

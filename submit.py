@@ -83,12 +83,12 @@ def submit_and_log(websheet_name, student, client_request, meta):
     #print(cgi.escape(student_solution[1]))
     #print(cgi.escape(reference_solution))
 
-    if websheet.lang == "C++":
+    if websheet.lang.startswith("C++"):
       student_solution = student_solution[1]
-      if websheet.mode == "func":
+      if websheet.lang == "C++func":
         student_solution = re.sub(r"\bmain\b", "__student_main__", student_solution)
 
-    if websheet.lang == "C++":
+    if websheet.lang.startswith("C++"):
       import grade_cpp
       return grade_cpp.grade(reference_solution, student_solution, translate_line, websheet)
     elif websheet.lang == "Java":

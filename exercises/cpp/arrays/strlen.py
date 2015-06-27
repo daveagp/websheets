@@ -16,9 +16,7 @@ using namespace std;
 }
 """
 
-lang = "C++"
-
-mode = "func"
+lang = "C++func"
 
 description = r"""
 Define a function <tt>strlen</tt> that takes a single character array as input, 

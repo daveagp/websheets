@@ -19,7 +19,7 @@ void countup(int n) {
 ]\
 """
 
-lang = "C++"
+lang = "C++func"
 
 description = r"""
 Write a recursive function <tt>countup(int n)</tt> that prints out
@@ -41,8 +41,6 @@ tests = [
     ["call-function", "countup", ['10']],
     ["call-function", "countup", ['1']],
 ]
-
-mode = "func"
 
 attempts_until_ref = 0
 

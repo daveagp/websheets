@@ -11,9 +11,8 @@ using namespace std;
 }
 """
 
-lang = "C++"
+lang = "C++func"
 
-mode = "func"
 
 description = r"""
 Define a function <tt>recip</tt> that takes an integer argument
