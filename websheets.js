@@ -91,8 +91,9 @@ websheets.createAt = function(slug, data, containerdiv) {
    return ws;
 };
 
-// don't pollute things with new variables
+// embedding tool
 (function() {
+   // don't pollute things with new variables
    // the callback
    var process = function (parent, child) {
       if (child.nodeName=="DIV" && child.classList.contains("websheet-stub"))
