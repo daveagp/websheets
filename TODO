@@ -1,41 +1,33 @@
-new attempts_until_ref options
-attempts_until_ref and boolean (show_class_decl).. conversion from string?
 
-editor note: server should sanitize classname
+saner "you're not logged in" message / options
+(1) notify upon first load
+(2) notify upon first edit
+(a) prevent any changes
+(b) allow changes
+'require_login' global option
+
+listing page:
+- table with all websheets listed + link to edit + link to give to students to solve
+
+implement new attempts_until_ref options
+
+implement sharing options
+
+
+authenticating student of a teacher?
+hosted exercise scores / review hw-usc.{php,py}
+
+server should sanitize classname
 
 should test every option to see if it's still working!
 
-in practice, are examples the same as things without editable areas? 
- except for scratch?
-
-make cppflags_add and _remove less awkward
-
-create new options:
-- comments
-- visibility:
-  -- hide/show in index.php browsing interface
-  -- hide source, show source, show source but redact reference solution
-
-Organize cs103 exercises vs examples
-- examples shouldn't show up in folder browser
+Set cs103 exercises vs examples (public visibility options)
+make the random one public despite not being a real exercise?
 
 Fix java "bytopic" page
 
-hosted creation of exercises. 
-  editor. 
-  sharability options.
 
-hosted exercise scores / review hw-usc.{php,py}
-  authenticating student of a teacher?
-
-saner "you're not logged in" message / options
-
-reference solution options:
- always, never, after success, after N tries
-
-make homework exercises hidden (incl. from github) 
-
-allow blank at top for header
+can the very first line be editable?
 
 parsons problems? should be doable using on("changes") and
 "origin" object of each change (one "drag", one "paste", with

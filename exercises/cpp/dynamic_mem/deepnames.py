@@ -38,8 +38,7 @@ int main() {
 }
 """
 
-cppflags_remove = ["-Wall"]
-cppflags_add = ["-Wall", "-Wno-unused-variable"]
+cppflags_add = ["-Wno-unused-variable"]
 
 
 lang = "C++"

@@ -5,7 +5,9 @@ using namespace std;
 
 int main() {
 \[
-
+   cout << boolalpha;
+\show:
+   ;
 ]\
    int age = 9; // years
    double mass = 5.6; // kilograms
@@ -26,4 +28,3 @@ An example of variables, using my cat.
 
 tests = [["", []]] # stdin, args
 
-example = True

@@ -18,12 +18,11 @@ int main() {
 lang = "C++"
 
 description = r"""
-Running out of memory.
+Running out of memory. <i>What needs to change to avoid this?</i>
 """
 
 tests = [["", []]] # stdin, args
 
-example = True
+#example = True
 
-cppflags_remove = ["-Wall"]
-cppflags_add = ["-Wall",  "-Wno-unused-variable"]
+cppflags_add = ["-Wno-unused-variable"]

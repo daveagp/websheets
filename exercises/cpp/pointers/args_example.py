@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 
 lang = "C++"
 
-example = "True"
+example = True
 
 description = r"""
 An example of <tt>argc</tt> and <tt>argv</tt>.

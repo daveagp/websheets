@@ -28,8 +28,8 @@ its input <tt>cin</tt> was. For instance, if <tt>word.txt</tt> contains
 You will need to use <tt>get</tt> and <tt>fail</tt>. Remember that <tt>fail</tt> returns <tt>true</tt> <i>after</i> reading past the end of the file.
 """
 
-cppflags_remove = ["-Wall"]
-cppflags_add = ["-Wall", "-Wno-unused-variable"]
+#cppflags_remove = ["-Wall"]
+cppflags_add = ["-Wno-unused-variable"]
 
 tests = [
     ["Hello", []],

@@ -5,18 +5,19 @@ using namespace std;
 void countdown(int n) {
   // whoops!
 \[
-  if (n == 0) {
+  if (n == 0)
 \show:
-  if (n == 100) { // whoops!
+  if (n == 100) // whoops!
 ]\
-     cout << "Blastoff!" << endl;
-  }
-  // recursive case
-  else {
-     cout << n << endl;
-     // recursive call
-     countdown(n-1);
-  }
+   {
+      cout << "Blastoff!" << endl;
+   }
+   // recursive case
+   else {
+      cout << n << endl;
+      // recursive call
+      countdown(n-1);
+   }
 }
 
 int main() {
@@ -25,6 +26,8 @@ int main() {
 """
 
 example = True
+
+remarks = "The purpose of this example is to use wwhen discussing the meaning of 'stack overflow' and the goal of a base case."
 
 lang = "C++"
 

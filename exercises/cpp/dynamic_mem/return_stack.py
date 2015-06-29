@@ -23,5 +23,8 @@ tests = [["", []]] # stdin, args
 
 example = True
 
-cppflags_remove = ["-Wall"]
-cppflags_add = ["-Wall", "-Wno-return-stack-address", "-Wno-unused-variable"]
+cppflags_add = ["-Wno-return-stack-address", "-Wno-unused-variable"]
+# "-Wno-return-local-addr"]
+
+remarks = """for this to work, either you need clang, or a recent enough
+version of g++ that supports -Wno-return-local-addr"""

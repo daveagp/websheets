@@ -18,6 +18,8 @@ def execute(command, stdin):
 def grade(reference_solution, student_solution, translate_line, websheet):
     cpp_compiler = config.config_jo["cpp_compiler"]
 
+    unusable_cppflags = []
+
     # following http://bits.usc.edu/cs103/compile/
     default_cppflags = ["-g",
                         "-Wall", "-Wshadow", "-Wunreachable-code",
@@ -25,6 +27,10 @@ def grade(reference_solution, student_solution, translate_line, websheet):
                         "-Wno-sign-compare", "-Wno-write-strings"]
     if "clang" in cpp_compiler: # good options, but not in g++
         default_cppflags += ["-Wvla", "-Wno-shorten-64-to-32", "-Wno-sign-conversion"]
+    else:
+      unusable_cppflags = ["-Wno-array-bounds","-Wno-return-stack-address","-Wunreachable-code"]
+
+    websheet.unusable_cppflags = unusable_cppflags
 
     # create a temp directory
     refdir = config.create_tempdir()

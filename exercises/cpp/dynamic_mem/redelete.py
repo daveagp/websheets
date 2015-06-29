@@ -22,4 +22,3 @@ Re-deleting memory.
 
 tests = [["", []]] # stdin, args
 
-example = True
