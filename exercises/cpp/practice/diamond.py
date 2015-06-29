@@ -1,5 +1,7 @@
-#based on this Creative Commons Att-SA 3.0 exercise:
-#https://cloudcoder.org/repo/exercise/535b0347ba7d641fd5860ddace95f258c17e2386
+remarks = """
+based on this Creative Commons Att-SA 3.0 exercise:
+https://cloudcoder.org/repo/exercise/535b0347ba7d641fd5860ddace95f258c17e2386
+"""
 
 source_code = r"""
 #include <iostream>

@@ -46,7 +46,7 @@ prints the potential at location (.25, .5) due
 to the combined four charges. All four
 charges should have unit positive charge. See the illustration below.
 
-<div style='text-align:center'><img src='http://cscircles.cemc.uwaterloo.ca/websheets/exercises/java/10-objects/FourChargeClient.ipe.png'></div>
+<div style='text-align:center'><img src='http://cscircles.cemc.uwaterloo.ca/websheets/images/FourChargeClient.ipe.png'></div>
 
 <p>For example, <tt>java FourChargeClient 0.1</tt>
 should print out

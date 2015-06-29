@@ -1,5 +1,6 @@
-#based on a Creative Commons Att-NC-SA 3.0 exercise from:
-#http://cscircles.cemc.uwaterloo.ca/8-remix/
+remarks = """based on a Creative Commons Att-NC-SA 3.0 exercise from:
+http://cscircles.cemc.uwaterloo.ca/8-remix/
+"""
 
 source_code = r"""
 #include <iostream>

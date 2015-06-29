@@ -43,7 +43,7 @@ Swap the 4 variables indicated in the code to match the change
 that occurs when we rotate a square 90 degrees clockwise.
 <br> Hint: If you get stuck, see how to swap two variables in Web Exercise 2 from
 <a href="http://introcs.cs.princeton.edu/java/12types/">booksite Section 1.2</a>. One of the important ideas from there needs to be used here.
-<div><img style='height:150px;margin-top:5px' src='http://cscircles.cemc.uwaterloo.ca/websheets/exercises/java/00-intro/FourSwap.ipe.png'></div>
+<div><img style='height:150px;margin-top:5px' src='http://cscircles.cemc.uwaterloo.ca/websheets/images/FourSwap.ipe.png'></div>
 """
 
 #hide_class_decl = True

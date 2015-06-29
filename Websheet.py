@@ -223,7 +223,7 @@ class Websheet:
                            "epilogue": None, 
                            "dependencies": [], 
                            "imports": [],
-                           "attempts_until_ref": 1000000,
+                           "attempts_until_ref": "infinity",
                            "verboten": (),
                            "choices": [],
                            "nocode": False,

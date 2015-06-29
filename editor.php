@@ -46,7 +46,7 @@
 <p>Optional properties:<span id='optionals'></span>
 <p>
 Note: problems are open-source by default (see 'Public permissions'). 
-License is <a href='https://creativecommons.org/licenses/by/4.0/'>Creative Commons 4.0 Attribution</a> unless you specify in 'Remarks'.
+License will be assumed to be <a href='https://creativecommons.org/licenses/by-sa/4.0/'>Creative Commons 4.0 Attribution-ShareAlike</a> unless you specify in 'Remarks'.
 <hr>
 <p>(Preview will disappear if any settings are changed.)
 <p>Preview here.

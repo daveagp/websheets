@@ -35,7 +35,7 @@ $$|(x_1-x_2, y_1-y_2)|$$
 and the distance between those two points is defined as that vector's length: 
 $$\textrm{distance}(x_1, y_1, x_2, y_2) = |(x_1-x_2, y_1-y_2)|$$
 Here is an illustration of this definition; the vector's length is the distance between the points.
-<div style='text-align:center'><img src='http://cscircles.cemc.uwaterloo.ca/websheets/exercises/cpp/cs103/hw-functions/dist.ipe.png'></div>
+<div style='text-align:center'><img src='http://cscircles.cemc.uwaterloo.ca/websheets/images/dist.ipe.png'></div>
 
 Define a function <tt>distance(x1, y1, x2, y2)</tt>
 that computes the distance between two points, using the <tt>length</tt> function that you

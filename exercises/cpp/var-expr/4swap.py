@@ -31,7 +31,7 @@ and output the top, bottom, left, right colors after the rotation.
 <p>
 For example if the input is <tt>red green blue yellow</tt> then the rotation
 looks like this:
-<div><img src="http://cscircles.cemc.uwaterloo.ca/websheets/exercises/java/00-intro/FourSwap.ipe.png"></div>
+<div><img src="http://cscircles.cemc.uwaterloo.ca/websheets/images/FourSwap.ipe.png"></div>
 and the output should be <tt>blue yellow green red</tt>.
 <p>
 Hint: use a variant of the <i>swap idiom</i>.

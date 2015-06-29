@@ -38,7 +38,8 @@ var editor_schema =
    {key: 'dependencies', optional: true, lang: 'Java', type: 'codemirror', mode:'json', label: 'Dependent on other websheets?',
     howto: 'json list of websheet names in this folder<br>e.g. <tt>["DataStructure"]</tt>'},
 
-   {key: 'example', optional: true, langs: ['C++', 'C++func'], type: 'boolean', label: 'Is example?',
+   {key: 'example', optional: true, langs: ['C++', 'C++func'], type: 'choice', label: 'Is example?',
+    choices: [['false', 'false'], ['true', 'true']], default: 'false',
     howto: 'i.e., just a demo<br><a href="javascript:explain_example()">can still be <tt>\\[editable]\\</tt></a>'},
    {key: 'cppflags_add', optional: true, langs: ['C++', 'C++func'], type: 'codemirror', mode:'json', label: 'Add compiler flag(s)',
     howto: 'json list of flags<br>e.g. <tt>["-Wno-unused-variable"]</tt>'},
@@ -97,9 +98,6 @@ $(function() {
         +'</option>';
       result += '</select>';
       return result;
-    }
-    if (item.type == 'boolean') {
-      return widget({type:'choice', default:'false', choices:[['false','false'],['true','true']]});
     }
     if (item.type == 'string') {
       return '<input type="text"></input>';
@@ -171,8 +169,6 @@ $(function() {
       var value;
       if (item.type == 'choice')
         value = $('#row-'+i+' select').val();
-      else if (item.type == 'boolean')
-        value = $('#row-'+i+' select').val() == 'true'; // evaluate string
       else if (item.type == 'string')
         value = $('#row-'+i+' input').val();
       else 
@@ -203,8 +199,6 @@ $(function() {
           var value = obj[item.key];
           if (item.type == 'choice')
             $('#row-'+i+' select').val(value);
-          else if (item.type == 'boolean')
-            $('#row-'+i+' select').val(value?'true':'false'); // evaluate string
           else if (item.type == 'string')
             $('#row-'+i+' input').val(value);
           else {

@@ -125,6 +125,8 @@ CREATE TABLE IF NOT EXISTS `ws_sheets` (
   KEY `author` (`author`,`problem`,`action`,`time`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 
+(action should be save, preview, delete; sharing should be option from editor.js)
+
 WARNING: If you use a database, you'll be putting a DB password in ws-config.json.
 Please check that
  http://your.website/url/to/websheets/ws-config.json
