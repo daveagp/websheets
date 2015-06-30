@@ -607,7 +607,7 @@ self.classname + " to = new " + self.classname + "();\n" +
                 if action == 'delete': return None
                 if sharing == 'draft': return None
                 mydef = definition
-        else:
+        else:            
             for definition, id in config.get_rows(
                 "select definition, id from ws_sheets " +
                 "WHERE problem = '"+slug+"' AND author = '"+author+"' AND action = 'preview' ORDER BY ID DESC LIMIT 1;"):

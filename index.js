@@ -70,9 +70,9 @@ $(function() {
    
    // note! return from facebook auth changes hash
    var ex;
-   if ("start" in websheets.GET && 
-            websheets.sheets.indexOf(websheets.GET["start"]) >= 0)
-      ex = websheets.GET["start"];
+  if ("start" in websheets.GET) {
+    ex = websheets.GET["start"];
+  }
    else 
       ex = websheets.sheets[0];
 

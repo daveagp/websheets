@@ -275,6 +275,11 @@ if (strlen($error) != 0) {
    $(function(){alert('Error! Please see status message.');});</script></div>";
 }
 
+$gets = '?';
+foreach ($_GET as $key=>$val)
+  $gets .= urlencode($key) .'='. urlencode($val) . '&';
+
+
 if (strlen($error) != 0)
    $WS_AUTHINFO["info_span"] = "<span class='ws-error-message'><i>$error</i>
    <script type='text/javascript'>
@@ -282,11 +287,11 @@ if (strlen($error) != 0)
 else if ($WS_AUTHINFO['logged_in'])
    $WS_AUTHINFO["info_span"] = "<span>Logged in as " . $WS_AUTHINFO["username"] 
       . " via " . $WS_AUTHINFO["domain"] 
-      . ". <a href='?auth=logout'>Log out.</a></span>";
+      . ". <a href='$gets"."auth=logout'>Log out.</a></span>";
 else {
    $msg = "<span>Not logged in. Log in with";
    foreach ($WS_AUTHINFO["providers"] as $i => $p)
-      $msg .= " <a href='?auth=$p'>$p</a>";
+      $msg .= " <a href='$gets"."auth=$p'>$p</a>";
    $WS_AUTHINFO["info_span"] = $msg . '</span>';
 }
 

@@ -54,6 +54,9 @@ var explain_example = function() {
 var codemirrors = {};
 
 $(function() {
+  if (websheets.editor_readonly)
+    $('body').addClass('readonly');
+
   var widget = function(item) {
     if (item.type == 'choice') {
       var result = '<select>';
@@ -80,7 +83,7 @@ $(function() {
     if (item.howto) row += '<div class="howto">'+item.howto+'</div>';
     row += '</td><td class="widget">';
     row += widget(item);
-    if (item.optional) row += ' <a href="#" class="optout" data-row="'+i+'">remove</a>';
+    if (item.optional) row += ' <a href="#" class="optout hide-readonly" data-row="'+i+'">remove</a>';
     row += '</td></tr>';
     
     // force rendering as DOM element so codemirror can access it immediately
@@ -92,13 +95,14 @@ $(function() {
       var modetag = item.mode;
       if (!modemap[modetag])
         alert("Don't know mode " + modetag);
-      codemirrors[i] = CodeMirror(row.children[1], {
+      codemirrors[i] = CodeMirror(row.children[1].firstChild, {
         mode: modemap[modetag],
         theme: "neat", tabSize: 3, indentUnit: 3,
         //         lineNumbers: true,
         styleSelectedText: true,
         viewportMargin: Infinity,
-        matchBrackets: true
+        matchBrackets: true,
+        readOnly: websheets.editor_readonly === true
       });
     }
   }
@@ -198,6 +202,10 @@ $(function() {
     $('div#error').html('<hr>'+html);
     $('div#error').show();
   }
+  
+  window.remove_error = function() {
+    $('div#error').hide();
+  }
 
   if (websheets.initialize_error) {
     display_error(websheets.initialize_error);
@@ -206,25 +214,64 @@ $(function() {
 
   if (websheets.initialize_editor !== undefined) {
     if (websheets.initialize_editor['new']) {
-      alert('You are creating a new websheet named '+websheets.GET['edit']);
+      //alert('You are creating a new websheet named '+websheets.GET['edit']);
     }
     else { 
       window.decode(websheets.initialize_editor['definition']);
+      window.editstate = 'saved';
     }
   }
 
+  var enable_buttons = function()  {
+    if (websheets.editor_readonly)
+      $('button.pure').prop("disabled",false);
+    else {
+      $('button, input, select').prop('disabled',false);
+    for (var i=0; i<editor_schema.length; i++)
+      if (codemirrors[""+i]) codemirrors[""+i].options.readOnly = false;
+    }
+  }
+
+  var disable_buttons = function() {
+    $('button, input, select').prop('disabled', true);
+    for (var i=0; i<editor_schema.length; i++)
+      if (codemirrors[""+i]) codemirrors[""+i].options.readOnly = true;
+  }
+
+  disable_buttons();
+  enable_buttons();
+
+  var onchange = function() {
+    $('span.unsaved-changes').show(400);
+    $('div.preview').hide(200);
+    remove_error();
+  }
+
+  $('body').on('change', 'select, input', onchange);
+  for (var i=0; i<editor_schema.length; i++)
+    if (codemirrors[i])
+      codemirrors[i].on("change", onchange);
+
   $('button#reload').on('click', function() {
-    var slug = window.prompt("Enter the full path of the websheet to create or edit. E.g., cpp/arrays/echo");
-    if (slug != null)
-      window.location.href='?edit='+encodeURIComponent(slug);    
+    var msg = "";
+    if ($('.unsaved-changes').is(':visible')) 
+      msg = 'NOTE: you have unsaved changes!.\n';
+    var slug = window.prompt(msg + "Enter the full path of the websheet to create or edit. E.g., cpp/arrays/echo");
+    if (slug != null) {
+      nowarn = true;
+      window.location.href='?edit='+encodeURIComponent(slug); 
+    }
+    
   });
 
   $('button#export').on('click', function() {
-    prompt("JSON of the currently defined websheet:", window.encode());
+    prompt("Copy this JSON of the currently defined websheet:", window.encode());
   });
 
   $('button#import').on('click', function() {
-    window.decode(prompt("Paste your JSON websheet definition:"));
+    var p = prompt("Paste your JSON websheet definition:")
+    if (p != null)
+      window.decode(p);
   });
 
   $('button#rename, button#copy, button#save, button#preview, button#delete').on('click', function() {
@@ -237,24 +284,37 @@ $(function() {
                    ajax_uid_intended: websheets.authinfo.username};
     if (action == 'rename' || action == 'copy') {
       var newname = prompt(action+ " to what new name? (Include the full path, e.g. cpp/cs201/halting)");
+      if (newname == null) return;
       request.newname = newname;
     }    
 
+    disable_buttons();
+    $('#error').hide();
     $.ajax(websheets.urlbase + '/edit.php',
            {
              data: request,
              dataType: "json",
              
              success: function(data) {
-               $('#error').hide();
-               if (typeof data == "string") display_error(data);
+               enable_buttons();
+               if (typeof data == "string") alert(data);
                else {
-                 display_error(data.message);
+                 if (data.success) 
+                   display_error(data.message);
+                 else {
+                   hide_error();
+                   alert('Failed: ' + data.message);
+                 }
                  if (data.success && (action=='delete' || action=='rename' || action=='copy')) {
                    alert(action + ' successful.');
+                   nowarn = true;
                    window.location.href='./editor.php' + (action!='delete'?'?edit='+newname:'');
                  }
+                 if (data.success && action=='save') {
+                   $('.unsaved-changes').hide(400);
+                 }
                  if (data.success && action=='preview') {
+                   $("div.preview").show();
                    if (websheets.previewer)
                      websheets.previewer.load(websheets.GET['edit']);
                    else
@@ -267,12 +327,20 @@ $(function() {
              },
              
              error: function(jqXHR, textStatus, errorThrown) {
+               enable_buttons();
                if (textStatus == "parsererror") {
                  var info = jqXHR.responseText;
-                 display_error('Error: '+info);
+                 alert('Error: '+info);
                }}
            })
     
+  });
+
+  var nowarn = false;
+  $(window).on('beforeunload', function(){
+    if (!nowarn && $('.unsaved-changes').is(':visible')) {
+      return 'You have unsaved changes.';
+    }
   });
   
 });

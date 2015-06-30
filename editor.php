@@ -29,7 +29,10 @@
    .cm-container {max-height: 50vh; overflow:auto;}
    .rowlabel {text-align:right;}
    .widget {text-align:left;}
-   #editor .CodeMirror {font-size: 80%;}
+   table#editor .CodeMirror {font-size: 80%;}
+   .unsaved-changes {font-style: italic; font-weight: bold; color: red; display: none;}
+   table#editor tr td:first-child {width: 250px;}
+   .readonly .hide-readonly {display: none;}
 </style>
 <script type='text/javascript'> 
 
@@ -49,11 +52,17 @@ if (!$GLOBALS['WS_AUTHINFO']['logged_in'])
   $_REQUEST['action'] = 'load';
   $_REQUEST['problem'] = $_REQUEST['edit'];
   $result = json_decode(run_edit_py(), true);
+  $author = '';
+  $readonly = false;
   if (is_string($result))
     echo "websheets.initialize_error = " . json_encode($result).";";
   else {
-    if ($result['success'])
+    if ($result['success']) {
       echo "websheets.initialize_editor = " . json_encode($result) . ";";
+      $author = $result['author'];
+      if ($author != $GLOBALS['WS_AUTHINFO']['username'])
+        echo "websheets.editor_readonly = true;";
+    }
     else
       echo "websheets.initialize_error = " . json_encode($result['message']).";";
   }
@@ -64,20 +73,20 @@ if (!$GLOBALS['WS_AUTHINFO']['logged_in'])
 </head>
 <body>
 <div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?></div>
-<p><button id='reload'>Create Websheet or open existing Websheet</button> <button>List all my Websheets (TODO)</button>
+<p><button id='reload' class='pure'>Create blank Websheet or open existing Websheet</button> <button class='pure'>List all my Websheets (TODO)</button>
 <div id='error' style='display:none'>
 </div>
 <div class='editor'>
 <hr>
-<p>Currently editing <tt><?php echo $_REQUEST['edit'];?></tt>. <button id='preview'>Preview</button> <button id='save'>Save</button> <button id='rename'>Rename</button> <button id='copy'>Copy</button> <button id='export'>Export</button> <button id='import'>Import</button> <button id='delete'>Delete</button> 
+<p>Editing <tt><?php echo $_REQUEST['edit'];?></tt> by <tt><?php echo $author;?></tt>. <span class='unsaved-changes'>You have unsaved changes.</span> <button id='preview'>Preview</button> <button id='save'>Save</button> <button id='rename'>Rename</button> <button id='copy' class='pure'>Copy</button> <button id='export' class='pure'>Export</button> <button id='import'>Import</button> <button id='delete'>Delete</button> 
 <table id='editor' style='width:100%'>
-   <tr><th style='width:250px'>Property</th><th style='text-align:left'>Value</th></tr>
+   <tr><th>Property</th><th style='text-align:left'>Value</th></tr>
 </table>
 <hr style='width:50%'>
-<p>Optional properties:<span id='optionals'></span>
+<p class='hide-readonly'>Optional properties:<span id='optionals'></span>
 <p>
 Note: problems are open-source by default (see 'Public permissions'). 
-License will be assumed to be <a href='https://creativecommons.org/licenses/by-sa/4.0/'>Creative Commons 4.0 Attribution-ShareAlike</a> unless you specify in 'Remarks'.
+License will be assumed to be <a href='https://creativecommons.org/licenses/by-sa/4.0/'>Creative Commons 4.0 Attribution-ShareAlike</a> unless otherwise specified in 'Remarks'.
 <hr>
 <div class='preview'></div>
 </div> <!-- editor -->

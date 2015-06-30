@@ -123,8 +123,10 @@ websheets.Websheet = function(slug, data, div, preview) {
    this.slug = slug;
    this.div = div; // .wscontainer
   
-   if (typeof preview == "undefined")
-     preview = false;
+   if (typeof preview == "undefined" || preview == false)
+     preview = "False";
+   else
+     preview = "True";
    this.preview = preview;
  
    this.num_submissions = 0;

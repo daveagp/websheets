@@ -104,8 +104,9 @@ if __name__ == "__main__":
     newname = request['newname']
     if not valid(newname):
       done(success=False, message="New name does not have valid format: " + newname)
-    if not canedit(newname):
-      done(success=False, message="You are not allowed to edit: " + newname)
+    if owner(newname) != None:
+      done(success=False, message="There is already a websheet with this name: " + newname)
+    
 
     definition = json.loads(request['definition'])
     sharing = 'open-nosol'
@@ -118,7 +119,7 @@ if __name__ == "__main__":
 
     if action == 'rename':      
       cursor.execute("insert into ws_sheets (author, problem, action)" +
-                     " VALUES (%s, %s, %s, %s, %s)",
+                     " VALUES (%s, %s, %s)",
                      (authinfo['username'], problem, 'delete'))
       
     done(success=True, message=action + " of " + problem + " to " + newname + " successful.")
@@ -127,11 +128,11 @@ if __name__ == "__main__":
     myowner = owner(problem)
     # if it doesn't exist, everything is good
     if myowner == None:
-      done(success=True, message="Loaded " + problem, new=True, canedit=True)
+      done(success=True, message="Loaded " + problem, new=True, canedit=True, author=authinfo['username'])
     # it exists
     if not canread(problem):
       done(success=False, message="You do not have read permissions for: " + problem)
     done(success=True, message="Loaded " + problem, new=False, canedit=myowner == authinfo['username'],
-          definition= definition(problem))
+          definition= definition(problem), author=myowner)
       
   internal_error('Unknown action ' + action)
