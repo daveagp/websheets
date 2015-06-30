@@ -8,7 +8,7 @@ if (!array_key_exists('stdin', $_REQUEST)
     die;
   }
 
-$client_request = json_decode($_REQUEST["stdin"]);
+$client_request = json_decode($_REQUEST["stdin"], true);
 if ($client_request == FALSE) {
   echo "Internal error, request did not receive a json on stdin";
   die;
@@ -33,6 +33,7 @@ $stdin = json_encode(array("client_request" => $client_request,
                            "php_data" => array("user"=>$WS_AUTHINFO['username'],
                                                "problem"=>$problem,
                                                "meta"=>array("authdomain"=>$WS_AUTHINFO['domain'],
+                                                             "preview"=>$client_request['preview'],
                                                              "ip"=>$_SERVER['REMOTE_ADDR']))));
 
 $process = proc_open("./submit.py", $descriptorspec, $pipes);

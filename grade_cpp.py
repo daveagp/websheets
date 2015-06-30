@@ -93,7 +93,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
       return None
 
     for test in websheet.tests:
-      if test[0]=="check-function":
+      if websheet.lang =='C++func' and test[0]=="check-function":
         funcname = test[1]
         returntype = test[2]
         if (returntype == "void"):
@@ -140,7 +140,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
               
         continue # check-function
       
-      if test[0]=="call-function":
+      if websheet.lang=='C++func' and test[0]=="call-function":
         funcname = test[1]
         args = test[2]        
         testline = funcname + "(" + ', '.join(args) + ")"
@@ -194,9 +194,13 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         exename = newslug
         stdin = ""
         args = []
-      else: # normal test, calling main
-        stdin = test[0]
-        args = test[1]
+      if websheet.lang=='C++': # normal test, calling main
+        stdin = ""
+        args = []
+        if 'stdin' in test:
+          stdin = test['stdin']
+        if 'args' in test:
+          args = test['args']
 
         cmd = websheet.slug
         if len(args) > 0: cmd += " " + " ".join(args)

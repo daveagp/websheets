@@ -6,12 +6,14 @@ import sys, os, os.path, json, config
 db = config.connect()
 cursor = db.cursor()
 
-for path, folder, files in os.walk('exercises'):
+os.chdir('exercises')
+
+for path, folder, files in os.walk('.'):
     for file in files:
         if file.endswith('.py'):
             print(os.path.join(path, file))
             import importlib.machinery
-            fullname = os.path.join(path, file)
+            fullname = os.path.join(path, file)[2:] # remove ./
             loader = importlib.machinery.SourceFileLoader(fullname, fullname)
             module = loader.load_module(fullname)
 
@@ -35,6 +37,8 @@ for path, folder, files in os.walk('exercises'):
                 if field in dicted:
                     dicted[field] = json.dumps(dicted[field])
 
+            if 'example' in dicted:
+                dicted['example'] = "True" if dicted['example'] else "False"
 
             cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
                            " VALUES (%s, %s, %s, %s, %s)",

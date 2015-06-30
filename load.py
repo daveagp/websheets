@@ -5,7 +5,7 @@ if __name__ == "__main__":
   from Websheet import Websheet
   student = sys.argv[2]
   try:
-    websheet = Websheet.from_filesystem(sys.argv[1])
+    websheet = Websheet.from_name(sys.argv[1], sys.argv[3]=='True', student) # preview?
     dbslug = websheet.dbslug
     
     import config, json

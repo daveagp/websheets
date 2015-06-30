@@ -116,10 +116,10 @@ CREATE TABLE IF NOT EXISTS `ws_sheets` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `author` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
   `problem` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `definition` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+  `definition` mediumtext COLLATE utf8_unicode_ci,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `action` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `sharing` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `sharing` varchar(20) COLLATE utf8_unicode_ci,
   PRIMARY KEY (`id`),
   KEY `problem` (`problem`,`action`,`time`),
   KEY `author` (`author`,`problem`,`action`,`time`)

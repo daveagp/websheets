@@ -15,6 +15,7 @@ if (//!array_key_exists('stdin', $_REQUEST) ||
   }
 //$stdin = $_REQUEST["stdin"];
 $problem = $_REQUEST["problem"];
+$preview = $_REQUEST["preview"]=='True' ? 'True' : 'False';
 
 // only accept characters that cannot cause problems
 $regex = "[_0-9a-zA-Z/-]+";
@@ -29,7 +30,7 @@ $descriptorspec = array(
                         2 => array("pipe", "w"),  // stderr
                         );
 
-$process = proc_open("./load.py " . $problem . " " . $WS_AUTHINFO['username'], $descriptorspec, $pipes);
+$process = proc_open("./load.py " . $problem . " " . $WS_AUTHINFO['username'] . " " . $preview, $descriptorspec, $pipes);
 
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";

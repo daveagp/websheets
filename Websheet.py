@@ -17,6 +17,7 @@ import sys
 import os
 import os.path
 import json
+import config
 from java_syntax import java_syntax
 
 def exercise_path(qualified_slug, suffix=".py"):
@@ -203,13 +204,18 @@ class Websheet:
         # parsed ok
         return [True, result]
 
-    def __init__(self, field_dict):
+    def __init__(self, field_dict, slug):
         """
         Constructor, accepts a string-to-string dictionary of field names,
         values. Some are mandatory and some are optional; optional ones
         will appear anyway as fields, but just with default values.
         """
 
+        if "classname" not in field_dict:
+            field_dict["classname"] = slug.split("/")[-1]
+        field_dict["slug"] = slug.split("/")[-1]
+        field_dict["dbslug"] = slug
+                                                                
         if "lang" in field_dict and field_dict["lang"] in {"multichoice", "shortanswer"}:
             field_dict["source_code"] = None
             field_dict["tests"] = None
@@ -219,7 +225,7 @@ class Websheet:
 
         # optional fields AND default values
         optional_fields = {"lang": "Java", "slug": None,
-                           "example": False,
+                           "example": "False",
                            "epilogue": None, 
                            "dependencies": [], 
                            "imports": [],
@@ -253,6 +259,8 @@ class Websheet:
 
         if self.nocode:
             return
+
+        self.example = self.example == "True" # convert string to bool
 
         # normalize so starts, ends with newline if not already present
         if not self.source_code.startswith("\n"):
@@ -581,19 +589,46 @@ self.classname + " to = new " + self.classname + "();\n" +
     @staticmethod
     def from_filesystem(slug):
         import importlib.machinery
-        loader = importlib.machinery.SourceFileLoader(slug,
+        loader = importlib.machinery.SourceFileLoader(slug+".ws",
                                                       exercise_path(slug))
-        module = loader.load_module(slug)
+        module = loader.load_module(slug+".ws")
 
         dicted = {attname: getattr(module, attname) for attname in dir(module)}
-        if "classname" not in dicted:
-            dicted["classname"] = slug.split("/")[-1]
-        dicted["slug"] = slug.split("/")[-1]
-        dicted["dbslug"] = slug
-        return Websheet(dicted)
+        return Websheet(dicted, slug)
+
 
     @staticmethod
-    def list_exercises_in(directory = ""):
+    def from_db(slug, preview = False, author = None):
+        mydef = None
+        if not preview:
+            for action, definition, sharing, id in config.get_rows(
+                "select action, definition, sharing, id from ws_sheets " +
+                "WHERE problem = '"+slug+"' AND action != 'preview' ORDER BY ID DESC LIMIT 1;"):
+                if action == 'delete': return None
+                if sharing == 'draft': return None
+                mydef = definition
+        else:
+            for definition, id in config.get_rows(
+                "select definition, id from ws_sheets " +
+                "WHERE problem = '"+slug+"' AND author = '"+author+"' AND action = 'preview' ORDER BY ID DESC LIMIT 1;"):
+                mydef = definition
+        if mydef != None:
+            mymap = json.loads(definition)
+            json_fields = ['choices', 'verboten', 'imports', 'dependencies', 'cppflags_add', 'cppflags_remove']
+            if mymap['lang'] in ['C++', 'C++func']:
+                json_fields += ['tests']
+            for x in json_fields:
+                if x in mymap:
+                    mymap[x] = json.loads(mymap[x])
+            return Websheet(mymap, slug)
+        return None
+
+    @staticmethod
+    def from_name(slug, preview = False, author = None):
+        return Websheet.from_db(slug, preview, author)
+
+    @staticmethod
+    def list_exercises_in_filesystem(directory = ""):
         r = []
         for file in os.listdir(exercise_path(directory, suffix="")):
             if file.endswith(".py") and not file.startswith("_"):
@@ -602,7 +637,44 @@ self.classname + " to = new " + self.classname + "();\n" +
         return r
 
     @staticmethod
-    def list_subgroups_in(group):
+    def list_exercises_in(directory = ""):
+        result = []
+        prefix = '' if directory=='' else directory+'/'
+
+        condition = "action != 'preview' AND problem LIKE '"+prefix+"%' AND problem NOT LIKE '"+prefix+"%/%'"
+
+        for problem, action, sharing in config.get_rows(
+            """SELECT o1.problem, o1.action, o1.sharing FROM ws_sheets o1
+            INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE """+condition+""" GROUP BY problem) o2
+            ON (o1.problem = o2.problem AND o1.id = o2.id);"""):
+            if action == 'delete': continue
+            if sharing == 'draft' or sharing == 'hidden': continue
+            result += [problem[len(prefix):]]
+
+        result.sort()
+        return result
+
+    @staticmethod
+    def list_subgroups_in(directory = ""):
+        result = set()
+        prefix = '' if directory=='' else directory+'/'
+
+        condition = "action != 'preview' AND problem LIKE '"+prefix+"%/%'"
+        
+        for problem, action, sharing in config.get_rows(
+            """SELECT o1.problem, o1.action, o1.sharing FROM ws_sheets o1
+            INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE """+condition+""" GROUP BY problem) o2
+            ON (o1.problem = o2.problem AND o1.id = o2.id);"""):
+            if action == 'delete': continue
+            if sharing == 'draft' or sharing == 'hidden': continue
+            result |= {prefix+problem[len(prefix):].split('/')[0]}
+
+        result = list(result)
+        result.sort()
+        return result
+
+    @staticmethod
+    def list_subgroups_in_filesystem(group):
         r = []
         for file in os.listdir(exercise_path(group, suffix="")):
             if (os.path.isdir(exercise_path(os.path.join(group, file), suffix="")) 
@@ -613,6 +685,12 @@ self.classname + " to = new " + self.classname + "();\n" +
         return r
 
     def list_folders(item):
+        if item=="": result=[]
+        elif '/' not in item: result = [""]
+        else: result = ['/'.join('/'.split(item)[:-1])]
+        return result+Websheet.list_subgroups_in(item)    
+
+    def list_folders_filesystem(item):
         if os.path.isdir(exercise_path(item, suffix="")):
             parent = [] if item=="" else [os.path.dirname(item)]
             return parent + Websheet.list_subgroups_in(item)
@@ -710,23 +788,23 @@ if __name__ == "__main__":
 
     # call Websheet.py get_reference_solution MaxThree
     if sys.argv[1] == "get_reference_solution":
-        websheet = Websheet.from_filesystem(sys.argv[2])
+        websheet = Websheet.from_name(sys.argv[2])
         print(json.dumps(websheet.get_reference_solution("reference")))
 
     # call Websheet.py get_json_template MaxThree
     elif sys.argv[1] == "get_json_template":
-        websheet = Websheet.from_filesystem(sys.argv[2])
+        websheet = Websheet.from_name(sys.argv[2])
         print(json.dumps(websheet.get_json_template()))
 
     # call Websheet.py get_html_template MaxThree
     elif sys.argv[1] == "get_html_template":
-        websheet = Websheet.from_filesystem(sys.argv[2])
+        websheet = Websheet.from_name(sys.argv[2])
         print(json.dumps({"code":websheet.get_json_template(),
                           "description":websheet.description}))
 
     # call Websheet.py combine_with_template MaxThree stu, input [" int ",...]
     elif sys.argv[1] == "combine_with_template":
-        websheet = Websheet.from_filesystem(sys.argv[2])
+        websheet = Websheet.from_name(sys.argv[2])
         user_input = input() # assume json all on one line
         user_poschunks = json.loads(user_input)
         print(json.dumps(websheet.combine_with_template(
@@ -745,29 +823,29 @@ if __name__ == "__main__":
         print(json.dumps(Websheet.list_folders(arg)))
 
     elif sys.argv[1] == "testing_ui":
-        print(json.dumps(Websheet.from_filesystem(sys.argv[2]).testing_ui()))
+        print(json.dumps(Websheet.from_name(sys.argv[2]).testing_ui()))
 
     elif sys.argv[1] == "testall_ui":
         wslist = Websheet.list_exercises_in()
-        print(json.dumps({slug: Websheet.from_filesystem(slug).testing_ui()
+        print(json.dumps({slug: Websheet.from_name(slug).testing_ui()
                           for slug in wslist}
                          ,indent=4, separators=(',', ': '))) # pretty!
 
     elif sys.argv[1] == "regression_save":
-        Websheet.from_filesystem(sys.argv[2]).regression_save()
+        Websheet.from_name(sys.argv[2]).regression_save()
 
     elif sys.argv[1] == "regression_save_all":
         for slug in Websheet.list_filesystem():
             print(slug)
-            Websheet.from_filesystem(slug).regression_save()
+            Websheet.from_name(slug).regression_save()
 
     elif sys.argv[1] == "regression":
-        Websheet.from_filesystem(sys.argv[2]).regression_ui()
+        Websheet.from_name(sys.argv[2]).regression_ui()
 
     elif sys.argv[1] == "regression_all":
         for slug in Websheet.list_filesystem():
             print(slug)
-            Websheet.from_filesystem(slug).regression_ui()
+            Websheet.from_name(slug).regression_ui()
 
     else:
         print("Invalid command for Websheet")

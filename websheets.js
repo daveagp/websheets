@@ -49,10 +49,10 @@ websheets.createHere = function(slug, data) {
    var arrScripts = document.getElementsByTagName('script');
    var currScript = arrScripts[arrScripts.length - 1];
    var containerdiv = $(currScript).closest('div');
-   return websheets.createAt(slug, data, containerdiv);
+  return websheets.createAt(slug, data, containerdiv);
 }
 
-websheets.createAt = function(slug, data, containerdiv) {
+websheets.createAt = function(slug, data, containerdiv, preview) {
    $(containerdiv).addClass("wscontainer");
    $(containerdiv).addClass("show-body");
    $(containerdiv).html(' \
@@ -86,7 +86,7 @@ websheets.createAt = function(slug, data, containerdiv) {
   </div> <!-- container -->');
    if (websheets.header_toggling)
       $(containerdiv).find('.exercise-header').addClass('toggleable');
-   var ws = new websheets.Websheet(slug, data, containerdiv);
+  var ws = new websheets.Websheet(slug, data, containerdiv, preview);
    websheets.all.push(ws);
    return ws;
 };
@@ -117,12 +117,16 @@ websheets.createAt = function(slug, data, containerdiv) {
    mo.observe(document, {childList: true, subtree: true});
 })();
 
-websheets.Websheet = function(slug, data, div) {
+websheets.Websheet = function(slug, data, div, preview) {
    var this_ws = this; // to access in callbacks
    
    this.slug = slug;
    this.div = div; // .wscontainer
-   
+  
+   if (typeof preview == "undefined")
+     preview = false;
+   this.preview = preview;
+ 
    this.num_submissions = 0;
    this.viewing_ref = false;
    this.changing_viewing_ref = false;
@@ -286,7 +290,8 @@ websheets.Websheet.prototype.load = function(newslug) {
 
    $.ajax(websheets.urlbase+"/load.php", {
       data: {problem: this_ws.slug,
-             ajax_uid_intended: websheets.authinfo.username},
+             ajax_uid_intended: websheets.authinfo.username,
+             preview: this_ws.preview},
       dataType: "json",
       
       success: function(data) {
@@ -337,10 +342,10 @@ websheets.Websheet.prototype.submit = function() {
    else {
       user_state['snippets'] = this.wse.getUserCodeAndLocations();
    }
-   
+  user_state['preview'] = this_ws.preview;
    $.ajax(websheets.urlbase+"/submit.php", {
       data: {stdin: JSON.stringify(user_state), problem: this_ws.slug,
-            ajax_uid_intended: websheets.authinfo.username},
+             ajax_uid_intended: websheets.authinfo.username},
       dataType: "json",
       error: function(jqXHR, textStatus, errorThrown) {
 	 $(this_ws.div).find(".submitButton").removeAttr("disabled");

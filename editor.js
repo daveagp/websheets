@@ -20,7 +20,9 @@ var editor_schema =
    {key: 'source_code', lang: 'Java', type: 'codemirror', mode:'java', label: 'Template / Reference solution'},
    {key: 'source_code', langs: ['C++', 'C++func'], type: 'codemirror', mode:'c++', label: 'Template / Reference solution'},
    {key: 'tests', lang: 'Java', type: 'codemirror', mode:'java', label: 'Java test suite'},
-   {key: 'tests', langs: ['C++', 'C++func'], type: 'codemirror', mode:'json', label: 'C++ test suite'},
+   {key: 'tests', lang: 'C++', type: 'codemirror', mode:'json', label: 'C++ test suite',
+    howto: 'json list of stdin/args tests<br>e.g. <tt>[{"stdin":"hi", "args":["4", "5"]},<br>{"stdin":"noargs"}]</tt><br>to just run once with no input use <tt>[{}]</tt>'},
+   {key: 'tests', lang: 'C++func', type: 'codemirror', mode:'json', label: 'C++ test suite', howto:'TODO'},
    {key: 'verboten', optional: true, langs: ['Java', 'C++', 'C++func'], type: 'codemirror', mode:'json', label: 'Forbidden substrings',
     howto:'json list of strings<br>e.g. <tt>["for","while"]</tt>'},
    {key: 'attempts_until_ref', default: 'infinity', optional: true, type: 'choice', label: 'Solution visibility', 
@@ -39,7 +41,7 @@ var editor_schema =
     howto: 'json list of websheet names in this folder<br>e.g. <tt>["DataStructure"]</tt>'},
 
    {key: 'example', optional: true, langs: ['C++', 'C++func'], type: 'choice', label: 'Is example?',
-    choices: [['false', 'false'], ['true', 'true']], default: 'false',
+    choices: [['False', 'False'], ['True', 'True']], default: 'False',
     howto: 'i.e., just a demo<br><a href="javascript:explain_example()">can still be <tt>\\[editable]\\</tt></a>'},
    {key: 'cppflags_add', optional: true, langs: ['C++', 'C++func'], type: 'codemirror', mode:'json', label: 'Add compiler flag(s)',
     howto: 'json list of flags<br>e.g. <tt>["-Wno-unused-variable"]</tt>'},
@@ -50,41 +52,6 @@ var explain_example = function() {
 }
 
 var codemirrors = {};
-
-// inelegant since jquery's .append doesn't pass items to MutationObserver one by one
-   var process = function (parent, child) {
-     $(child).find('div.cm-maker').each(function() {
-       if (!$(this).hasClass('cm-maker')) return;
-       $(this).removeClass('cm-maker');
-       $(this).addClass('cm-container');
-       var modemap = {'html':'text/html','json':'application/json','c++':'text/x-c++src','java':'text/x-java'};
-       var modetag = $(this).attr('data-mode');
-       var row = $(this).closest('tr').attr('id').substring(4); // row-
-       if (!modemap[modetag])
-         alert("Don't know mode " + modetag);
-       codemirrors[row] = CodeMirror(this, {
-         mode: modemap[modetag],
-         theme: "neat", tabSize: 3, indentUnit: 3,
-//         lineNumbers: true,
-         styleSelectedText: true,
-         viewportMargin: Infinity,
-         matchBrackets: true
-       });
-     })};
-
-   // construct observer _before_ anything is rendered
-   new MutationObserver(
-      // constructor argument: callback on MutationRecord[]
-      function (events) {
-         // for each record,
-         for (var i=0; i<events.length; i++)
-            // MutationRecord has Node "target" and Node[] "addedNodes"
-            for (var j=0; j<events[i].addedNodes.length; j++)
-               // we'll define "process(parent, child)" below
-               process(events[i].target, events[i].addedNodes[j]);
-      }
-   ).observe(document, {childList: true, subtree: true});
-
 
 $(function() {
   var widget = function(item) {
@@ -103,7 +70,7 @@ $(function() {
       return '<input type="text"></input>';
     }
     if (item.type == 'codemirror') {
-      return '<div class="cm-maker" data-mode="'+item.mode+'"></div>';
+      return '<div class="cm-maker"></div>';
     }
   }
 
@@ -115,7 +82,25 @@ $(function() {
     row += widget(item);
     if (item.optional) row += ' <a href="#" class="optout" data-row="'+i+'">remove</a>';
     row += '</td></tr>';
-    $('table#editor').append(row);
+    
+    // force rendering as DOM element so codemirror can access it immediately
+    row = $.parseHTML(row)[0];
+    $('table#editor').append(row); 
+
+    if (item.type == 'codemirror') {
+      var modemap = {'html':'text/html','json':'application/json','c++':'text/x-c++src','java':'text/x-java'};
+      var modetag = item.mode;
+      if (!modemap[modetag])
+        alert("Don't know mode " + modetag);
+      codemirrors[i] = CodeMirror(row.children[1], {
+        mode: modemap[modetag],
+        theme: "neat", tabSize: 3, indentUnit: 3,
+        //         lineNumbers: true,
+        styleSelectedText: true,
+        viewportMargin: Infinity,
+        matchBrackets: true
+      });
+    }
   }
 
   var update_rows = function() {
@@ -209,5 +194,86 @@ $(function() {
     };
   };
 
+  window.display_error = function(html) {
+    $('div#error').html('<hr>'+html);
+    $('div#error').show();
+  }
+
+  if (websheets.initialize_error) {
+    display_error(websheets.initialize_error);
+    $(".editor").hide();
+  }
+
+  if (websheets.initialize_editor !== undefined) {
+    if (websheets.initialize_editor['new']) {
+      alert('You are creating a new websheet named '+websheets.GET['edit']);
+    }
+    else { 
+      window.decode(websheets.initialize_editor['definition']);
+    }
+  }
+
+  $('button#reload').on('click', function() {
+    var slug = window.prompt("Enter the full path of the websheet to create or edit. E.g., cpp/arrays/echo");
+    if (slug != null)
+      window.location.href='?edit='+encodeURIComponent(slug);    
+  });
+
+  $('button#export').on('click', function() {
+    prompt("JSON of the currently defined websheet:", window.encode());
+  });
+
+  $('button#import').on('click', function() {
+    window.decode(prompt("Paste your JSON websheet definition:"));
+  });
+
+  $('button#rename, button#copy, button#save, button#preview, button#delete').on('click', function() {
+    var action = $(this).attr('id');
+    if (action == 'delete' || action == 'rename') {
+      if (!confirm("Do you really want to "+action+" " + websheets.GET['edit'] + "?"))
+        return;
+    }
+    var request = {action: action, problem: websheets.GET['edit'], definition: window.encode(),
+                   ajax_uid_intended: websheets.authinfo.username};
+    if (action == 'rename' || action == 'copy') {
+      var newname = prompt(action+ " to what new name? (Include the full path, e.g. cpp/cs201/halting)");
+      request.newname = newname;
+    }    
+
+    $.ajax(websheets.urlbase + '/edit.php',
+           {
+             data: request,
+             dataType: "json",
+             
+             success: function(data) {
+               $('#error').hide();
+               if (typeof data == "string") display_error(data);
+               else {
+                 display_error(data.message);
+                 if (data.success && (action=='delete' || action=='rename' || action=='copy')) {
+                   alert(action + ' successful.');
+                   window.location.href='./editor.php' + (action!='delete'?'?edit='+newname:'');
+                 }
+                 if (data.success && action=='preview') {
+                   if (websheets.previewer)
+                     websheets.previewer.load(websheets.GET['edit']);
+                   else
+                     websheets.createAt(websheets.GET['edit'], null, $('div.preview'), true);
+                     $('html, body').animate({
+                       scrollTop: $("div.preview").offset().top
+                     }, 2000);
+                 }
+               }
+             },
+             
+             error: function(jqXHR, textStatus, errorThrown) {
+               if (textStatus == "parsererror") {
+                 var info = jqXHR.responseText;
+                 display_error('Error: '+info);
+               }}
+           })
+    
+  });
+  
 });
 

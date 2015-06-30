@@ -1,6 +1,6 @@
 import socket, os
 from subprocess import Popen, PIPE
-from Websheet import record
+import Websheet
 import json
 
 # we already checked for this error in php land
@@ -37,12 +37,12 @@ def execute(command, the_stdin, input_encoding="UTF-8", output_encoding="UTF-8")
     proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         
     result = proc.communicate(input = the_stdin.encode(input_encoding))
-    return record(command = command,
-                  pwd = os.getcwd(),
-                  stdin = the_stdin,
-                  stdout = result[0].decode(output_encoding),
-                  stderr = result[1].decode(output_encoding),
-                  returncode = proc.returncode)
+    return Websheet.record(command = command,
+                           pwd = os.getcwd(),
+                           stdin = the_stdin,
+                           stdout = result[0].decode(output_encoding),
+                           stderr = result[1].decode(output_encoding),
+                           returncode = proc.returncode)
     
 def run_java(command, the_stdin = ""):
     return execute(java_prefix() + command, the_stdin)
@@ -145,3 +145,23 @@ def num_submissions(student, problem):
         cursor.close()
         db.close()
         return result
+
+def get_row(query, multiple=False):
+    db = connect()
+    cursor = db.cursor()
+    cursor.execute(query)
+    
+    result = [] if multiple else None
+    for row in cursor:
+        if multiple:
+            result.append([x for x in row])
+        else:
+            result = [x for x in row]
+            
+    cursor.close()
+    db.close()
+    return result
+
+def get_rows(query):
+    return get_row(query, multiple=True)
+
