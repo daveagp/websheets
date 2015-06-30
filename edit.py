@@ -22,14 +22,6 @@ if __name__ == "__main__":
     print(json.dumps(response))
     sys.exit(0)
 
-  request = json.loads("".join(sys.stdin))
-
-  authinfo = request['authinfo']
-  if not authinfo["logged_in"]:
-    internal_error("Only logged-in users can edit")
-  problem = request['problem']
-  action = request['action']
-  
   def owner(slug):
     # really should be done with %s but ok since we sanitize
     cursor.execute(
@@ -51,6 +43,22 @@ if __name__ == "__main__":
       return row[0]
     internal_error('Whoa, where did that row go?')
 
+  def list_problems(username):
+    result = []
+
+    condition = "action != 'preview' AND author = '" + username + "'"
+
+    for problem, action, sharing in config.get_rows(
+      """SELECT o1.problem, o1.action, o1.sharing FROM ws_sheets o1
+      INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE """+condition+""" GROUP BY problem) o2
+      ON (o1.problem = o2.problem AND o1.id = o2.id);"""):
+      if action == 'delete': continue
+      if sharing == 'draft' or sharing == 'hidden': continue
+      result.append([problem, sharing])
+
+    result.sort()
+    return result
+
   def valid(slug):
     return re.match(r"^([\w-]+/)*[\w-]+$", slug)
 
@@ -70,10 +78,19 @@ if __name__ == "__main__":
       author = row[0]
       action = row[1]
       sharing = row[2]
-      return sharing.startswith('open')
+      return sharing==None or sharing.startswith('open')
     internal_error('Whoa, where did that row go?')
 
-  if not valid(problem):
+  # start of request handling
+  request = json.loads("".join(sys.stdin))
+
+  authinfo = request['authinfo']
+  if not authinfo["logged_in"]:
+    internal_error("Only logged-in users can edit")
+  problem = request['problem'] if 'problem' in request else None
+  action = request['action']  
+
+  if action != 'list' and not valid(problem):
     if (action == 'load'):
       done(success=False, message="Requested name does not have valid format: <tt>" + problem + "</tt>")
     else:
@@ -134,5 +151,8 @@ if __name__ == "__main__":
       done(success=False, message="You do not have read permissions for: " + problem)
     done(success=True, message="Loaded " + problem, new=False, canedit=myowner == authinfo['username'],
           definition= definition(problem), author=myowner)
-      
+
+  if action == 'list':
+    if not authinfo['logged_in']: done([])
+    done(problems = list_problems(authinfo['username']))
   internal_error('Unknown action ' + action)

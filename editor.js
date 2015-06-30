@@ -54,8 +54,10 @@ var explain_example = function() {
 var codemirrors = {};
 
 $(function() {
-  if (websheets.editor_readonly)
+  if (websheets.editor_readonly) {
     $('body').addClass('readonly');
+    $('#doing').html('Viewing');
+  }
 
   var widget = function(item) {
     if (item.type == 'choice') {
@@ -168,8 +170,8 @@ $(function() {
   };
 
   window.decode = function(jsoned_websheet) {
-    var obj = JSON.parse(jsoned_websheet);
-    var lang = obj.lang;
+    var obj = JSON.parse(jsoned_websheet || '{}' );
+    var lang = obj.lang || '';
     $('#optionals').html('');
     for (var i=0; i<editor_schema.length; i++) {
       var item = editor_schema[i];
@@ -302,7 +304,7 @@ $(function() {
                  if (data.success) 
                    display_error(data.message);
                  else {
-                   hide_error();
+                   remove_error();
                    alert('Failed: ' + data.message);
                  }
                  if (data.success && (action=='delete' || action=='rename' || action=='copy')) {

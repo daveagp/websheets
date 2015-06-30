@@ -5,14 +5,13 @@ saner "you're not logged in" message / options
 (b) allow changes
 'require_login' global option
 
-listing page:
-- table with all websheets listed + link to edit + link to give to students to solve
-
 implement new attempts_until_ref options
 
 implement solution sanitization
 
 state change problem between switching problems and reference/non?
+
+what to do if 'save' with invalid json or missing engine?
 
 authenticating student of a teacher?
 hosted exercise scores / review hw-usc.{php,py}
