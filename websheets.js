@@ -204,7 +204,9 @@ websheets.Websheet = function(slug, data, div, preview) {
 
    if (websheets.header_toggling) {
       $(this.div).find('.exercise-header').click( function(eventObject) {
-         this_ws.toggle();
+        // dont expand when clicking on (cc) link
+        if (eventObject.target.tagName != 'IMG')
+          this_ws.toggle();
       });
    }
    
