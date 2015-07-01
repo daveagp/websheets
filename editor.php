@@ -77,7 +77,7 @@ $attemptlink = "./?start=".$bits[count($bits)-1]."&folder=".implode('/', array_s
 </head>
 <body>
 <div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?> <a href="https://github.com/daveagp/websheets">View Websheets source code repository.</a></div>
-<p><button id='reload' class='pure'>Create blank Websheet or open existing Websheet</button> <a href='./list.php'>List of all my Websheets</a>
+<p><button id='reload' class='pure'>Create blank Websheet or open existing Websheet</button> <a href='./list.php'>List of all available Websheets</a>
 <div id='error' style='display:none'>
 </div>
 <div class='editor'>

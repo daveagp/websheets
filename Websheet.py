@@ -632,9 +632,8 @@ self.classname + " to = new " + self.classname + "();\n" +
         r = []
         for file in os.listdir(exercise_path(directory, suffix="")):
             if file.endswith(".py") and not file.startswith("_"):
-                r.append(file[:-3])
+                r.append('/'.split(file[:-3]))
         r.sort()
-        return r
 
     @staticmethod
     def list_exercises_in(directory = ""):

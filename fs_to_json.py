@@ -11,7 +11,7 @@ os.chdir('exercises')
 for path, folder, files in os.walk('.'):
     for file in files:
         if file.endswith('.py'):
-            print(os.path.join(path, file))
+            #print(os.path.join(path, file))
             import importlib.machinery
             fullname = os.path.join(path, file)[2:] # remove ./
             loader = importlib.machinery.SourceFileLoader(fullname, fullname)
@@ -38,11 +38,33 @@ for path, folder, files in os.walk('.'):
                     dicted[field] = json.dumps(dicted[field])
 
             if 'example' in dicted:
+                if dicted['example'] == True:
+                    tmp = fullname.split('/')
+                    fullname = '/'.join(tmp[:-1]+['examples']+tmp[-1:])
                 dicted['example'] = "True" if dicted['example'] else "False"
 
+            marks = ['printseconds', 'cs104', 'mergearrays', 'strcpy', 'strlen', 'cpp/eggs', 'countodd', 'discount',
+                     'liebnizapprox', 'revdigits', 'wallisapprox', 'weekday', 'names', 'nxmboard',
+                     'ordered_array', 'draw_square', 'remove_factor', 'cmdargs_smartsum', 'cmdargs_sum', 'divide',
+                     'roll2', 'combo', 'binsearch', 'binary_search', 'strset', 'var-expr/math'] # continue from random
+
+            default_author = 'daveagp@gmail.com'
+            
+            for name in marks:
+                if name in fullname:
+                    print(fullname)
+                    if 'remarks' not in dicted: dicted['remarks'] = ""
+                    dicted['remarks'] = "Originally by Mark Redekopp (redekopp@usc.edu) and Dave Pritchard (daveagp@gmail.com)\n" + dicted['remarks']
+                    default_author = 'redekopp@usc.edu'
+
+            if 'AboveAverage' in fullname:
+                if 'remarks' not in dicted: dicted['remarks'] = ""
+                dicted['remarks'] = "Originally by Maia Ginsburg (maia@princeton.edu) and Dave Pritchard (daveagp@gmail.com)\n" + dicted['remarks']
+                default_author = 'maia@princeton.edu'
+            
             cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
                            " VALUES (%s, %s, %s, %s, %s)",
-                           ('daveagp@gmail.com', fullname[:-3], json.dumps(dicted), 'save', 'open-nosol'))
+                           (default_author, fullname[:-3], json.dumps(dicted), 'save', 'open-nosol'))
 db.commit()
 cursor.close()
 db.close()

@@ -46,17 +46,23 @@ if __name__ == "__main__":
   def list_problems(username):
     result = []
 
-    condition = "action != 'preview' AND author = '" + username + "'"
+    condition = "action != 'preview'"
 
-    for problem, action, sharing in config.get_rows(
-      """SELECT o1.problem, o1.action, o1.sharing FROM ws_sheets o1
+    for problem, action, sharing, author in config.get_rows(
+      """SELECT o1.problem, o1.action, o1.sharing, o1.author FROM ws_sheets o1
       INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE """+condition+""" GROUP BY problem) o2
       ON (o1.problem = o2.problem AND o1.id = o2.id);"""):
       if action == 'delete': continue
-      if sharing == 'draft' or sharing == 'hidden': continue
-      result.append([problem, sharing])
-
+      if author != username:
+        if sharing == 'draft' or sharing == 'hidden': continue
+      result.append([author != username, problem, sharing])
+    #saner sort, files before folders
+    for x in result:
+      tmp = x[1].split('/')
+      x[1] = [tmp[:-1], tmp[-1]]
     result.sort()
+#    print(result)
+    for x in result: x[1] = '/'.join(x[1][0]+[x[1][1]])
     return result
 
   def valid(slug):
@@ -90,7 +96,7 @@ if __name__ == "__main__":
   problem = request['problem'] if 'problem' in request else None
   action = request['action']  
 
-  if action != 'list' and not valid(problem):
+  if action != 'listmine' and not valid(problem):
     if (action == 'load'):
       done(success=False, message="Requested name does not have valid format: <tt>" + problem + "</tt>")
     else:
@@ -130,9 +136,13 @@ if __name__ == "__main__":
     if 'sharing' in definition:
       sharing = definition['sharing']
 
+    if action == 'copy':
+      if 'remarks' not in definition: definition['remarks'] = ""
+      definition['remarks'] = "Copied from problem " + problem + " (author: " + owner(problem) + ")\n" + definition['remarks']
+
     cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
                    " VALUES (%s, %s, %s, %s, %s)",
-                   (authinfo['username'], newname, request['definition'], 'save', sharing))
+                   (authinfo['username'], newname, json.dumps(definition), 'save', sharing))
 
     if action == 'rename':      
       cursor.execute("insert into ws_sheets (author, problem, action)" +
@@ -152,7 +162,7 @@ if __name__ == "__main__":
     done(success=True, message="Loaded " + problem, new=False, canedit=myowner == authinfo['username'],
           definition= definition(problem), author=myowner)
 
-  if action == 'list':
+  if action == 'listmine':
     if not authinfo['logged_in']: done([])
     done(problems = list_problems(authinfo['username']))
   internal_error('Unknown action ' + action)
