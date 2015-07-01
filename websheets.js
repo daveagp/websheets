@@ -63,10 +63,9 @@ websheets.popup_reauth = function(domain) {
 };
 
 websheets.set_authinfo = function(info) {
-  // reload on first auth or when username changes
-  var reload_sheets = (!websheets.authinfo) 
-    || (websheets.authinfo.username != info.username);
-  console.log(info, websheets.authinfo, reload_sheets);
+  // reload when username changes
+  var reload_sheets =  websheets.authinfo &&
+    websheets.authinfo.username != info.username;
   websheets.authinfo = info;
   if (info.error_span)
     $(".embed-authinfo").html(info.error_span);
