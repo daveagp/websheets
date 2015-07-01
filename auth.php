@@ -17,8 +17,7 @@ WS_AUTHINFO contains info that can be made PUBLIC to the user and which can be c
 ["username"] : email address, or "anonymous"
 ["domain"] : currently logged-in domain: Facebook/Google/Princeton/etc or "n/a"
 ["providers"] : list of known providers
-["error_plaintext"] : text version of same
-["error_div"] : html-formatted error message (bad server config, auth expiry) or empty string if none.
+["error_span"] : html-formatted error message (bad server config, auth expiry) or empty string if none.
 ["info_span"] : very simple user-showable summary of authentication status, for convenience
 ["required_username_suffix"] : blank if n/a, or required login domain, used for error message UI
  (e.g., cant load config file, user has wrong domain, ajax user expired etc)
@@ -266,13 +265,12 @@ on another window as <tt>".$WS_AUTHINFO["username"]."</tt>.";
    }
 }
 
-$WS_AUTHINFO["error_div"] = "";
-$WS_AUTHINFO["error_plaintext"] = $error;
+$WS_AUTHINFO["error_span"] = "";
 
 if (strlen($error) != 0) {
-   $WS_AUTHINFO["error_div"] = "<div class='ws-error-message'><i>$error</i>
+   $WS_AUTHINFO["error_span"] = "<span class='ws_error_span'><i>$error</i>
    <script type='text/javascript'>
-   $(function(){alert('Error! Please see status message.');});</script></div>";
+   $(function(){alert('Error! Please see status message.');});</script></span>";
 }
 
 $gets = '?';
@@ -281,17 +279,17 @@ foreach ($_GET as $key=>$val)
 
 
 if (strlen($error) != 0)
-   $WS_AUTHINFO["info_span"] = "<span class='ws-error-message'><i>$error</i>
+   $WS_AUTHINFO["info_span"] = "<span class='ws_info_span'><i>$error</i>
    <script type='text/javascript'>
    $(function(){alert('Error! Please see status message.');});</script></span>";
 else if ($WS_AUTHINFO['logged_in'])
-   $WS_AUTHINFO["info_span"] = "<span>Logged in as " . $WS_AUTHINFO["username"] 
+   $WS_AUTHINFO["info_span"] = "<span class='ws_info_span'>Logged in as " . $WS_AUTHINFO["username"] 
       . " via " . $WS_AUTHINFO["domain"] 
       . ". <a href='$gets"."auth=logout'>Log out.</a></span>";
 else {
-   $msg = "<span>Not logged in. Log in with";
+   $msg = "<span class='ws_info_span'>Not logged in. Log in with";
    foreach ($WS_AUTHINFO["providers"] as $i => $p)
-      $msg .= " <a href='$gets"."auth=$p'>$p</a>";
-   $WS_AUTHINFO["info_span"] = $msg . '</span>';
+     $msg .= ($i==0?"":" or")." <a href='$gets"."auth=$p'>$p</a>";
+   $WS_AUTHINFO["info_span"] = $msg . '.</span>';
 }
 

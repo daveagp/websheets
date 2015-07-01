@@ -1,3 +1,14 @@
+.embed-authinfo {
+    display:none;
+    padding-top: 0px;
+    padding-bottom: 10px;
+    text-align: center;
+}
+
+.show-embed-authinfo .embed-authinfo {
+    display:block;
+}
+
 .wscontainer.minimized {
   height: 40px;
   overflow: hidden;
@@ -142,6 +153,15 @@ code, pre, tt, .wscontainer .CodeMirror, .CodeMirror * {
     margin-bottom: 5px;
     text-align: center;
     background: #DDF;
+    position: relative;
+}
+
+.exercise-header a.sharing img {
+    height:1em;
+    position:absolute;
+    right:2px;
+    top:2px;
+    display:none;
 }
 
 .exercise-header.toggleable:hover {

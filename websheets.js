@@ -12,6 +12,12 @@ if (window.location.search) {
    }
 }
 
+websheets.url = function(tail) {
+  var result = websheets.urlbase;
+  if (result.slice(-1)!='/') result += '/';
+  return result + tail;
+}
+
 websheets.refresh_page = function(query) {
    var url = '';
    for (var key in query) if (query.hasOwnProperty(key)) {
@@ -33,15 +39,53 @@ websheets.auth_reload = function(provider) {
 
 // open a new window and reload the current provider
 // e.g., for when your login token has expired
-websheets.popup_reauth = function() {
-   var domain = websheets.authinfo.domain;
-   if (!websheets.authinfo.logged_in) domain = 'logout';
-   var newWindow = window.open(websheets.urlbase + 'loginout.php?auth=' + domain);
-   newWindow.onload = function() { 
-      newWindow.close(); 
-      $(this.div).find(".ws-error-div").remove();
-   };
+// this is a static function.
+websheets.popup_reauth = function(domain) {
+  if (typeof domain === 'undefined') {
+    domain = websheets.authinfo.domain;
+    if (!websheets.authinfo.logged_in) domain = 'logout';
+  }
+  var newWindow = window.open(websheets.url('loginout.php?auth=' + domain));
+  // hide the message and close the window once done.
+  var intervalID = setInterval(function(){
+    try {
+      if (newWindow.loginout_loaded) {
+        if (websheets.auth_by_embed) {
+          websheets.set_authinfo(newWindow.authinfo);
+        }
+        newWindow.close();
+        $(".ws_error_span").remove();
+        clearInterval(intervalID);
+      }
+    }
+    catch (err) {} // will get security errors until finished if cross-site login window
+  }, 100);
 };
+
+websheets.set_authinfo = function(info) {
+  // reload on first auth or when username changes
+  var reload_sheets = (!websheets.authinfo) 
+    || (websheets.authinfo.username != info.username);
+  console.log(info, websheets.authinfo, reload_sheets);
+  websheets.authinfo = info;
+  if (info.error_span)
+    $(".embed-authinfo").html(info.error_span);
+  else {
+    if (info.logged_in)
+      $(".embed-authinfo").html("Logged in as " + info.username + ". <a href='javascript:websheets.popup_reauth(\"logout\")'>Log out</a>");
+    else {
+      var msg = "Not logged in, your work will not be saved. Log in with ";
+      for (var i=0; i<info.providers.length; i++) {
+        if (i != 0) msg += ' or ';
+        msg += "<a href='javascript:websheets.popup_reauth(\""+info.providers[i]+"\")'>"+info.providers[i]+"</a>";
+      }
+      $(".embed-authinfo").html(msg);
+    }
+  }
+  if (reload_sheets)
+    for (var i=0; i<websheets.all.length; i++)
+      websheets.all[i].load();
+}
 
 // if data is null, fetch it asynchronously
 // otherwise, it should be the json output of a 'load'
@@ -55,8 +99,9 @@ websheets.createHere = function(slug, data) {
 websheets.createAt = function(slug, data, containerdiv, preview) {
    $(containerdiv).addClass("wscontainer");
    $(containerdiv).addClass("show-body");
-   $(containerdiv).html(' \
-<div class="exercise-header"></div> \
+     var template = ' \
+<div class="embed-authinfo"></div> \
+<div class="exercise-header"><span class="title"></span><a class="sharing"><img src="images/cc.png"></a></div> \
  <div class="exercise-body"> \
    <div class="description"></div> \
    <textarea class="code" name="code" ></textarea> \
@@ -83,7 +128,11 @@ websheets.createAt = function(slug, data, containerdiv, preview) {
    <div class="noprint results"></div> \
    <div class="noprint after-results" style="display:none"></div> \
   </div> <!-- exercise-body --> \
-  </div> <!-- container -->');
+  </div> <!-- container -->';
+
+$(containerdiv).html(template); // too slow?
+//$(containerdiv).append($.parseHTML(template)[0]); // force adding to DOM?
+
    if (websheets.header_toggling)
       $(containerdiv).find('.exercise-header').addClass('toggleable');
   var ws = new websheets.Websheet(slug, data, containerdiv, preview);
@@ -206,9 +255,14 @@ websheets.Websheet.prototype.load_success = function(data) {
    $(this_ws.div).find('.exercise-body').show();   
    
    var arrtmp = this_ws.slug.split("/");
-   $(this_ws.div).find('.exercise-header')
+   $(this_ws.div).find('.exercise-header .title')
       .html("<code>" + arrtmp[arrtmp.length-1] + "</code>");
-   
+
+  if (data.sharing.substring(0, 4)=='open') {
+    $(this_ws.div).find('.exercise-header a.sharing img').show();
+    $(this_ws.div).find('.exercise-header a.sharing').attr('href', websheets.url("editor.php?edit="+this_ws.slug));
+  } 
+
    // for reloads
    $(this_ws.div).find(".CodeMirror").remove();
    $(this_ws.div).find(".results").html("");
@@ -285,21 +339,30 @@ websheets.Websheet.prototype.load = function(newslug) {
    var this_ws = this; // to access in callbacks
 
    $(this_ws.div).find(".exercise-body").hide();
-   $(this_ws.div).find(".exercise-header").html('loading&hellip;');
+   $(this_ws.div).find(".exercise-header .title").html('loading&hellip;');
+  $(this_ws.div).find('.exercise-header a.sharing img').hide();
    
    if (newslug)
       this_ws.slug = newslug;
 
-   $.ajax(websheets.urlbase+"/load.php", {
-      data: {problem: this_ws.slug,
-             ajax_uid_intended: websheets.authinfo.username,
-             preview: this_ws.preview},
-      dataType: "json",
+  var doauth = websheets.auth_by_embed && !websheets.authinfo;
+  
+  var request = {problem: this_ws.slug,
+                 preview: this_ws.preview};
+
+  if (!doauth) request['ajax_uid_intended'] = websheets.authinfo.username;
+
+  $.ajax(websheets.url("load.php"), {
+    data: request,
+    dataType: "json",
       
       success: function(data) {
+        if (doauth) {
+          websheets.set_authinfo(data . authinfo);
+        }
          $(this_ws.div).find(".load-error").remove();
-         if (data.error_div) {
-            $(this_ws.div).prepend(data.error_div);            
+         if (data.error_span) {
+            $(this_ws.div).prepend('<span class="load-error">'+data.error_span+'</span>');            
          }
          else {
             this_ws.load_success(data);
@@ -310,8 +373,8 @@ websheets.Websheet.prototype.load = function(newslug) {
          if (textStatus == "parsererror") {
             var info = jqXHR.responseText;
             $(this_ws.div).find(".exercise-body").hide();
-            $(this_ws.div).find(".exercise-header").html('Error');
-            $(this_ws.div).prepend("<div class='load-error'>Error: "+info+"</div>");
+            $(this_ws.div).find(".exercise-header .title").html('Error');
+            $(this_ws.div).find(".exercise-header").after("<div class='load-error'>Error: "+info+"</div>");
          }
       }
    });
@@ -345,7 +408,7 @@ websheets.Websheet.prototype.submit = function() {
       user_state['snippets'] = this.wse.getUserCodeAndLocations();
    }
   user_state['preview'] = this_ws.preview;
-   $.ajax(websheets.urlbase+"/submit.php", {
+  $.ajax(websheets.url("submit.php"), {
       data: {stdin: JSON.stringify(user_state), problem: this_ws.slug,
              ajax_uid_intended: websheets.authinfo.username},
       dataType: "json",
@@ -360,6 +423,11 @@ websheets.Websheet.prototype.submit = function() {
                + jqXHR.responseText + "</pre>");  
       },
       success: function(data) {
+        if ('error_span' in data && data['error_span'] != '') {
+	  $(this_ws.div).find(".submitButton").removeAttr("disabled");
+          $(this_ws.div).find(".results").html(data['error_span']);
+          return;
+        }
 	 //console.log(data);
 	 this_ws.num_submissions++;
          if (data.reference_sol !== undefined)
@@ -767,6 +835,10 @@ websheets.WebsheetEditor = function(textarea_element, fragments, initial_snippet
 }
 
 $(function() {
+  if (websheets.auth_by_embed)
+    $('body').addClass('show-embed-authinfo');
+
+
    $("body").on("click", ".nocode-option", function(event) {
       var cb = $(event.target).closest('.nocode-option').find('input')[0];
       if (websheets.require_login && !websheets.authinfo.logged_in) {

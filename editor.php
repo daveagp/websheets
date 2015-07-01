@@ -67,18 +67,22 @@ if (!$GLOBALS['WS_AUTHINFO']['logged_in'])
       echo "websheets.initialize_error = " . json_encode($result['message']).";";
   }
 }
+
+$bits = explode('/', $_REQUEST['edit']);
+$attemptlink = "./?start=".$bits[count($bits)-1]."&folder=".implode('/', array_slice($bits, 0, -1));
+
 ?>
 
 </script>
 </head>
 <body>
-<div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?></div>
+<div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?> <a href="https://github.com/daveagp/websheets">View Websheets source code repository.</a></div>
 <p><button id='reload' class='pure'>Create blank Websheet or open existing Websheet</button> <a href='./list.php'>List of all my Websheets</a>
 <div id='error' style='display:none'>
 </div>
 <div class='editor'>
 <hr>
-<p><span id='doing'>Editing</span> <a href='./?start=<?php echo $_REQUEST['edit']; ?>'><tt><?php echo $_REQUEST['edit'];?></tt></a> by <tt><?php echo $author;?></tt>. <span class='unsaved-changes'>You have unsaved changes.</span> <button id='preview'>Preview</button> <button id='save'>Save</button> <button id='rename'>Rename</button> <button id='copy' class='pure'>Copy</button> <button id='export' class='pure'>Export</button> <button id='import'>Import</button> <button id='delete'>Delete</button> 
+<p><span id='doing'>Editing</span> <a href='<?php echo $attemptlink; ?>'><tt><?php echo $_REQUEST['edit'];?></tt></a> by <tt><?php echo $author;?></tt>. <span class='unsaved-changes'>You have unsaved changes.</span> <button id='preview'>Preview</button> <button id='save'>Save</button> <button id='rename'>Rename</button> <button id='copy' class='pure'>Copy</button> <button id='export' class='pure'>Export</button> <button id='import'>Import</button> <button id='delete'>Delete</button> 
 <table id='editor' style='width:100%'>
    <tr><th>Property</th><th style='text-align:left'>Value</th></tr>
 </table>

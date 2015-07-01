@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 if __name__ == "__main__":
-  import sys
+  import sys, json
   from Websheet import Websheet
   student = sys.argv[2]
   try:
@@ -17,8 +17,10 @@ if __name__ == "__main__":
             "user_code": config.load_submission(student, dbslug),
             "ever_passed": config.ever_passed(student, dbslug),
             "num_submissions": config.num_submissions(student, dbslug),
-            "initial_snippets": websheet.get_initial_snippets(),
-            "lang": websheet.lang
+            "initial_snippets": websheet.get_initial_snippets(),            
+            "lang": websheet.lang,
+            "sharing": websheet.sharing,
+            "authinfo": json.loads("".join(sys.stdin))
           }
     if websheet.nocode:
       data["nocode"] = websheet.get_nocode_question()

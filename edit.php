@@ -9,7 +9,7 @@ require_once('auth.php');
 function run_edit_py() {
 
   global $WS_AUTHINFO;
-  if ($WS_AUTHINFO["error_div"] != "") 
+  if ($WS_AUTHINFO["error_span"] != "") 
     return json_encode($WS_AUTHINFO);
   
   $_REQUEST['authinfo'] = $WS_AUTHINFO;

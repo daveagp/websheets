@@ -1,6 +1,12 @@
 <?php
 include_once('auth.php');
 
+global $WS_AUTHINFO;
+if ($WS_AUTHINFO["error_span"] != "") {
+   echo json_encode($WS_AUTHINFO);
+   die();
+}
+
 if (!array_key_exists('stdin', $_REQUEST)
     || !array_key_exists('problem', $_REQUEST))
   {

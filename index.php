@@ -2,6 +2,7 @@
 include_once('auth.php');
 
 if (!array_key_exists("folder", $_GET)) $_GET['folder'] = '';
+
 if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
   die('Illegal characters in requested folder name.'); 
 ?>
@@ -48,7 +49,7 @@ if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
  <div id="page">
   <div class="menu-bar noprint">
     <a href="mailto:daveagp@gmail.com">Report feedback</a>. 
-    <a href="https://github.com/daveagp/websheets">Get source</a>.    
+    <a href="https://github.com/daveagp/websheets">Websheets is open-source</a>.    
    
     <div class='selectdiv'>
     <span class='selectspan'>

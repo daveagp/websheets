@@ -2,7 +2,7 @@
 include_once('auth.php');
 
 global $WS_AUTHINFO;
-if ($WS_AUTHINFO["error_div"] != "") {
+if ($WS_AUTHINFO["error_span"] != "") {
    echo json_encode($WS_AUTHINFO);
    die();
 }
@@ -37,7 +37,7 @@ if (!is_resource($process)) {
   die;
  }
 
-fwrite($pipes[0], "");//$stdin);
+fwrite($pipes[0], json_encode($WS_AUTHINFO));
 fclose($pipes[0]);
 $stdout = stream_get_contents($pipes[1]);
 fclose($pipes[1]);

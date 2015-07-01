@@ -1,3 +1,5 @@
+Mark websheet authorship
+
 saner "you're not logged in" message / options
 (1) notify upon first load
 (2) notify upon first edit
@@ -6,6 +8,7 @@ saner "you're not logged in" message / options
 'require_login' global option
 
 implement new attempts_until_ref options
+preview auto solution visibility in editor
 
 implement solution sanitization
 

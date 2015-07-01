@@ -24,9 +24,12 @@ if ($GLOBALS['WS_AUTHINFO']['logged_in']) {
   else {
     foreach ($result['problems'] as $probleminfo) {
       $name = $probleminfo[0];
+      $i = strrpos($name, '/');
+      if ($i == -1) $folder = ""; else $folder = substr($name, 0, $i-1);
+      $slug = substr($name, $i+1);
       $sharing = $probleminfo[1];
       echo "<tr><td>$name</td><td><a href='editor.php?edit=$name'>Edit</a></td>";
-      if ($sharing != 'draft') echo "<td><a href='./?start=$name'>Solve</a></td>";
+      if ($sharing != 'draft') echo "<td><a href='./?folder=$folder&start=$slug'>Solve</a></td>";
       echo '</tr>';
     }
   }

@@ -15,7 +15,7 @@ def submit_and_log(websheet_name, student, client_request, meta):
 
   config.meta = meta
 
-  websheet = Websheet.Websheet.from_name(websheet_name, client_request['preview'], student)
+  websheet = Websheet.Websheet.from_name(websheet_name, client_request['preview']=='True', student)
 
   errmsg = None
   epilogue = None
@@ -120,8 +120,8 @@ def submit_and_log(websheet_name, student, client_request, meta):
 
   global authinfo
   #print(authinfo)
-  if authinfo["error_div"] != "":
-    print_output["results"] = authinfo["error_div"]
+  if authinfo["error_span"] != "":
+    print_output["results"] = authinfo["error_span"]
     print_output["category"] = "Auth Error" 
     meta["logout_bug"] = True
 
@@ -152,7 +152,9 @@ if __name__ == "__main__":
   if "frontend_user" in stdin["client_request"]:
     meta["frontend_user"] = stdin["client_request"]["frontend_user"]
  
-  data = submit_and_log(websheet_name, student, stdin["client_request"], meta) 
+  data = submit_and_log(websheet_name, student, stdin["client_request"], meta)
+
+  data["authinfo"] = authinfo
 
   print(json.dumps(data, 
                    indent=4, separators=(',', ': '))) # pretty!

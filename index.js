@@ -9,8 +9,8 @@ $(function() {
   }   
 
    var snippet = "";
-   if (websheets.authinfo.error_div != "") 
-      snippet = websheets.authinfo.error_div;
+   if (websheets.authinfo.error_span != "") 
+      snippet = websheets.authinfo.error_span;
    else if (websheets.authinfo.logged_in) 
       snippet = 
       "Logged in as <b>"+websheets.authinfo.username+"</b>"+
