@@ -18,6 +18,7 @@ MANUAL
 
 To read about how to write new exercises, read manual.html, mirrored at
 http://cscircles.cemc.uwaterloo.ca/websheets/manual.html
+The C++ documentation is forthcoming.
 
 BASIC INSTALLATION
 
@@ -41,7 +42,8 @@ cause errors.
 
 Set up the otions in ws-config.json.
 
-Run the commands in "install.sql".
+Run the commands in "install.sql", e.g. with:
+  mysql database_name -u user_name -p < install.sql
 
 ADDITIONAL SETUP
 
