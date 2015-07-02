@@ -41,7 +41,7 @@ for path, folder, files in os.walk('.'):
                 if field in dicted:
                     dicted[field] = json.dumps(dicted[field])
 
-            if 'example' in dicted:
+            if 'example' in dicted and 'scratch' not in fullname:
                 if dicted['example'] == True:
 #                    print("UPDATE `wp_16_posts` SET `post_content` = replace(post_content, '"+fullname[4:-3]+"', '", end="")
                     tmp = fullname.split('/')
