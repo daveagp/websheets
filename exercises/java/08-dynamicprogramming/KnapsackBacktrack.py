@@ -81,8 +81,9 @@ public static void main(String[] args) {
 """
 
 description = r"""
-This is a continuation of the problem 
-<a href="?group=Knapsack">Knapsack</a> (read it first). 
+This is a continuation of the problem
+<a href="javascript:websheets.load('java/08-dynamicprogramming/Knapsack')">Knapsack</a>
+(read it first). 
 Like in that problem, you will 
 write a static method that takes two arguments,
 <tt>int[] itemWeights, int capacity</tt> representing item weights

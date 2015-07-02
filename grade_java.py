@@ -1,6 +1,6 @@
 import config, json, cgi, sys, Websheet, re, os
 
-def grade(reference_solution, student_solution, translate_line, websheet):
+def grade(reference_solution, student_solution, translate_line, websheet, student):
 
     if not re.match(r"^\w+$", websheet.classname):
       return ("Internal Error (Compiling)", "Invalid overridden classname <tt>" + websheet.classname + " </tt>")
@@ -15,12 +15,14 @@ def grade(reference_solution, student_solution, translate_line, websheet):
       dump["websheets."+clazz] = "".join(open("grade_java_files/"+clazz+".java"))
 
     for dep in websheet.dependencies:
-      depws = Websheet.Websheet.from_filesystem(dep)
+      depws = Websheet.Websheet.from_name(dep)
+      if depws == None:
+          return ("Internal Error", "Dependent websheet " + dep + " does not exist");
       submission = config.load_submission(student, dep, True)
       if submission == False:
         return("Dependency Error",
                "<div class='dependency-error'><i>Dependency error</i>: " + 
-               "You need to successfully complete the <a href='javascript:loadProblem(\""+dep+"\")'><tt>"+dep+"</tt></a> websheet first (while logged in).</div>") # error text
+               "You need to successfully complete the <a href='javascript:websheets.load(\""+dep+"\")'><tt>"+dep+"</tt></a> websheet first (while logged in).</div>") # error text
       submission = [{'code': x, 'from': {'line': 0, 'ch':0}, 'to': {'line': 0, 'ch': 0}} for x in submission]
       dump["student."+dep] = depws.combine_with_template(submission, "student")[1]
       

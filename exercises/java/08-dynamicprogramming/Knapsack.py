@@ -93,7 +93,7 @@ What if each item
 has a dollar value (unrelated to its weight) and you want to 
 steal a maximum-value subset? What if there are both weight and size limits
 (and each item's size is given)? How do you <i>find</i> the best subset? (See
- the next problem <a href="?group=KnapsackBacktrack">KnapsackBacktrack</a>.)
+the next problem <a href="javascript:websheets.load('java/08-dynamicprogramming/KnapsackBacktrack')">KnapsackBacktrack</a>.)
 
 """
 

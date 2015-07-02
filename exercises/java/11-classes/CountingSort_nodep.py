@@ -1,7 +1,4 @@
-description = r"""
-<b>You have to solve the <a href='javascript:websheets.load("java/11-classes/Clicker")'>Clicker</a> websheet before this one will work.</b> 
-<p>
-Write a program <tt>CountingSort</tt>, a client of <tt><a href="javascript:websheets.load('java/11-classes/Clicker')">Clicker</a></tt>, 
+description = r"""Write a program <tt>CountingSort</tt>, a client of <tt><a href="javascript:websheets.load('java/11-classes/Clicker')">Clicker</a></tt>, 
 that sorts a list of single-digit numbers.
 On standard input, you will get a list of numbers like
 <pre>
@@ -19,6 +16,8 @@ Remember that <tt>Clicker</tt> has the following API:
 <li><tt>public int curr() // return the current value</tt>
 </ul>
 """
+
+classname = "CountingSort"
 
 source_code = r"""
 public static void main(String[] args) {
@@ -49,9 +48,57 @@ public static void main(String[] args) {
    }
    StdOut.println();
 }
+\hide[
+public static class Clicker {
+   // private instance variable(s) you will use are declared here:
+   private int value; // currently held value
+   
+   // constructor, make new clicker with value 0
+   public Clicker() {
+      value = 0;
+   }
+   // add one to the current value
+   public void inc() {
+      value++;
+   }
+   
+   // subtract one from the current value
+   public void dec() {
+      value--;
+   }
+   
+   // return the current value
+   public int curr() {
+      return value;
+   }
+   
+   // testing suite
+   public static void main(String[] args) {
+      Clicker myClick = new Clicker();
+      StdOut.println(myClick.curr()); // should be 0
+      myClick.inc();
+      myClick.inc();
+      StdOut.println(myClick.curr()); // should be 2
+      myClick.dec();
+      myClick.dec();
+      myClick.dec();
+      StdOut.println(myClick.curr()); // should be -1
+   
+      Clicker clickMore = new Clicker();
+      StdOut.println(clickMore.curr()); // should be 0
+      clickMore.inc();
+      clickMore.inc();
+      clickMore.inc();
+      StdOut.println(clickMore.curr()); // should be 3
+   
+      // the next line won't work if you used static variables
+      StdOut.println(myClick.curr()); // should still be -1
+   }
+}
+]\
 """
 
-dependencies = ["java/11-classes/Clicker"]
+#dependencies = ["Clicker"]
 
 tests = r"""
 stdin = "0 2 4 3 2 2 9 8 1 0";

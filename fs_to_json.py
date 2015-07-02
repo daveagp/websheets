@@ -82,6 +82,9 @@ for path, folder, files in os.walk('.'):
             dbsharing = 'open-nosol' # default
             if 'sharing' in dicted:
                 dbsharing = dicted['sharing']
+
+            if dicted['lang'] not in ['Java', 'C++', 'C++func'] and 'attempts_until_ref' in dicted:
+                del dicted['attempts_until_ref']
             
             cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
                            " VALUES (%s, %s, %s, %s, %s)",

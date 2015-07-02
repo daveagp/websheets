@@ -36,7 +36,7 @@ testMain("monocolor");
 """
 
 description = r"""
-This is an extension of the <a href='?group=SquareSwap'>SquareSwap</a> websheet.
+This is an extension of the <a href='javascript:websheets.load("java/00-intro/SquareSwap")'>SquareSwap</a> websheet.
 Given an array <code>colors</code> of <code>n</code> strings,
 move each string one position later in the array; and, you
 must move the one at the end to the start.

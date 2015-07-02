@@ -15,7 +15,7 @@ int main() {
 
 (Feel free to run it on your own machine if you want. If you
 don't have the VM installed yet, feel free to use 
-the <a href='/websheets/#scratch'>"scratch" websheet here</a>.)
+the <a href='javascript:websheets.load("cpp/scratch")'>"scratch" websheet here</a>.)
 """
 
 answer = "103"

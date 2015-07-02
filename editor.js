@@ -25,7 +25,7 @@ var editor_schema =
    {key: 'tests', lang: 'C++func', type: 'codemirror', mode:'json', label: 'C++ test suite', howto:'TODO'},
    {key: 'verboten', optional: true, langs: ['Java', 'C++', 'C++func'], type: 'codemirror', mode:'json', label: 'Forbidden substrings',
     howto:'json list of strings<br>e.g. <tt>["for","while"]</tt>'},
-   {key: 'attempts_until_ref', default: 'infinity', optional: true, type: 'choice', label: 'Solution visibility', 
+   {key: 'attempts_until_ref', langs: ['Java', 'C++', 'C++func'], default: 'infinity', optional: true, type: 'choice', label: 'Solution visibility', 
     choices: [["0", "Always"],
               ["1", "After 1 attempt"], ["2", "After solving or 2 attempts"],
               ["3", "After solving or 3 attempts"], ["4", "After solving or 4 attempts"],

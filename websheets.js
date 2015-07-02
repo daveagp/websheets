@@ -18,6 +18,13 @@ websheets.url = function(tail) {
   return result + tail;
 }
 
+websheets.load = function(slug) {
+  var p = slug.lastIndexOf('/');
+  if (p < 0)
+    window.location.href = websheets.url('?start='+slug);
+  window.location.href = websheets.url('?folder='+slug.substr(0, p)+'&start='+slug.substr(p+1));
+}
+
 websheets.refresh_page = function(query) {
    var url = '';
    for (var key in query) if (query.hasOwnProperty(key)) {
@@ -97,7 +104,7 @@ websheets.authwarn = function() {
   }
   else {
     if (!websheets.authwarned) {
-      alert("Note: you are not logged in, so your work will not be saved.");
+      alert("Not logged in. WARNING: your work will not be saved.");
       websheets.authwarned = true;
     }
     return false;
@@ -268,10 +275,30 @@ websheets.Websheet.prototype.toggle = function() {
    }
 }
 
+websheets.Websheet.prototype.updateTriesButton = function() {
+  if (this.reference_sol) {
+    $(this.div).find(".showrefButton").removeAttr("disabled");          
+    $(this.div).find(".showrefButton").html("View reference solution");              
+  }
+  var triesleft = this.load_data.attempts_until_ref - this.num_submissions;
+  // for anonymous users UI decides threshold
+  if (triesleft <= 0) {
+    if (this.anon_reference_sol) {
+      this.reference_sol = this.anon_reference_sol;
+      $(this.div).find(".showrefButton").removeAttr("disabled");          
+      $(this.div).find(".showrefButton").html("View reference solution");              
+    }
+    return;
+  }
+  var msg = "View solution after "+triesleft+' more tr' + (triesleft > 1 ? 'ies':'y');
+  $(this.div).find('.showrefButton').html(msg);  
+}
+
 websheets.Websheet.prototype.load_success = function(data) {
    var this_ws = this; // to access in callbacks
    this_ws.load_data = data;
    $(this_ws.div).find('.exercise-body').show();   
+  $(this_ws.div).find('.showrefButton').show();
    
    var arrtmp = this_ws.slug.split("/");
    $(this_ws.div).find('.exercise-header .title')
@@ -296,8 +323,23 @@ websheets.Websheet.prototype.load_success = function(data) {
       $(this_ws.div).removeClass("ever-passed");
    $(this_ws.div).removeClass("passed");
 
-   this_ws.num_submissions = data.num_submissions;
-   
+  // update solution revel button
+   this_ws.num_submissions = data.num_submissions;   
+  if (data.reference_sol) {
+    // nothing to do
+  }
+  else if (data.attempts_until_ref == 'never') {
+    $(this_ws.div).find('.showrefButton').hide();
+  }
+  else if (data.attempts_until_ref == 'infinity') {
+    $(this_ws.div).find('.showrefButton').attr("disabled", "disabled");
+    $(this_ws.div).find('.showrefButton').html('Solve to see reference solution');  
+  }
+  else {
+    $(this_ws.div).find('.showrefButton').attr("disabled", "disabled");
+    this.updateTriesButton();
+  }
+
    if (data.nocode) {
       var markup = "";
       if (data.nocode.type=="multichoice") {
@@ -330,7 +372,7 @@ websheets.Websheet.prototype.load_success = function(data) {
       }
    
    this_ws.wse.cm.on("beforeChange", function(cm, change) {
-     if (websheets.authwarn())
+     if (!this_ws.setting_viewing_ref && websheets.authwarn())
        change.cancel();
    });   
    
@@ -437,10 +479,19 @@ websheets.Websheet.prototype.submit = function() {
           $(this_ws.div).find(".results").html(data['error_span']);
           return;
         }
+
+        if (!this_ws.reference_sol && data.reference_sol) {
+          this_ws.reference_sol = data.reference_sol;
+	  $(this_ws.div).find(".showrefButton").removeAttr("disabled");          
+	  $(this_ws.div).find(".showrefButton").html("View reference solution");          
+        }
+
 	 //console.log(data);
 	 this_ws.num_submissions++;
-         if (data.reference_sol !== undefined)
-            this_ws.reference_sol = data.reference_sol;
+        if (data.anon_reference_sol)
+          this_ws.anon_reference_sol = data.anon_reference_sol;
+        if (!this_ws.reference_sol && ["never", "infinity"].indexOf(this_ws.load_data.attempts_until_ref)==-1) 
+            this_ws.updateTriesButton(); 
 	 $(this_ws.div).find(".submitButton").removeAttr("disabled");
 	 if (data.category == 'Passed' && !this_ws.viewing_ref) {
 	    $(this_ws.div).addClass("passed");
@@ -488,10 +539,6 @@ websheets.Websheet.prototype.set_viewing_ref = function(ref) {
 }
 
 websheets.Websheet.prototype.showRef = function() {
-   if (!this.reference_sol) {
-      alert("You need to complete the exercise first.");
-      return;
-   }
    this.setting_viewing_ref = true;
    $(this.div).addClass("viewing-ref");
    $(this.div).find(".hiderefButton").show();

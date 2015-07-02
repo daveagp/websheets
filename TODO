@@ -1,7 +1,6 @@
-implement new attempts_until_ref options
-preview auto solution visibility in editor
+remove private usc thingies from github repo
 
-
+script to install db tables and sample exercises
 
 export button prefix with export source
 
@@ -11,8 +10,6 @@ authenticating student of a teacher?
 hosted exercise scores / review hw-usc.{php,py}
 
 usability: pre-save check for invalid json or missing engine
-
-should test every option to see if it's still working!
 
 super-user steal of default problems
 

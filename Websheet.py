@@ -221,6 +221,9 @@ class Websheet:
             field_dict["tests"] = None
             field_dict["nocode"] = True
 
+        if 'attempts_until_ref' in field_dict and field_dict['attempts_until_ref'] not in ['never', 'infinity']:
+            field_dict['attempts_until_ref'] = int(field_dict['attempts_until_ref'])
+
         mandatory_fields = ["classname", "source_code", "tests", "description", "dbslug"]
 
         # optional fields AND default values
@@ -239,7 +242,7 @@ class Websheet:
                            "remarks": None,
                            "sharing": "open-nosol"
                            }
-                           
+
         for field in mandatory_fields:
             setattr(self, field, field_dict[field])
 
@@ -258,6 +261,7 @@ class Websheet:
                 raise Exception("Unknown field" + field)
 
         if self.nocode:
+            self.attempts_until_ref = "never"
             return
 
         self.example = self.example == "True" # convert string to bool
@@ -686,7 +690,7 @@ self.classname + " to = new " + self.classname + "();\n" +
     def list_folders(item):
         if item=="": result=[]
         elif '/' not in item: result = [""]
-        else: result = ['/'.join('/'.split(item)[:-1])]
+        else: result = ['/'.join(item.split('/')[:-1])]
         return result+Websheet.list_subgroups_in(item)    
 
     def list_folders_filesystem(item):

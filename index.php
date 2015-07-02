@@ -38,7 +38,7 @@ if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
     rel='stylesheet' type='text/css'>
    <script type='text/javascript'> 
    websheets.urlbase = "./";
-   websheets.require_login = true;
+   websheets.require_login = false;
    websheets.current_folder = <?php echo json_encode($_GET['folder']); ?>;
    websheets.authinfo = <?php echo json_encode($GLOBALS['WS_AUTHINFO']); ?>;
    websheets.sheets = <?php echo passthru("./Websheet.py list ".$_GET['folder']); ?>;

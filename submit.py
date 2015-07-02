@@ -93,7 +93,9 @@ def submit_and_log(websheet_name, student, client_request, meta):
       return grade_cpp.grade(reference_solution, student_solution, translate_line, websheet)
     elif websheet.lang == "Java":
       import grade_java
-      return grade_java.grade(reference_solution, student_solution, translate_line, websheet)
+      # java needs to know student name to look up their solutions for dependencies
+      return grade_java.grade(reference_solution, student_solution, translate_line, websheet, student)
+    
 
   try:
     category, results = compile_and_run()
@@ -133,9 +135,20 @@ def submit_and_log(websheet_name, student, client_request, meta):
       user_state = [blank["code"] for blank in client_request["snippets"]]
     config.save_submission(student, websheet.dbslug, user_state, save_this, passed)
 
-  if passed or websheet.attempts_until_ref == 0: 
-    print_output["reference_sol"] = websheet.get_reference_snippets()
-    
+  if websheet.attempts_until_ref == 'never':
+    pass
+  elif websheet.attempts_until_ref == 'infinity':
+    if passed:
+      print_output["reference_sol"] = websheet.get_reference_snippets()
+  else:
+    if passed or config.num_submissions(student, websheet.dbslug) == websheet.attempts_until_ref:
+      print_output["reference_sol"] = websheet.get_reference_snippets()
+
+  # we can't reliably track # submissions of anonymous users so put trust in the UI
+  if ('reference_sol' not in print_output and authinfo['username'] == 'anonymous'
+      and websheet.attempts_until_ref not in ['never', 'infinity']):
+    print_output["anon_reference_sol"] = websheet.get_reference_snippets()
+
   return print_output
 
 if __name__ == "__main__":

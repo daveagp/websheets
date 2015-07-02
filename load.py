@@ -4,8 +4,9 @@ if __name__ == "__main__":
   import sys, json
   from Websheet import Websheet
   student = sys.argv[2]
+  ispreview = sys.argv[3]=='True'
   try:
-    websheet = Websheet.from_name(sys.argv[1], sys.argv[3]=='True', student) # preview?
+    websheet = Websheet.from_name(sys.argv[1], ispreview, student)
     dbslug = websheet.dbslug
     
     import config, json
@@ -20,13 +21,17 @@ if __name__ == "__main__":
             "initial_snippets": websheet.get_initial_snippets(),            
             "lang": websheet.lang,
             "sharing": websheet.sharing,
+            "attempts_until_ref": websheet.attempts_until_ref,
             "authinfo": json.loads("".join(sys.stdin))
           }
     if websheet.nocode:
       data["nocode"] = websheet.get_nocode_question()
     else:
       data["nocode"] = False
-    if data["ever_passed"] or websheet.attempts_until_ref == 0:
+    if (ispreview or 
+        data["ever_passed"] and websheet.attempts_until_ref != "never"
+        or (websheet.attempts_until_ref not in ["never", "infinity"] and
+            data["num_submissions"] >= websheet.attempts_until_ref)) :
       data["reference_sol"] = websheet.get_reference_snippets()
     print(json.dumps(data, indent=4, separators=(',', ': '))) # pretty!
   except FileNotFoundError:

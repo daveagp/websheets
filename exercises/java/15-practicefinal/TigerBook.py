@@ -14,7 +14,7 @@ This websheet is intended as a practice exam. However, in a real exam,
 </ul>
 We recommend doing this practice in a timed environment; give yourself 90 minutes.
 <p>
-<b>You have to solve the <a href='?group=Person'>Person</a> websheet before this one will work.</b> (But in a real exam, you don't necessarily need
+<b>You have to solve the <a href='javascript:websheets.load("java/15-practicefinal/Person")'>Person</a> websheet before this one will work.</b> (But in a real exam, you don't necessarily need
 to complete one part to get credit for the next.)
 """
 
@@ -140,4 +140,4 @@ stdinURL = "http://www.cs.princeton.edu/courses/archive/spring13/cos126/docs/dat
 testNamedMain("exampleClientMain", "ExampleClient");
 """
 
-dependencies = ["Person"]
+dependencies = ["java/15-practicefinal/Person"]

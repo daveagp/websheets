@@ -39,7 +39,9 @@ Next, copy ws-config.example.json to ws-config.json.
 Reloading that page, it won't warn you, but submitting will
 cause errors.
 
-Set up the first 2 otions in ws-config.json. Now you can submit code!
+Set up the otions in ws-config.json.
+
+Run the commands in "install.sql".
 
 ADDITIONAL SETUP
 
@@ -48,11 +50,7 @@ There are some optional things you can do once the basics are working:
 0. To download updates, you need two commands to get the subrepos:
    git pull; git submodule update
 
-1. Setup the db. This is necessary if you want to log past submissions or
-   use logins (see below). Set the appropriate options in ws-config.json
-   and create a table like "DB TECHNICAL DETAILS" below.
-
-2. Setup or change login mechanisms if you want the websheets site to
+1. Setup or change login mechanisms if you want the websheets site to
    remember each user's latest submission and what they've solved. 
    Pre-requisite: you've created and setup a DB (step 1.)
    If you want to use facebook and/or google, get API keys for them 
@@ -70,20 +68,23 @@ There are some optional things you can do once the basics are working:
    or a facebook "App ID" and "App Secret" See the hybridauth documentation
    for more details.
 
-3. Create more problems! The bad news is that the documentation for this
+2. Create more problems! The bad news is that the documentation for this
    does not yet exist and some spacing issues are not yet worked out. But for
    the non-faint of heart, follow the examples in the "exercises" directory. 
    They are key-value string pairs, written as Python modules because it 
    makes less escaping necessary and because we use Python as a system
    to glue everything together.
 
-4. The C++ backend can basically use the same 'java_jail' jail except
+3. The C++ backend can basically use the same 'java_jail' jail except
     (a) you need to add a subdirectory "scratch" with apache write permission
     (b) you need to add libraries libstdc++.so.6 & libgcc_s.so.1 to the jail
 
-5. See embed.php for an example of embedding Websheets in other pages,
-   e.g. in course notes. Because of XSS restrictions we've only tested
-   this when the course notes server is the same as the websheets server.
+4. See embed.html for an example of embedding Websheets in other pages,
+
+5. WARNING: If you use a database, you'll be putting a DB password in ws-config.json.
+   Please check that
+     http://your.website/url/to/websheets/ws-config.json
+   is inaccessible; .htaccess tries to do this, but you should confirm it works.
 
 THANKS
 
@@ -94,43 +95,6 @@ Donna Gabai, Maia Ginsburg, Bob Sedgewick and Doug Clark.
 Thanks to Mark Redekopp at U. Southern California for great feedback when
 the C++ backend was developed.
 
-
-DB TECHNICAL DETAILS
-
-Here's the table format used currently for saving past submissions:
-
-CREATE TABLE IF NOT EXISTS `ws_history` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `problem` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `submission` varchar(5000) COLLATE utf8_unicode_ci NOT NULL,
-  `result` mediumtext COLLATE utf8_unicode_ci NOT NULL,
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `passed` tinyint(1) NOT NULL DEFAULT '0',
-  `meta` text COLLATE utf8_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `user` (`user`,`problem`,`passed`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
-
-CREATE TABLE IF NOT EXISTS `ws_sheets` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `author` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `problem` varchar(100) COLLATE utf8_unicode_ci NOT NULL,
-  `definition` mediumtext COLLATE utf8_unicode_ci,
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `action` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
-  `sharing` varchar(20) COLLATE utf8_unicode_ci,
-  PRIMARY KEY (`id`),
-  KEY `problem` (`problem`,`action`,`time`),
-  KEY `author` (`author`,`problem`,`action`,`time`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
-
-(action should be save, preview, delete; sharing should be option from editor.js)
-
-WARNING: If you use a database, you'll be putting a DB password in ws-config.json.
-Please check that
- http://your.website/url/to/websheets/ws-config.json
-is inaccessible; .htaccess tries to do this, but you should confirm it works.
 
 FILES LISTING
 
