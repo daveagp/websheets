@@ -7,12 +7,10 @@ export button prefix with export source
 
 state change problem between switching problems and reference/non?
 
-what to do if 'save' with invalid json or missing engine?
-
 authenticating student of a teacher?
 hosted exercise scores / review hw-usc.{php,py}
 
-server should sanitize classname
+usability: pre-save check for invalid json or missing engine
 
 should test every option to see if it's still working!
 

@@ -243,16 +243,17 @@ $(function() {
   disable_buttons();
   enable_buttons();
 
-  var onchange = function() {
+  var change_callback = function() {
     $('span.unsaved-changes').show(400);
     $('div.preview').hide(200);
     remove_error();
   }
 
-  $('body').on('change', 'select, input', onchange);
+  $('body').on('change', 'select', change_callback);
+  $('body').on('keypress', 'input', change_callback);
   for (var i=0; i<editor_schema.length; i++)
     if (codemirrors[i])
-      codemirrors[i].on("change", onchange);
+      codemirrors[i].on("change", change_callback);
 
   $('button#reload').on('click', function() {
     var msg = "";

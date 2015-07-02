@@ -1,6 +1,9 @@
 import config, json, cgi, sys, Websheet, re, os
 
 def grade(reference_solution, student_solution, translate_line, websheet):
+
+    if not re.match(r"^\w+$", websheet.classname):
+      return ("Internal Error (Compiling)", "Invalid overridden classname <tt>" + websheet.classname + " </tt>")
     
     dump = {
         "reference." + websheet.classname : reference_solution,
