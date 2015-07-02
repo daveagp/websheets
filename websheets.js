@@ -100,7 +100,7 @@ websheets.createAt = function(slug, data, containerdiv, preview) {
    $(containerdiv).addClass("show-body");
      var template = ' \
 <div class="embed-authinfo"></div> \
-<div class="exercise-header"><span class="title"></span><a class="sharing"><img src="images/cc.png"></a></div> \
+<div class="exercise-header"><span class="title"></span><a class="sharing"><img src="'+websheets.url('images/cc.png')+'"></a></div> \
  <div class="exercise-body"> \
    <div class="description"></div> \
    <textarea class="code" name="code" ></textarea> \

@@ -8,16 +8,16 @@ if __name__ == "__main__":
 
   # should pass message which is a string
   def internal_error(message):
+    cursor.close()  
     db.commit()
-    cursor.close()
     db.close()
     print(json.dumps(message))
     sys.exit(0)
 
   # should pass response which is an object
   def done(**response):
+    cursor.close()   
     db.commit()
-    cursor.close()
     db.close()
     print(json.dumps(response))
     sys.exit(0)

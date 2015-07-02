@@ -1,5 +1,5 @@
 # MySQL Connector/Python - MySQL driver written in Python.
-# Copyright (c) 2012, 2015, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2014, Oracle and/or its affiliates. All rights reserved.
 
 # MySQL Connector/Python is licensed under the terms of the GPLv2
 # <http://www.gnu.org/licenses/old-licenses/gpl-2.0.html>, like most
@@ -20,18 +20,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
-"""MySQL Connector/Python version information
 
-The file version.py gets installed and is available after installation
-as mysql.connector.version.
-"""
+"""Custom Python types used by MySQL Connector/Python"""
 
-VERSION = (2, 0, 4, '', 0)
 
-if VERSION[3] and VERSION[4]:
-    VERSION_TEXT = '{0}.{1}.{2}{3}{4}'.format(*VERSION)
-else:
-    VERSION_TEXT = '{0}.{1}.{2}'.format(*VERSION[0:3])
+import sys
 
-LICENSE = 'GPLv2 with FOSS License Exception'
-EDITION = ''  # Added in package names, after the version
+
+class HexLiteral(str):
+
+    """Class holding MySQL hex literals"""
+
+    def __new__(cls, str_, charset='utf8'):
+        if sys.version_info[0] == 2:
+            hexed = ["%02x" % ord(i) for i in str_.encode(charset)]
+        else:
+            hexed = ["%02x" % i for i in str_.encode(charset)]
+        obj = str.__new__(cls, ''.join(hexed))
+        obj.charset = charset
+        obj.original = str_
+        return obj
+
+    def __str__(self):
+        return '0x' + self

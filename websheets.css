@@ -157,7 +157,7 @@ code, pre, tt, .wscontainer .CodeMirror, .CodeMirror * {
 }
 
 .exercise-header a.sharing img {
-    height:1em;
+    height:1em !important;
     position:absolute;
     right:2px;
     top:2px;

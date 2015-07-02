@@ -16,10 +16,10 @@ for path, folder, files in os.walk('.'):
             fullname = os.path.join(path, file)[2:] # remove ./
             import socket
             # at usc, put all the cpp stuff in the root
-            if "usc.edu" in socket.getfqdn() and fullname.startswith("cpp"):
-                fullname = fullname[4:]
             loader = importlib.machinery.SourceFileLoader(fullname, fullname)
             module = loader.load_module(fullname)
+            if "usc.edu" in socket.getfqdn() and fullname.startswith("cpp"):
+                fullname = fullname[4:]
 
             dicted = {attname: getattr(module, attname) for attname in dir(module) if attname[0]!='_'}
 
@@ -43,10 +43,10 @@ for path, folder, files in os.walk('.'):
 
             if 'example' in dicted:
                 if dicted['example'] == True:
-                    print("UPDATE `wp_16_posts` SET `post_content` = replace(post_content, '"+fullname[4:-3]+"', '", end="")
+#                    print("UPDATE `wp_16_posts` SET `post_content` = replace(post_content, '"+fullname[4:-3]+"', '", end="")
                     tmp = fullname.split('/')
                     fullname = '/'.join(tmp[:-1]+['examples']+tmp[-1:])
-                    print(fullname[4:-3] + "');")
+#                    print(fullname[4:-3] + "');")
                 dicted['example'] = "True" if dicted['example'] else "False"
 
             marks = ['printseconds', 'cs104', 'mergearrays', 'strcpy', 'strlen', 'cpp/eggs', 'countodd', 'discount',
