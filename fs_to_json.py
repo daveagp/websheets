@@ -71,10 +71,14 @@ for path, folder, files in os.walk('.'):
             if 'hw-' not in fullname and 'lab1' not in fullname:
                 dicted['sharing'] = 'open'
                 dicted['attempts_until_ref'] = '1'
+
+            dbsharing = 'open-nosol' # default
+            if 'sharing' in dicted:
+                dbsharing = dicted['sharing']
             
             cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
                            " VALUES (%s, %s, %s, %s, %s)",
-                           (default_author, fullname[:-3], json.dumps(dicted), 'save', 'open-nosol'))
+                           (default_author, fullname[:-3], json.dumps(dicted), 'save', dbsharing))
 db.commit()
 cursor.close()
 db.close()

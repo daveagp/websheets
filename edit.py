@@ -35,12 +35,22 @@ if __name__ == "__main__":
       return author
     return None
 
-  def definition(slug, preview=False):
-    cursor.execute(
-      "select definition from ws_sheets " +
-      "WHERE problem = '"+slug+"' AND action != 'preview' ORDER BY ID DESC LIMIT 1;")
-    for row in cursor:
-      return row[0]
+  def definition(slug, username):
+    for definition, sharing, author, action in config.get_rows(
+      "select definition, sharing, author, action from ws_sheets " +
+      "WHERE problem = '"+slug+"' AND action != 'preview' ORDER BY ID DESC LIMIT 1;"):
+      if action == 'delete': continue
+      if not sharing.startswith('open') and author != username: continue # closed-source
+      if sharing=='open-nosol' and author != username:        
+        definition = json.loads(definition)
+        if 'choices' in definition:
+          definition['choices'] = json.dumps([[x[0], None] for x in json.loads(definition['choices'])])
+        if 'answer' in definition:
+          definition['answer'] = 'REDACTED'
+        if 'source_code' in definition:
+          definition['source_code'] += "REDACTME "
+        definition = json.dumps(definition)
+      return definition
     internal_error('Whoa, where did that row go?')
 
   def list_problems(username):
@@ -160,7 +170,7 @@ if __name__ == "__main__":
     if not canread(problem):
       done(success=False, message="You do not have read permissions for: " + problem)
     done(success=True, message="Loaded " + problem, new=False, canedit=myowner == authinfo['username'],
-          definition= definition(problem), author=myowner)
+          definition= definition(problem, authinfo['username']), author=myowner)
 
   if action == 'listmine':
     done(problems = list_problems(authinfo['username']))
