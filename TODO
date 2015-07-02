@@ -1,7 +1,5 @@
 super-user steal of default problems
 
-non-logged in should be able to view
-
 saner "you're not logged in" message / options
 (1) notify upon first load
 (2) notify upon first edit

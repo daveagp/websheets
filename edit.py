@@ -55,14 +55,14 @@ if __name__ == "__main__":
       if action == 'delete': continue
       if author != username:
         if sharing == 'draft' or sharing == 'hidden': continue
-      result.append([author != username, problem, sharing])
+      result.append([problem, author != username, sharing])
     #saner sort, files before folders
     for x in result:
-      tmp = x[1].split('/')
-      x[1] = [tmp[:-1], tmp[-1]]
+      tmp = x[0].split('/')
+      x[0] = [tmp[:-1], tmp[-1]]
     result.sort()
 #    print(result)
-    for x in result: x[1] = '/'.join(x[1][0]+[x[1][1]])
+    for x in result: x[0] = '/'.join(x[0][0]+[x[0][1]])
     return result
 
   def valid(slug):
@@ -91,10 +91,10 @@ if __name__ == "__main__":
   request = json.loads("".join(sys.stdin))
 
   authinfo = request['authinfo']
-  if not authinfo["logged_in"]:
-    internal_error("Only logged-in users can edit")
   problem = request['problem'] if 'problem' in request else None
   action = request['action']  
+  if not authinfo["logged_in"] and action != 'listmine':
+    internal_error("Only logged-in users can edit")
 
   if action != 'listmine' and not valid(problem):
     if (action == 'load'):
@@ -163,6 +163,5 @@ if __name__ == "__main__":
           definition= definition(problem), author=myowner)
 
   if action == 'listmine':
-    if not authinfo['logged_in']: done([])
     done(problems = list_problems(authinfo['username']))
   internal_error('Unknown action ' + action)

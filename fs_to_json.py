@@ -14,6 +14,10 @@ for path, folder, files in os.walk('.'):
             #print(os.path.join(path, file))
             import importlib.machinery
             fullname = os.path.join(path, file)[2:] # remove ./
+            import socket
+            # at usc, put all the cpp stuff in the root
+            if "usc.edu" in socket.getfqdn() and fullname.startswith("cpp"):
+                fullname = fullname[4:]
             loader = importlib.machinery.SourceFileLoader(fullname, fullname)
             module = loader.load_module(fullname)
 
@@ -39,8 +43,10 @@ for path, folder, files in os.walk('.'):
 
             if 'example' in dicted:
                 if dicted['example'] == True:
+                    print("UPDATE `wp_16_posts` SET `post_content` = replace(post_content, '"+fullname[4:-3]+"', '", end="")
                     tmp = fullname.split('/')
                     fullname = '/'.join(tmp[:-1]+['examples']+tmp[-1:])
+                    print(fullname[4:-3] + "');")
                 dicted['example'] = "True" if dicted['example'] else "False"
 
             marks = ['printseconds', 'cs104', 'mergearrays', 'strcpy', 'strlen', 'cpp/eggs', 'countodd', 'discount',
@@ -52,7 +58,7 @@ for path, folder, files in os.walk('.'):
             
             for name in marks:
                 if name in fullname:
-                    print(fullname)
+                    #print(fullname)
                     if 'remarks' not in dicted: dicted['remarks'] = ""
                     dicted['remarks'] = "Originally by Mark Redekopp (redekopp@usc.edu) and Dave Pritchard (daveagp@gmail.com)\n" + dicted['remarks']
                     default_author = 'redekopp@usc.edu'
@@ -61,6 +67,10 @@ for path, folder, files in os.walk('.'):
                 if 'remarks' not in dicted: dicted['remarks'] = ""
                 dicted['remarks'] = "Originally by Maia Ginsburg (maia@princeton.edu) and Dave Pritchard (daveagp@gmail.com)\n" + dicted['remarks']
                 default_author = 'maia@princeton.edu'
+
+            if 'hw-' not in fullname:
+                dicted['sharing'] = 'open'
+                dicted['attempts_until_ref'] = '1'
             
             cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
                            " VALUES (%s, %s, %s, %s, %s)",
