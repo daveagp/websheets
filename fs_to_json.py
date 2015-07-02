@@ -41,10 +41,10 @@ for path, folder, files in os.walk('.'):
 
             if 'example' in dicted and 'scratch' not in fullname:
                 if dicted['example'] == True:
-                    print("UPDATE `wp_16_posts` SET `post_content` = replace(post_content, '"+fullname[4:-3]+"', '", end="")
+#                    print("UPDATE `wp_16_posts` SET `post_content` = replace(post_content, '"+fullname[4:-3]+"', '", end="")
                     tmp = fullname.split('/')
                     fullname = '/'.join(tmp[:-1]+['examples']+tmp[-1:])
-                    print(fullname[4:-3] + "');")
+#                    print(fullname[4:-3] + "');")
                 dicted['example'] = "True" if dicted['example'] else "False"
 
             marks = ['printseconds', 'cs104', 'mergearrays', 'strcpy', 'strlen', 'cpp/eggs', 'countodd', 'discount',
@@ -62,6 +62,13 @@ for path, folder, files in os.walk('.'):
                     if 'remarks' not in dicted: dicted['remarks'] = ""
                     dicted['remarks'] = "Originally by Mark Redekopp (redekopp@usc.edu) and Dave Pritchard (daveagp@gmail.com)\n" + dicted['remarks']
                     default_author = 'redekopp@usc.edu'
+
+            # pretty-print
+            if 'tests' in dicted and dicted['lang'].startswith('C++'):
+                tests = json.loads(dicted['tests'])
+                tmp = '[\n'
+                for test in tests: tmp += '   '+json.dumps(test)+',\n'
+                dicted['tests'] = tmp[:-2]+'\n]\n'
 
             if 'AboveAverage' in fullname:
                 if 'remarks' not in dicted: dicted['remarks'] = ""

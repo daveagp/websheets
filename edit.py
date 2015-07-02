@@ -48,7 +48,14 @@ if __name__ == "__main__":
         if 'answer' in definition:
           definition['answer'] = 'REDACTED'
         if 'source_code' in definition:
-          definition['source_code'] += "REDACTME "
+          bits = definition['source_code'].split(r'\[')
+          for i in range(1, len(bits)):
+            if r'\show:' in bits[i]:
+              p = bits[i].index(r'\show:')
+            elif ']\\' in bits[i]:
+              p = bits[i].index(']\\')
+            bits[i] = ('\nREDACTED\n' if '\n' in bits[i][:p] else ' REDACTED ') + bits[i][p:]
+          definition['source_code'] = r'\['.join(bits)
         definition = json.dumps(definition)
       return definition
     internal_error('Whoa, where did that row go?')
