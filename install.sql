@@ -36,6 +36,18 @@ CREATE TABLE IF NOT EXISTS `ws_history` (
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
 
 
+-- Table structure for table `ws_settings`
+--
+
+CREATE TABLE IF NOT EXISTS `ws_settings` (
+  `user` varchar(40) COLLATE utf8_unicode_ci default NULL,
+  `key` varchar(40) COLLATE utf8_unicode_ci NOT NULL,
+  `value` text COLLATE utf8_unicode_ci NOT NULL,
+  `id` int(11) NOT NULL auto_increment,
+  PRIMARY KEY  (`id`),
+  KEY `user` (`user`,`key`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
 --
 -- Table structure for table `ws_sheets`
 --
@@ -52,6 +64,7 @@ CREATE TABLE IF NOT EXISTS `ws_sheets` (
   KEY `problem` (`problem`,`action`,`time`),
   KEY `author` (`author`,`problem`,`action`,`time`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=329 ;
+
 
 --
 -- Dumping data for table `ws_sheets`
