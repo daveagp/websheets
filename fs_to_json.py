@@ -18,8 +18,6 @@ for path, folder, files in os.walk('.'):
             # at usc, put all the cpp stuff in the root
             loader = importlib.machinery.SourceFileLoader(fullname, fullname)
             module = loader.load_module(fullname)
-            if "usc.edu" in socket.getfqdn() and fullname.startswith("cpp"):
-                fullname = fullname[4:]
 
             dicted = {attname: getattr(module, attname) for attname in dir(module) if attname[0]!='_'}
 
@@ -43,10 +41,10 @@ for path, folder, files in os.walk('.'):
 
             if 'example' in dicted and 'scratch' not in fullname:
                 if dicted['example'] == True:
-#                    print("UPDATE `wp_16_posts` SET `post_content` = replace(post_content, '"+fullname[4:-3]+"', '", end="")
+                    print("UPDATE `wp_16_posts` SET `post_content` = replace(post_content, '"+fullname[4:-3]+"', '", end="")
                     tmp = fullname.split('/')
                     fullname = '/'.join(tmp[:-1]+['examples']+tmp[-1:])
-#                    print(fullname[4:-3] + "');")
+                    print(fullname[4:-3] + "');")
                 dicted['example'] = "True" if dicted['example'] else "False"
 
             marks = ['printseconds', 'cs104', 'mergearrays', 'strcpy', 'strlen', 'cpp/eggs', 'countodd', 'discount',
@@ -55,6 +53,8 @@ for path, folder, files in os.walk('.'):
                      'roll2', 'combo', 'binsearch', 'binary_search', 'strset', 'var-expr/math'] # continue from random
 
             default_author = 'daveagp@gmail.com'
+            if "usc.edu" in socket.getfqdn() and fullname.startswith("cpp"):
+                default_author = 'dpritcha@usc.edu'
             
             for name in marks:
                 if name in fullname:
