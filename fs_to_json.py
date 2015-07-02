@@ -68,7 +68,7 @@ for path, folder, files in os.walk('.'):
                 dicted['remarks'] = "Originally by Maia Ginsburg (maia@princeton.edu) and Dave Pritchard (daveagp@gmail.com)\n" + dicted['remarks']
                 default_author = 'maia@princeton.edu'
 
-            if 'hw-' not in fullname:
+            if 'hw-' not in fullname and 'lab1' not in fullname:
                 dicted['sharing'] = 'open'
                 dicted['attempts_until_ref'] = '1'
             

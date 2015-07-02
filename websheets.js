@@ -86,6 +86,24 @@ websheets.set_authinfo = function(info) {
       websheets.all[i].load();
 }
 
+websheets.authwarned = false;
+// make a warning. then return true if user cannot edit.
+websheets.authwarn = function() {
+  if (websheets.authinfo.logged_in)
+    return false;
+  if (websheets.require_login) {
+    alert("Note: you are not logged in. Since your work would not be saved, you cannot edit code. Please login using the link at the top right.");
+    return true;
+  }
+  else {
+    if (!websheets.authwarned) {
+      alert("Note: you are not logged in, so your work will not be saved.");
+      websheets.authwarned = true;
+    }
+    return false;
+  }
+}
+
 // if data is null, fetch it asynchronously
 // otherwise, it should be the json output of a 'load'
 websheets.createHere = function(slug, data) {
@@ -312,18 +330,8 @@ websheets.Websheet.prototype.load_success = function(data) {
       }
    
    this_ws.wse.cm.on("beforeChange", function(cm, change) {
-      if (!websheets.authinfo.logged_in && !this_ws.setting_viewing_ref) {
-         if (websheets.require_login) {
-            alert("Note: you are not logged in, so you cannot edit code. Please login using the link at the top right.");
-            change.cancel();
-         }
-         else {
-            if (!websheets.nologin_warned) {
-               alert("Note: you are not logged in, so your work will not be saved.");
-               websheets.nologin_warned = true;
-            }
-         }
-      }
+     if (websheets.authwarn())
+       change.cancel();
    });   
    
       this_ws.reference_sol = data.reference_sol;
@@ -842,20 +850,19 @@ $(function() {
 
    $("body").on("click", ".nocode-option", function(event) {
       var cb = $(event.target).closest('.nocode-option').find('input')[0];
-      if (websheets.require_login && !websheets.authinfo.logged_in) {
-         cb.checked = false;
-         alert("Note: you are not logged in, so your work can't be saved. Please login using the link at the top right.");
-         return false;
-      }
-      if (cb != event.target)
-         cb.checked = !cb.checked;
+     if (websheets.authwarn()) {
+       cb.checked = false;
+       return false;
+     }
+
+     if (cb != event.target)
+       cb.checked = !cb.checked;
    });
    $("body").on("input", ".nocode-textinput", function(event) {
-      if (websheets.require_login && !websheets.authinfo.logged_in) {
-         event.target.value = "";
-         alert("Note: you are not logged in, so your work can't be saved. Please login using the link at the top right.");
-         return false;
-      }
+     if (websheets.authwarn()) {
+       event.target.value = "";
+       return false;
+     }
    });
 });
 

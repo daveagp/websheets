@@ -1,14 +1,7 @@
-saner "you're not logged in" message / options
-(1) notify upon first load
-(2) notify upon first edit
-(a) prevent any changes
-(b) allow changes
-'require_login' global option
+implement solution sanitization
 
 implement new attempts_until_ref options
 preview auto solution visibility in editor
-
-implement solution sanitization
 
 
 
