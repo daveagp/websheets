@@ -8,7 +8,7 @@
 <?php
 global $WS_AUTHINFO;
 if (!$WS_AUTHINFO['logged_in']) {
-  echo "You have to log in to see your student's grades.";
+  echo "You have to log in to see your students' grades.";
  }
  else {
   require_once('edit.php');
