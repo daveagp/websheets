@@ -36,11 +36,11 @@ observeNew(document, {childList: true, subtree: true}, function (elt) {
  <h1>Websheets Manual</h1>
  This manual describes how to write new exercises. It doesn't 
  cover installation &mdash; for that, see the README or the 
- <a href="https://github.com/daveagp/websheets">git repository</a>.
+ <a href="https://github.com/daveagp/websheets">git repository</a>. See also the <a href="http://cscircles.cemc.uwaterloo.ca/websheets.html">quick reference list here</a>.
 
 <h2>The Websheet Editor</h2>
 
-Point your browser at the following URL:
+To start we recommend opening these links in two tabs:
 <div>
 <tt>
 <a href="./editor.php?edit=java/00-intro/TwoPlusTwo">
@@ -48,8 +48,16 @@ Point your browser at the following URL:
 </a>
 </tt>
 </div>
+<div>
+<tt>
+<a href="./?folder=java/00-intro&start=TwoPlusTwo">
+./?folder=java/00-intro&start=TwoPlusTwo
+</a>
+</tt>
+</div>
 
-It is a very basic websheet. It defines a Template / Reference solution:
+This lets you see a very basic Websheet and its (very basic) definition.
+It uses this Template / Reference solution:
 <pre>
 public static void main(String[] args) {
 \[
@@ -58,12 +66,9 @@ public static void main(String[] args) {
 }
 </pre>
 
-It also has a description and a Java test suite and a couple of other minor options. In the editor you will see some other languages
-than Java which are available.
-
-<p>
-You can see this Websheet definition in action by visiting the <a href="javascript:websheets.load('java/00-intro/TwoPlusTwo')">
-page to try solving the websheet</a>. Try making some correct and incorrect submissions.
+Note that in the interface where you solve the exercise, the <tt>\[...]\</tt> region is blanked-out and has to be filled in,
+with a correct reference solution being to fill in <tt>System.out.print(2+2);</tt>. This templating idea is the core concept behind Websheets. 
+<p>Try solving the websheet, making some correct and incorrect submissions.
 <p>
 
 <p>
@@ -87,15 +92,17 @@ observeNew(window.page, {childList: true}, function (elt) {
 });
  </script>
 
-Of course, looking at existing examples is the most thorough way to understand
-what's going on, once you're familiar with the main concepts.
-
 
 <h2>Examples</h2>
 
-You can access a <a href='./list.php'>list of all Websheets</a> (login required).
+Looking at existing examples is the most thorough way to understand
+what's going on, once you're familiar with the main concepts.
+
+<p>You can access a <a href='./list.php'>list of all Websheets</a> (login required).
 There, you can see the definition of about 200 sample exercises.
 
+<p>You can create Java and C++ programming problems, but C++ is not yet documented. You 
+also can create short-answer or true/false questions (also not yet documented).
 
 <h2>Template / Reference solution</h2>
 
@@ -133,7 +140,7 @@ on a line by itself.
 
 <p>
 For example, look at how
-<a href="javascript:websheets.load('java/01-types/Distance')"><tt>Distance</tt></a>
+<a href="./editor.php?edit=java/01-types/Distance"><tt>Distance</tt></a>
 defines both kinds of blanks.
 
 <p>
@@ -143,6 +150,8 @@ could be meaningful in a later version, say where Python is used and
 we want to force indentation of a region.)
 
 <h3>Hidden code, fake code, default contents for blanks</h3>
+<p><i style='color:red'>Feel free to skip this section if you're reading the documentation for the first time.</i>
+<p>
 The simple <tt>\[...]\</tt> delimiters are sufficient to describe
 a large variety of exercises. But to allow the exercise writer
 more flexibility, websheets allow a few additional kinds of regions.
@@ -220,10 +229,10 @@ E.g. see <span class='EG' data-slug='java/03-arrays/NSwap'></span>.
 You can use any software and any formats you like, but the example exercises 
 using diagrams 
 (e.g.
-<span class='EG' data-slug='java/00-intro/SquareSwap'></span>,
+<span class='EG' data-slug='java/00-intro/SquareSwap'></span>;
 <span class='EG' data-slug='java/10-objects/FourChargeClient'></span>)
 were created using <a href="http://ipe7.sourceforge.net/">IPE</a> (which uses PDFs as an editable format)
-and rasterized to PNG using  <a href="https://github.com/daveagp/websheets/blob/master/exercises/render.sh"><tt>render.sh</tt></a>.
+and rasterized to PNG using  <a href="https://github.com/daveagp/websheets/blob/master/images/render.sh"><tt>render.sh</tt></a>.
 
 <h2>Java test suite</h2>
 
@@ -283,6 +292,9 @@ exist if there are multiple arguments of which some are arrays, e.g. see
 
 </dd>
 </dl>
+
+<p><i style='color:red'>If you're reading the manual for the first time, now would be a good time for you to
+try creating some sample exercises; you've now read the documentation for all of the basics.</i>
 
 <h3>Basics: testing instance methods</h3>
 
@@ -582,7 +594,7 @@ Note: if instead you want to give student extra reference code without requiring
 to actually complete the dependency, you can use <tt>\hide</tt> instead:
 </dd>
 <dd>
-E.g. <span class='EG' data-slug='java/11-classes/CountingSort'></span>.
+E.g. <span class='EG' data-slug='java/11-classes/CountingSort_nodep'></span> vs <span class='EG' data-slug='java/11-classes/CountingSort'></span>.
 </dd>
 
 <dt><tt>imports</tt></dt>
