@@ -1,6 +1,8 @@
 <?php require_once('auth.php'); ?>
 <html>
 <head>
+<title>Websheets Listing</title>
+   <link rel="icon" type="image/png" href="favicon.png">
 <style>
 table#list tr td:first-child {text-align:right;}
 .hidemine .mine {display:none;}

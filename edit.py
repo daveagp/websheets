@@ -104,6 +104,18 @@ if __name__ == "__main__":
       return sharing==None or sharing.startswith('open')
     internal_error('Whoa, where did that row go?')
 
+  def get_setting(user, key):
+    for (value,) in config.get_rows(
+      "select value from ws_settings " +
+      "WHERE user = '"+user+"' AND keyname = '"+key+"';"):
+      return value
+
+  def set_setting(user, key, value):
+    cursor.execute("delete from ws_settings where user = '"+user+"' AND keyname = '"+key+"';")
+    cursor.execute("insert into ws_settings (user, keyname, value)" +
+                                        " VALUES (%s, %s, %s)",
+                                        (user, key, value))
+      
   # start of request handling
   request = json.loads("".join(sys.stdin))
 
@@ -113,7 +125,7 @@ if __name__ == "__main__":
   if not authinfo["logged_in"] and action != 'listmine':
     internal_error("Only logged-in users can edit")
 
-  if action != 'listmine' and not valid(problem):
+  if action not in ['listmine', 'settings', 'showgrades'] and not valid(problem):
     if (action == 'load'):
       done(success=False, message="Requested name does not have valid format: <tt>" + problem + "</tt>")
     else:
@@ -181,4 +193,24 @@ if __name__ == "__main__":
 
   if action == 'listmine':
     done(problems = list_problems(authinfo['username']))
+
+  if action == 'settings':
+    if 'instructor' in request:
+      set_setting(authinfo['username'], 'instructor', request['instructor'])
+    inst = get_setting(authinfo['username'], 'instructor')
+    if inst is None: inst = ""
+    done(success=True, settings={"instructor":inst})
+    
+  if action == 'showgrades':
+    result = {}
+    for (student,) in config.get_rows(
+      "select user from ws_settings " +
+      "WHERE value = '"+authinfo['username']+"' AND keyname = 'instructor';"):
+      stuinfo = {}
+      for (count, passed, problem) in config.get_rows(
+        "select count(1), max(passed), problem from ws_history WHERE user = '"+student+"' group by problem;"):
+        stuinfo[problem] = ["Passed" if passed==1 else "Not Passed", str(count)+" Attempts"]
+      result[student] = stuinfo
+    done(success=True, grades=result)
+    
   internal_error('Unknown action ' + action)

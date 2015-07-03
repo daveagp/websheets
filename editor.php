@@ -1,6 +1,8 @@
 <?php require_once('auth.php'); ?>
 <html>
 <head>
+   <link rel="icon" type="image/png" href="favicon.png">
+<title><?php if (array_key_exists('edit', $_REQUEST)) echo $_REQUEST['edit'] . " Source"; else echo "Websheet Editor" ?></title>
 <script type="text/x-mathjax-config"> 
     MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]} });
 </script>

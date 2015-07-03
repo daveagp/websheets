@@ -1,4 +1,4 @@
-<?php // security stuff first
+
 include_once('auth.php');
 
 if (!array_key_exists("folder", $_GET)) $_GET['folder'] = '';
