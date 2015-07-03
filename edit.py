@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # really should be done with %s but ok since we sanitize
     cursor.execute(
       "select author, action from ws_sheets " +
-      "WHERE problem = '"+slug+"' AND 1 ORDER BY ID DESC LIMIT 1;")
+      "WHERE problem = '"+slug+"' AND action != 'preview' ORDER BY ID DESC LIMIT 1;")
     result = "false"
     for row in cursor:
       author = row[0]

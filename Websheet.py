@@ -419,9 +419,9 @@ class Websheet:
                     if "\n" not in chunk.text:
                         return ["False", "Internal error: User chunk " + str(i)
                                 + " shouldn't be multiline: " + user_text]
-                    if user_text[0] != '\n':
-                        return ["False", "Internal error: User chunk " + str(i)
-                                + " multiline but doesn't start with newline"] 
+#                    if user_text[0] != '\n':
+#                        return ["False", "Internal error: User chunk " + str(i)
+#                                + " multiline but doesn't start with newline"] 
                     if user_text[-1] != '\n':
                         return ["False", "Internal error: User chunk " + str(i)
                                 + " multiline but doesn't end with newline"]
@@ -489,7 +489,7 @@ class Websheet:
             if chunk.type in {ChunkType.plain,
                               ChunkType.blank, ChunkType.hide}:
                 Websheet.smart_append(r, chunk.text)
-        
+
         return ''.join(r)
 
     def get_reference_snippets(self):
@@ -498,8 +498,13 @@ class Websheet:
         they can be displayed in the UI
         """
         if self.nocode: return None
-        return [chunk.text for chunk in self.chunks
+        result = [chunk.text for chunk in self.chunks
                 if chunk.type == ChunkType.blank]
+
+        if self.chunks[0].type == ChunkType.blank and result[0].startswith("\n"):
+            result[0] = result[0][1:]
+        
+        return result
         
     def get_initial_snippets(self):
         """
@@ -536,19 +541,20 @@ class Websheet:
         for i in range(len(r)-1):
             if r[i].endswith("\n") or r[i+1].startswith("\n"):
                 if (not (r[i].endswith("\n") and r[i+1].startswith("\n"))
-                    and not (i%2 == 0 and r[i].endswith("\n") and r[i+1].startswith(" "))):
-                        raise Exception("Sanity check failed!")
+                    and not (i%2 == 0 and r[i].endswith("\n") and r[i+1].startswith(" "))
+                    and not (i==0 and r[0]=="")):
+                        raise Exception("Sanity check failed!")#+json.dumps([i, r[i], r[i+1]]))
             if r[i].endswith("\n") and r[i+1].startswith("\n"):
                 if (i%2 == 0): r[i] = r[i][:-1]
                 else: r[i+1] = r[i+1][1:]
 
         # remove trailing newlines from last read-only region & start of first
         while r[-1].endswith("\n"): r[-1] = r[-1][:-1]
-        if not (r[0].startswith("\n")):
+        if r[0] != "" and not r[0].startswith("\n"):
             #print(repr(r))
             raise Exception("Sanity check failed!")
         r[0] = r[0][1:]
-        
+
         return r
 
     def cppflags(self, defaultflags):

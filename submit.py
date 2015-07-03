@@ -46,6 +46,7 @@ def submit_and_log(websheet_name, student, client_request, meta):
         return("Pre-syntax Error",
                "<div class='pre-syntax-error'>Syntax error:" + 
                "<pre>\n"+cgi.escape(student_solution[1])+"</pre></div>") # error text
+
     ss_to_ui_linemap = student_solution[2]
 
     def translate_line(ss_lineno):

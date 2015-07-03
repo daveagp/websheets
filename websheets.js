@@ -359,6 +359,7 @@ websheets.Websheet.prototype.load_success = function(data) {
          $(this_ws.div).find(".code")[0], 
          data.template_code, 
          data.initial_snippets);
+
       
    
 //   $(function() {$(this_ws.div).find('.exercise-body').hide();});
@@ -623,6 +624,11 @@ websheets.WebsheetEditor = function(textarea_element, fragments, initial_snippet
       matchBrackets: true
    });
    
+  var firsteditable = 1;
+  if (fragments[0] == "" && fragments[1].charAt(0) == "\n") {
+    fragments[1] = fragments[1].substring(1);
+  }
+//  console.log(fragments);
    cm.setValue(fragments.join(""));
    
    var inline = new Array();
@@ -649,8 +655,8 @@ websheets.WebsheetEditor = function(textarea_element, fragments, initial_snippet
          ch = fragments[i].length - lastNL - 1;
       }
       
-      if (i%2 == 1) { // alternate chunks are for user input
-         if (fragments[i].length < 2) {
+      if (i%2 == firsteditable) { // alternate chunks are for user input
+         if (fragments[i].length < 1) {
             cm.toTextArea();
             var errmsg = "Error: fragment " + i + " is too short";
             console.log(errmsg, fragments);
@@ -676,11 +682,15 @@ websheets.WebsheetEditor = function(textarea_element, fragments, initial_snippet
                return;
             }
          }
-         
+
+        var incleft = (oldline == 0 && oldch == 0);
          var marker = cm.markText(
             {line: oldline, ch: oldch},
             {line: line, ch: ch},
-            {className: lastNL==-1?"inline":"block"});
+           {className: lastNL==-1?"inline":"block", inclusiveLeft:incleft});
+//        console.log({line: oldline, ch: oldch},
+  //                  {line: line, ch: ch},
+    //                {className: lastNL==-1?"inline":"block"});
          editable.push(marker);
          editable_info.push(lastNL==-1?{"type":"inline", "index":inline.length}
                             :{"type":"block", "index":block.length});
@@ -731,7 +741,8 @@ websheets.WebsheetEditor = function(textarea_element, fragments, initial_snippet
       // only allow changes within editable regions
       for (var i=0; i<editable.length; i++) {
          var fixedrange = editable[i].find();
-         
+        if (fixedrange.from.ch == 0 && fixedrange.from.line == 0)
+          fixedrange.from.line = -1;
          latest_change = i; // for removing excess trailing space
          
          if (editable_info[i].type == "inline" && change.to.ch == fixedrange.to.ch-1)
@@ -822,7 +833,8 @@ websheets.WebsheetEditor = function(textarea_element, fragments, initial_snippet
       var ln = cm.getLineNumber(line);
       for (var i=0; i<block.length; i++) {
          var mrange = block[i].find();
-         if (mrange && mrange.from.line < ln && mrange.to.line > ln) $(elt).addClass("block");
+         if (mrange && mrange.from.line < ln && mrange.to.line > ln
+            || mrange.from.ch == 0 && mrange.from.line == 0 && ln == 0) $(elt).addClass("block");
       }
    });
    
@@ -840,7 +852,7 @@ websheets.WebsheetEditor = function(textarea_element, fragments, initial_snippet
 	 var t = editable[i].find().to;
 //         console.log(f, t);
 	 if (data[i].indexOf("\n") != -1) {
-	    f = {line: f.line+1, ch: 0};
+	   f = f.line+f.ch==0 ? f : {line: f.line+1, ch: 0};
 	    t = {line: t.line-1, ch: cm.getLine(t.line-1).length};
 	 }
 	 else {
