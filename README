@@ -4,23 +4,21 @@ Created originally by David Pritchard (daveagp@gmail.com) in 2013.
 Released under the GNU Affero General Public License (but see
 other licenses for subdirectories/subrepositories).
 
-MIRRORS
+GETTING STARTED
 
-Right now there are three mirrors:
+See the list of the main components of the websheets system here:
+http://cscircles.cemc.uwaterloo.ca/websheets.html
+
+You can create problems and get your student grades without installation, 
+using one of these mirrors:
+
  http://cscircles.cemc.uwaterloo.ca/websheets/ (Java 8)
  http://bits.usc.edu/websheets/ (focuses on C++)
  http://www.cs.princeton.edu/~cos126/websheets/index.php (old, Java 7)
 
-You can link to a particular folder and/or exercise with
-.../?folder=java/04-stdin&start=Powers
+However, you may wish to do extra customizations, requiring your own mirror.
 
-MANUAL
-
-To read about how to write new exercises, read manual.html, mirrored at
-http://cscircles.cemc.uwaterloo.ca/websheets/manual.html
-The C++ documentation is forthcoming.
-
-BASIC INSTALLATION
+INSTALLATION
 
 Install these on your server first:
  https://github.com/cemc/safeexec
@@ -54,7 +52,6 @@ There are some optional things you can do once the basics are working:
 
 1. Setup or change login mechanisms if you want the websheets site to
    remember each user's latest submission and what they've solved. 
-   Pre-requisite: you've created and setup a DB (step 1.)
    If you want to use facebook and/or google, get API keys for them 
    and change the listed options in ws-config.json. Delete the options
    you don't want to use. 
@@ -70,20 +67,13 @@ There are some optional things you can do once the basics are working:
    or a facebook "App ID" and "App Secret" See the hybridauth documentation
    for more details.
 
-2. Create more problems! The bad news is that the documentation for this
-   does not yet exist and some spacing issues are not yet worked out. But for
-   the non-faint of heart, follow the examples in the "exercises" directory. 
-   They are key-value string pairs, written as Python modules because it 
-   makes less escaping necessary and because we use Python as a system
-   to glue everything together.
-
-3. The C++ backend can basically use the same 'java_jail' jail except
+2. The C++ backend can basically use the same 'java_jail' jail as long as
     (a) you need to add a subdirectory "scratch" with apache write permission
     (b) you need to add libraries libstdc++.so.6 & libgcc_s.so.1 to the jail
 
-4. See embed.html for an example of embedding Websheets in other pages,
+3. See embed.html for an example of embedding Websheets in other pages,
 
-5. WARNING: If you use a database, you'll be putting a DB password in ws-config.json.
+4. WARNING: If you use a database, you'll be putting a DB password in ws-config.json.
    Please check that
      http://your.website/url/to/websheets/ws-config.json
    is inaccessible; .htaccess tries to do this, but you should confirm it works.
@@ -98,19 +88,3 @@ Thanks to Mark Redekopp at U. Southern California for great feedback when
 the C++ backend was developed.
 
 
-FILES LISTING
-
-ws-config.example.json - copy this to ws-config.json and fill it in
-manual.html - how to write Java exercises
-embed.php - example of embedding websheets in other pages
-index.{php,css,js} - main UI and problem browser
-
-websheets.{css,js} - codemirror area and action buttons
-load.{php,py} - (for ajax) load a problem to show
-submit.{php,py}, grade_{java,cpp}.py - (for ajax) submit an attempt
-auth.php, loginout.php - authentication used by all php files
-Websheet.py - Python model of a Websheet, snippet merging tools, cmd-line util
-config.py - interact with safeexec, database, config options
-
-bytopic.php - (out of date) lists problems by topic
-hw-usc.{php,py} - used by USC
