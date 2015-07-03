@@ -5,6 +5,7 @@
 </head>
 <body>
 <div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?> </div>
+<p><i>The grades interface is new and experimental. <a href='mailto:daveagp@gmail.com'>Please send us your feedback</a>.</i>
 <?php
 global $WS_AUTHINFO;
 if (!$WS_AUTHINFO['logged_in']) {

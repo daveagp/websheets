@@ -1,0 +1,67 @@
+<html>
+<head>
+<title>Websheets</title>
+
+<!-- all of the requirements for an embedded websheet: -->
+<script type='text/javascript' src='jquery.min.js'></script>
+<script type='text/javascript' src='CodeMirror/lib/codemirror.js'></script>
+<script type='text/javascript' src='CodeMirror/mode/clike/clike.js'></script>
+<script type='text/javascript' src='CodeMirror/addon/selection/mark-selection.js'></script>
+<script type='text/javascript' src='CodeMirror/addon/edit/matchbrackets.js'></script>
+<link rel='stylesheet' type='text/css' href='CodeMirror/lib/codemirror.css'/>
+<link rel='stylesheet' type='text/css' href='CodeMirror/theme/neat.css'/>
+<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700'/>
+<script type='text/javascript' src='http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<link rel='stylesheet' type='text/css' href='websheets.css'/>
+<script type='text/javascript' src='websheets.js'></script>
+<script type='text/x-mathjax-config'> 
+MathJax.Hub.Config({tex2jax: {displayMath: [ ['$$','$$'] ], inlineMath: [['$','$'] ]} });
+</script>
+   <link rel="icon" type="image/png" href="favicon.png">
+<script type='text/javascript'>
+  websheets.urlbase = '.';          // where do load.php, submit.php etc live?
+  websheets.header_toggling = false; // start closed and open/close by a click?
+  websheets.require_login = false;  // refuse to work with non-logged in users?
+  websheets.auth_by_embed = true;   // first load will check user login status
+  websheets.skipauthwarn = true;
+</script>
+</head>
+<body style='max-width:800px;margin:auto;font-size:125%'>
+<img style='float:right;border:none' src='favicon.png'>
+<h1 style='text-align:center'>Websheets</h1>
+This is the landing page for <b>Websheets</b>, a system for creating
+and solving programming exercises.
+<p>Try the following Websheet out by filling in the blanks. After
+solving it or making three incorrect submissions, you can also see the 
+author's solution. 
+<div class='websheet-stub'>cpp/var-expr/hello</div>
+<h3>Components of the Websheets System</h3>
+<p>
+<b>Students</b> can use the <a href=".">problem-solving interface</a>
+to start practicing their Java and C++ skills. A <a href="list.php">list of all Websheet problems</a> 
+is also available.
+<p>
+<b>Exercise Authors</b> can use the <a href="editor.php">editor</a> to create and edit Websheet problems</a>.
+There is an <a href="manual.html">author's manual</a>, but C++ is not yet documented.
+<p>
+<b>Teachers</b> can have their students sign up on the <a href="settings.php">settings page</a>,
+and then see their grades on the <a href="grades.php">grades page</a>. (This feature is new and experimental.)
+<p>
+<b>Hackers and Administrators</b> can read the
+<a href="https://github.com/daveagp/websheets">installation guide and source code</a>
+of the system, which is open-source, and see a simple example of
+<a href="embed.html">embedding websheets in webpages</a>.
+<h3>About</h3>
+Websheets has been developed since 2013 by <a href='http://ints.io/daveagp'>David Pritchard</a>,
+supported by Princeton University, the University of Southern California,
+and the University of Waterloo. It has been used by over 1000 students.
+<p>Please send any positive feedback, bug reports, or feature
+requests by email to <tt>daveagp@gmail.com</tt>. We are looking for instructors who will help
+measure the effects of different types of scaffolded exercises in the classroom.
+<p>We welcome any sort of code contributions: new language support, new features, interface improvements, etc.
+It is easiest to incorporate work proposed as a <a href="https://github.com/daveagp/websheets">GitHub pull request</a>.
+<p>Websheets was presented at the conference <a href='http://dl.acm.org/citation.cfm?id=2754863'>ITiCSE 2015</a> 
+(<i>Pritchard, David. Websheets: A Templated Online Coding Exercise System, Proc. 15th ITiCSE, p.335, 2015</i>).
+<p>The source code is provided under a GPL Affero License. Exercises are available under a Creative Commons License.
+</body>
+</html>

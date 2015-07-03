@@ -93,9 +93,10 @@ websheets.set_authinfo = function(info) {
       websheets.all[i].load();
 }
 
-websheets.authwarned = false;
+websheets.skipauthwarn = false;
 // make a warning. then return true if user cannot edit.
 websheets.authwarn = function() {
+  console.log('authwarn');
   if (websheets.authinfo.logged_in)
     return false;
   if (websheets.require_login) {
@@ -103,9 +104,9 @@ websheets.authwarn = function() {
     return true;
   }
   else {
-    if (!websheets.authwarned) {
+    if (!websheets.skipauthwarn) {
       alert("Not logged in. WARNING: your work will not be saved.");
-      websheets.authwarned = true;
+      websheets.skipauthwarn = true;
     }
     return false;
   }
