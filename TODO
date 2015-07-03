@@ -1,13 +1,8 @@
-student choose a teacher
-teacher view student scores
-
 export button prefix with export source
 
 usability: pre-save check for invalid json or missing engine
 
 super-user steal of default problems
-
-Fix java "bytopic" page
 
 allow \[ to start on first line
 
