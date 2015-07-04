@@ -5,6 +5,7 @@
 </head>
 <body>
 <div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?> </div>
+<p>
 <?php
 global $WS_AUTHINFO;
 if (!$WS_AUTHINFO['logged_in']) {

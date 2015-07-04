@@ -207,9 +207,16 @@ if __name__ == "__main__":
       "select user from ws_settings " +
       "WHERE value = '"+authinfo['username']+"' AND keyname = 'instructor';"):
       stuinfo = {}
-      for (count, passed, problem) in config.get_rows(
-        "select count(1), max(passed), problem from ws_history WHERE user = '"+student+"' group by problem;"):
-        stuinfo[problem] = ["Passed" if passed==1 else "Not Passed", str(count)+" Attempts"]
+      for (passed, time, problem) in config.get_rows(
+        "SELECT passed, time, problem from ws_history where user = '"+student+"' order by id asc;"):
+        if (problem not in stuinfo): prev = (False, 0)
+        else: prev = stuinfo[problem]
+        if not prev[0]: # if not yet passed
+          if passed==1:
+            curr = (True, prev[1]+1, time.strftime('%Y-%m-%d %H:%M:%S'))
+          else:
+            curr = (False, prev[1]+1)
+          stuinfo[problem] = curr
       result[student] = stuinfo
     done(success=True, grades=result)
     

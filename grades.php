@@ -5,7 +5,8 @@
 </head>
 <body>
 <div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?> </div>
-<p><i>The grades interface is new and experimental. <a href='mailto:daveagp@gmail.com'>Please send us your feedback</a>.</i>
+<p><i>The grades interface is new and experimental. <a href='mailto:daveagp@gmail.com'>Please send us your feedback</a>. Students indicate their teacher on the <a href='settings.php'>settings page</a>.</i>
+<p>
 <?php
 global $WS_AUTHINFO;
 if (!$WS_AUTHINFO['logged_in']) {
@@ -22,6 +23,7 @@ if (!$WS_AUTHINFO['logged_in']) {
   else if (count($result['grades']) == 0)
     echo "You have no students.";
   else {
+    echo "In JSON format, this lists: {ever passed?, num submissions until passing, [date of first pass]}";
     $count = 0;
     echo "<pre>{";
     foreach ($result['grades'] as $student => $info) {
@@ -32,7 +34,7 @@ if (!$WS_AUTHINFO['logged_in']) {
       foreach ($info as $problem => $results) {
         if ($count2 > 0) echo ",\n"; else echo "\n";
         $count2++;
-        echo "    ".json_encode($problem).": ".json_encode($results);
+        echo "    ".str_replace("\\/", "/", json_encode($problem)).": ".json_encode($results);
       }
       echo "\n  }";
     }
