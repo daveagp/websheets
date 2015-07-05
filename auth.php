@@ -42,7 +42,7 @@ else {
     $error = "ws-config.json is not JSON formatted";
   }
   else foreach (array("safeexec-executable-abspath", "java_jail-abspath", 
-                      "hybridauth-base_url", 
+                      "baseurl", 
                       "db-password", "db-database", "db-user", "db-host") 
                 as $required) {
       if (!array_key_exists($required, $WS_CONFIG)) {
@@ -89,7 +89,7 @@ else {
    }   
 
   $ha_config = array();
-  $ha_config["base_url"] = $WS_CONFIG["hybridauth-base_url"];
+  $ha_config["base_url"] = $WS_CONFIG["baseurl"] . "/hybridauth/hybridauth/index.php";
   $ha_config["providers"] = array();
 
   // configure Facebook if details exist in ws-config.json

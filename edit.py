@@ -130,7 +130,7 @@ if __name__ == "__main__":
       done(success=False, message="Requested name does not have valid format: <tt>" + problem + "</tt>")
     else:
       internal_error("Does not have valid format: " + problem)
-    
+
   if (action in ['preview', 'save', 'delete']):
     if not canedit(problem):
       internal_error("You don't have edit permissions for " + problem)
@@ -143,6 +143,21 @@ if __name__ == "__main__":
       if 'sharing' in definition:
         sharing = definition['sharing']
     # add a row
+
+    if action == 'save' and owner(problem) == None:
+      for email_address in config.config_jo['notify_new']:
+        import smtplib
+        from email.mime.text import MIMEText
+        folder = "/".join(problem.split("/")[:-1])
+        slug = problem.split("/")[-1]
+        msg = MIMEText("A new websheet " + problem + " has been created by " + authinfo['username'] + " at " + config.config_jo["baseurl"] + "/?folder="+folder+"&start="+slug)
+        msg['Subject'] = 'New Websheet ' + problem
+        msg['From'] = "nobody@nowhere.com"
+        msg['To'] = email_address
+        s = smtplib.SMTP('localhost')
+        s.send_message(msg)
+        s.quit()
+
     cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
                    " VALUES (%s, %s, %s, %s, %s)",
                    (authinfo['username'], problem, request['definition'], action, sharing))

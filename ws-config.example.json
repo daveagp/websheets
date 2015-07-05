@@ -9,17 +9,19 @@
  "db-database": "...",
 
  "cpp_compiler":"g++",
- "comment":"or put clang++, or path to one of these",
+ "//or put clang++, or path to one of these":"",
 
- "hybridauth-base_url":
-         "http://your-website.../websheets/hybridauth/hybridauth/index.php",
+ "baseurl": "http://your-website.../websheets",
+
+ "//list of email addresses to noftify when new problem is created":"",
+ "notify_new":[],
 
  "facebook-id": "your facebook api id",
  "facebook-secret": "your facebook api secret key",
  "google-id":"your google api id",
  "google-secret":"your google api secret key",
 
- "comment": "keep the 2 below only if your university uses google apps and you want to authenticate using it",
+ "//keep the 2 below only if your university uses google apps and you want to authenticate using it" : "",
  "google-apps-domain": "youruniversity.edu",
  "required_username_suffix": "@youruniversity.edu"
 
