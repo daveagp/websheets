@@ -5,6 +5,10 @@
     text-align: center;
 }
 
+.tempAlert pre, .tempAlert span {
+        background-color: pink !important;
+}
+
 .show-embed-authinfo .embed-authinfo {
     display:block;
 }
@@ -64,12 +68,6 @@ div.CodeMirror-cursors {
   font-weight: bold;
 }
 
-
-.tempAlert {
-    border-top: 1px solid red;
-    border-bottom: 1px solid red;
-    line-height: 20px;
-}
 
 .wscontainer .results div {
     padding: 3px;

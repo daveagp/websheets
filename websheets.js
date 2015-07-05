@@ -507,10 +507,11 @@ websheets.Websheet.prototype.submit = function() {
             $(this_ws.div).find(".after-results").show();
          }
          $(this_ws.div).find(".results").html(results);
-         var re = new RegExp(this_ws.slug + "\\.cpp:(\\d+)(?!\\d)");
-         var line = results.match(re);
+        console.log(results)
+        var re = /([Ll]ine |\.cpp:)([0-9]+)/; // greedy :)
+        var line = re.exec(results);
          if (line != null && line.length > 0) {
-            var lineno = parseInt(line[1]);
+            var lineno = parseInt(line[2]); // group 2 holds the [0-9]+
             this_ws.wse.tempAlert(lineno);
          }
          //$("html, body").animate({ 
@@ -892,6 +893,7 @@ websheets.WebsheetEditor = function(textarea_element, fragments, initial_snippet
             cm.indentLine(i);
       },
       tempAlert: function(line) {
+        console.log("templaert", line);
          // subtract one since what the gutter displays is one less than the line index
          if (hhandle != null) cm.removeLineClass(hhandle, "wrapper", "tempAlert");
          hhandle = cm.addLineClass(line-1, "wrapper", "tempAlert");
