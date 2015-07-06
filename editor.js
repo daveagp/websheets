@@ -22,7 +22,7 @@ var editor_schema =
    {key: 'tests', lang: 'Java', type: 'codemirror', mode:'java', label: 'Java test suite'},
    {key: 'tests', lang: 'C++', type: 'codemirror', mode:'json', label: 'C++ test suite',
     howto: 'json list of stdin/args tests<br>e.g. <tt>[{"stdin":"hi", "args":["4", "5"]},<br>{"stdin":"noargs"}]</tt><br>to just run once with no input use <tt>[{}]</tt>'},
-   {key: 'tests', lang: 'C++func', type: 'codemirror', mode:'json', label: 'C++ test suite', howto:'TODO'},
+   {key: 'tests', lang: 'C++func', type: 'codemirror', mode:'json', label: 'C++ test suite', howto:'See <a href="manual.html">manual</a>.'},
    {key: 'verboten', optional: true, langs: ['Java', 'C++', 'C++func'], type: 'codemirror', mode:'json', label: 'Forbidden substrings',
     howto:'json list of strings<br>e.g. <tt>["for","while"]</tt>'},
    {key: 'attempts_until_ref', langs: ['Java', 'C++', 'C++func'], default: 'infinity', optional: true, type: 'choice', label: 'Solution visibility', 
@@ -42,14 +42,11 @@ var editor_schema =
 
    {key: 'example', optional: true, langs: ['C++', 'C++func'], type: 'choice', label: 'Is example?',
     choices: [['False', 'False'], ['True', 'True']], default: 'False',
-    howto: 'i.e., just a demo<br><a href="javascript:explain_example()">can still be <tt>\\[editable]\\</tt></a>'},
+    howto: 'i.e., just a demo'},
    {key: 'cppflags_add', optional: true, langs: ['C++', 'C++func'], type: 'codemirror', mode:'json', label: 'Add compiler flag(s)',
     howto: 'json list of flags<br>e.g. <tt>["-Wno-unused-variable"]</tt>'},
    {key: 'cppflags_remove', optional: true, langs: ['C++', 'C++func'], type: 'codemirror', mode:'json', label: 'Remove default compiler flag(s)', howto: 'json list of flags<br>see <a href="https://github.com/daveagp/websheets/blob/master/grade_cpp.py">default_cppflags</a><br>e.g. <tt>["-Wno-write-strings"]</tt>'}
   ];
-var explain_example = function() {
-  alert("This could be a sandbox or something to kick off discussion. In the cpp folder, see scratch, arrays/arraybad, var-expr/optest for instance. This also is appropriate if it simply can't be autograded due to randomness or timeouts, see random/randdigits and streams/buffer.");
-}
 
 var codemirrors = {};
 

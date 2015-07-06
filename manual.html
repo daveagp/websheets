@@ -33,43 +33,50 @@ observeNew(document, {childList: true, subtree: true}, function (elt) {
 </head>
 <body>
  <div id="page">
- <h1>Websheets Manual</h1>
- This manual describes how to write new exercises. It doesn't 
- cover installation &mdash; for that, see the README or the 
- <a href="https://github.com/daveagp/websheets">git repository</a>. See also the <a href="http://cscircles.cemc.uwaterloo.ca/websheets.html">quick reference list here</a>.
+ <h1>Creating and Editing Websheets</h1>
+ This manual describes how to write new exercises. 
+If you instead want to learn about installation 
+or usage, see the <a href="about.html">"about" page</a>.
 
-<h2>The Websheet Editor</h2>
+<p> To get started, we recommend diving in by opening these two links, 
+which demonstrate an exercise called TwoPlusTwo:
 
-To start we recommend opening these links in two tabs:
+
 <div>
-<tt>
-<a href="./editor.php?edit=java/00-intro/TwoPlusTwo">
-./editor.php?edit=java/00-intro/TwoPlusTwo
-</a>
-</tt>
-</div>
-<div>
-<tt>
+<ul>
+<li>Solve TwoPlusTwo in student interface: <tt>
 <a href="./?folder=java/00-intro&start=TwoPlusTwo">
 ./?folder=java/00-intro&start=TwoPlusTwo
 </a>
 </tt>
+</li>
+<li>View definition of TwoPlusTwo in author interface: <tt>
+<a href="./editor.php?edit=java/00-intro/TwoPlusTwo">
+./editor.php?edit=java/00-intro/TwoPlusTwo
+</a>
+</tt></li>
+
 </div>
 
-This lets you see a very basic Websheet and its (very basic) definition.
-It uses this Template / Reference solution:
-<pre>
+Look at the author interface.
+The most important part of the exercise definition is the
+Template / Reference solution:
+<pre style='border:1px solid black;'>
 public static void main(String[] args) {
 \[
    System.out.print(2+2);
 ]\
 }
 </pre>
+In the student interface, 
+the <tt>\[...]\</tt> region is blanked-out and has to be filled in. Try making some incorrect and correct submissions.
 
-Note that in the interface where you solve the exercise, the <tt>\[...]\</tt> region is blanked-out and has to be filled in,
-with a correct reference solution being to fill in <tt>System.out.print(2+2);</tt>. This templating idea is the core concept behind Websheets. 
-<p>Try solving the websheet, making some correct and incorrect submissions.
-<p>
+
+<p>Moreover, the Template  / Reference Solution specifies a correct "reference" solution, which is to fill in that blank with 
+<tt>System.out.print(2+2);</tt>. 
+
+<p>(The grader actually runs the code, so any other solution that behaves the same way is just as good. So <tt>System.out.print(4);</tt> is correct too.)
+
 
 <p>
 Here are the sections of this manual, which describe how to write each 
@@ -99,10 +106,18 @@ Looking at existing examples is the most thorough way to understand
 what's going on, once you're familiar with the main concepts.
 
 <p>You can access a <a href='./list.php'>list of all Websheets</a> (login required).
-There, you can see the definition of about 200 sample exercises.
+There, you can see the definition of about 200 sample exercises in Java and C++.
 
-<p>You can create Java and C++ programming problems, but C++ is not yet documented. You 
-also can create short-answer or true/false questions (also not yet documented).
+<h3>Short Answer / Multiple Choice</h3>
+Because we use them occasionally in our courses, 
+Websheets supports a couple of non-coding types of exercises too. 
+Rather than document them, we just give a couple of examples:
+<ul>
+<li>short answer: <span class='EG' data-slug='cpp/misc/x'></span>
+<li>multiple true/false: <span class='EG' data-slug='cpp/cs103/lec-intro/usc'></span>
+</ul>
+
+The rest of the manual talks about coding problems only.
 
 <h2>Template / Reference solution</h2>
 
@@ -115,8 +130,7 @@ or let it be filled in implicitly, like <tt>TwoPlusTwo</tt> above.)
 <p>
 Once you fill in a working program, you need to decide on what parts
 you want to blank out for the student.
-For the purposes of websheets, every blank has to 
-fall in one of the following two categories:
+Websheets supports two kinds of blanks:
 <ul>
 <li><i>inline blanks</i> which start and end on the same line; they can expand horizontally, but can never contain newlines
 <li><i>multi-line blanks</i> which take up the entirety of several lines; they can expand vertically, but never can start or
@@ -190,6 +204,7 @@ For example, see
 table td, table th {
     border: 1px solid black;
 }
+h2 {text-align:center;}
 </style>
 <table style="border:1px solid black;border-collapse:collapse">
 <tr><td></td><td>in UI?</td><td>in reference solution?</td><td>in executed/tested combined student solution?</td></tr>
@@ -558,20 +573,8 @@ This is a <tt><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Random
 just made available for convenience. E.g., see 
  <span class='EG' data-slug='java/02-control/AgeChecker'></span> which calls <tt>randgen.<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Random.html#nextInt(int)">nextInt</a>(100)</tt> to generate a random number from 0 to 99.</dd>
 
-<h2>Optional websheet fields</h2>
-Here are a couple of other fields that are available for use in Java websheets
-
-<dl>
-<dt><tt>epilogue</tt></dt>
-<dd>show a message or explanation after problem is completed.</dd>
-<dd>
-E.g. <span class='EG' data-slug='java/01-types/PercentScore'></span>.
-</dd>
-
-</dl>
-
-<h2>Java-specific Optional websheet fields</h2>
-Here are a couple of other fields that are available for use in websheets
+<h2>Java-specific optional websheet properties</h2>
+Here are a couple of other properties that are available for use in websheets
 
 <dl>
 <dt><tt>classname</tt></dt>
@@ -605,6 +608,70 @@ E.g. <span class='EG' data-slug='java/12-structures/CME'></span>.
 </dd>
 
 </dl>
+
+<h2>C++ test suite</h2>
+
+Websheets supports two different C++ engines:
+<h3>C++ (call main with stdin and args)</h3>
+The more basic kind of C++ websheet is one where
+the student is developing a <tt>main</tt> function. We test their code
+by running the <tt>main</tt> function (running the program) one or more
+times.
+<p>For each run, you specify the standard input and the command-line
+arguments, both of which are optional. Specifically, for our editor, each test is a JSON
+dict with optional keys <tt>stdin</tt> (a string) and <tt>args</tt> (a list of strings),
+and the test suite is a list of tests.
+<p>Take a look at <span class='EG' data-slug='cpp/pointers/increase_by'></span> which uses
+both stdin and args. Many other C++ examples use just one of stdin or args but not both.
+<p>A test that runs with no inputs is an empty dict, so a test suite that just runs one 
+test with no inputs would have test suite <tt>[{}]</tt>. See 
+<span class='EG' data-slug='cpp/hello'></span>.
+<h3>C++ (call functions directly)</h3>
+The other kind of C++ test engine supported is one that makes function calls directly.
+This allows more fine-grained testing of multiple functions.
+(Unlike Java, it doesn't allow stdin or calling OOP member functions.)
+<p>A test suite for this engine is a list of commands, where each command has one of two types:
+<ol>
+<li><tt>["check-function", "<i>function name</i>", "<i>return type</i>", ["<i>arg 1 type</i>", "<i>arg 2 type</i>", &hellip;]]</tt>
+<br>which checks that a function of this name and exact signature exists
+<li><tt>["call-function", "<i>function name</i>", ["<i>arg literal 1</i>", "<i>arg literal 2</i>", &hellip;]]</tt>
+<br>which calls the function and checks that its return value, when printed, is correct
+</ol>
+See <span class='EG' data-slug='cpp/functions/draw_square'></span> as well as <span class='EG' data-slug='cpp/functions/vowels'></span>.
+
+<h2>C++-specific optional websheet properties</h2>
+
+<dl>
+<dt>Is example?</dt>
+<dd>Used to indicate a chunk of code that is being included (perhaps by embedding) just for demonstration purposes.</dd>
+<dd>
+E.g. <span class='EG' data-slug='cpp/var-expr/examples/tacos'></span>.
+</dd>
+Examples can be editable, e.g. <span class='EG' data-slug='cpp/var-expr/optest'></span> which is used to kick off an in-class discussion. Sometimes this is also useful when your exercise can't really be autograded properly
+due to technical constraints. See <span class='EG' data-slug='cpp/random/randdigits'></span> which 
+uses randomness and <span class='EG' data-slug='cpp/streams/buffer'></span> which involves timeouts.
+
+</dl>
+
+
+<h2>Multi-language optional websheet properties</h2>
+Here are a couple of other properties that are available:
+
+<dl>
+<dt><tt>epilogue</tt></dt>
+<dd>show a message or explanation after problem is completed.</dd>
+<dd>
+E.g. <span class='EG' data-slug='java/01-types/PercentScore'></span>.
+</dd>
+
+<dt>Forbidden substrings</dt>
+<dd>Resrtict students from including these words in their code.</dd>
+<dd>
+E.g. <span class='EG' data-slug='cpp/recursion/countup'></span>.
+</dd>
+
+</dl>
+
 
  </div>
 </body>

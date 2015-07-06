@@ -1,5 +1,3 @@
-C++ documentation
-
 parsons problems? should be doable using on("changes") and
 "origin" object of each change (one "drag", one "paste", with
 complementary text/removed)
