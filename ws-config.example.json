@@ -16,6 +16,9 @@
  "//list of email addresses to noftify when new problem is created":"",
  "notify_new":[],
 
+ "//users with extra permissions (e.g. change websheet owner)":"",
+ "super_users":[],
+
  "facebook-id": "your facebook api id",
  "facebook-secret": "your facebook api secret key",
  "google-id":"your google api id",

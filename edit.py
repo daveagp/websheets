@@ -159,19 +159,23 @@ if __name__ == "__main__":
                    " VALUES (%s, %s, %s, %s, %s)",
                    (authinfo['username'], problem, request['definition'], action, sharing))
     done(success=True, message=action + " of " + problem + " successful.")
+
       
-  if (action in ['rename', 'copy']):
+  if (action in ['rename', 'copy', 'chown']):
+    if action == 'chown':
+      if not authinfo['is_super']:
+        internal_error("You're not a super user.")      
     if action == 'copy' and not canread(problem):
       internal_error("You don't have read permissions for " + problem)
     if action == 'rename' and not canedit(problem):
       internal_error("You don't have edit permissions for " + problem)
-    newname = request['newname']
-    if not valid(newname):
-      done(success=False, message="New name does not have valid format: " + newname)
-    if owner(newname) != None:
-      done(success=False, message="There is already a websheet with this name: " + newname)
+    if action != 'chown':
+      newname = request['newname']
+      if not valid(newname):
+        done(success=False, message="New name does not have valid format: " + newname)
+      if owner(newname) != None:
+        done(success=False, message="There is already a websheet with this name: " + newname)
     
-
     definition = json.loads(request['definition'])
     sharing = 'open-nosol'
     if 'sharing' in definition:
@@ -181,16 +185,25 @@ if __name__ == "__main__":
       if 'remarks' not in definition: definition['remarks'] = ""
       definition['remarks'] = "Copied from problem " + problem + " (author: " + owner(problem) + ")\n" + definition['remarks']
 
-    cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
-                   " VALUES (%s, %s, %s, %s, %s)",
-                   (authinfo['username'], newname, json.dumps(definition), 'save', sharing))
+    if action != 'chown':
+      cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
+                     " VALUES (%s, %s, %s, %s, %s)",
+                     (authinfo['username'], newname, json.dumps(definition), 'save', sharing))
 
-    if action == 'rename':      
-      cursor.execute("insert into ws_sheets (author, problem, action)" +
-                     " VALUES (%s, %s, %s)",
-                     (authinfo['username'], problem, 'delete'))
+      if action == 'rename':      
+        cursor.execute("insert into ws_sheets (author, problem, action)" +
+                       " VALUES (%s, %s, %s)",
+                       (authinfo['username'], problem, 'delete'))
       
-    done(success=True, message=action + " of " + problem + " to " + newname + " successful.")
+      done(success=True, message=action + " of " + problem + " to " + newname + " successful.")
+
+    else: # chown
+      cursor.execute("insert into ws_sheets (author, problem, definition, action, sharing)" +
+                     " VALUES (%s, %s, %s, %s, %s)",
+                     (request['newauthor'], problem, json.dumps(definition), 'save', sharing))
+
+      done(success=True, message=action + " of " + problem + " to " + request['newauthor'] + " successful.")
+      
 
   if action == 'load':
     myowner = owner(problem)

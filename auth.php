@@ -20,6 +20,7 @@ WS_AUTHINFO contains info that can be made PUBLIC to the user and which can be c
 ["error_span"] : html-formatted error message (bad server config, auth expiry) or empty string if none.
 ["info_span"] : very simple user-showable summary of authentication status, for convenience
 ["required_username_suffix"] : blank if n/a, or required login domain, used for error message UI
+["is_super"] : is this a super user?
  (e.g., cant load config file, user has wrong domain, ajax user expired etc)
 
 WS_CONFIG is the contents of ws-config.json and MUST BE KEPT PRIVATE since it will have things like database credentials
@@ -242,6 +243,9 @@ if (!$WS_AUTHINFO["logged_in"]) {
    $params = session_get_cookie_params();
    setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 }
+
+$WS_AUTHINFO['is_super'] = array_key_exists("super_users", $WS_CONFIG) && 
+  in_array($WS_AUTHINFO["username"], $WS_CONFIG["super_users"]);
 
 // check if an ajax request was not authenticatable by the expected user
 if ($error == "" && array_key_exists("ajax_uid_intended", $_REQUEST)) {

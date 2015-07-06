@@ -153,7 +153,7 @@ $(function() {
   $('.row-lang select').on('change', update_rows);
   update_rows();
 
-  window.encode = function() {
+  window.encode = function(nostringify) {
     result = {};
     for (var i=0; i<editor_schema.length; i++) if ($('#row-'+i).is(":visible")) {
       var item = editor_schema[i];
@@ -166,7 +166,9 @@ $(function() {
         value = codemirrors[""+i].getValue();
       result[item.key] = value;
     }
-    return JSON.stringify(result);
+    if (nostringify) return result;
+    else
+      return JSON.stringify(result);
   };
 
   window.decode = function(jsoned_websheet) {
@@ -268,7 +270,10 @@ $(function() {
   });
 
   $('button#export').on('click', function() {
-    prompt("Copy this JSON of the currently defined websheet:", window.encode());
+    var data = encode(true);
+    if (!data.remarks) data.remarks = "";
+    data.remarks = "Export of " +  websheets.GET['edit'] + " by " + websheets.author + "\n" + data.remarks;
+    prompt("Copy this JSON of the currently defined websheet:", JSON.stringify(data));
   });
 
   $('button#import').on('click', function() {
@@ -277,9 +282,41 @@ $(function() {
       window.decode(p);
   });
 
-  $('button#rename, button#copy, button#save, button#preview, button#delete').on('click', function() {
+  // http://stackoverflow.com/questions/3710204
+  function isJsonString(str) {
+    try {
+      JSON.parse(str);
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
+  $('button#rename, button#copy, button#save, button#preview, button#delete, button#chown').on('click', function() {
     var action = $(this).attr('id');
-    if (action == 'delete' || action == 'rename') {
+
+    if (action != 'delete') {
+      var lang = $('.row-lang select').val();
+      if (lang == "") {
+        if (!confirm("No engine selected, so Websheet will not run. "+action+" anyway?")) return;
+      }
+
+      var bads = [];
+      for (var i=0; i<editor_schema.length; i++) if ($('#row-'+i).is(":visible")) {
+        var item = editor_schema[i];
+        if (item.type == 'codemirror' && item.mode == 'json' && !isJsonString(codemirrors[""+i].getValue())) {
+          bads.push(i);
+        }
+      }
+      if (bads.length > 0) {
+        var msg = '"' + editor_schema[bads[0]].label + '"';
+        if (bads.length > 1) msg += " (and others)";
+        msg = "Field "+msg+" not valid JSON, so Websheet will not run. "+action+" anyway?";
+        if (!confirm(msg)) return;
+      }
+    }
+
+    if (action == 'delete' || action == 'rename' || action == 'chown') {
       if (!confirm("Do you really want to "+action+" " + websheets.GET['edit'] + "?"))
         return;
     }
@@ -289,6 +326,12 @@ $(function() {
       var newname = prompt(action+ " to what new name? (Include the full path, e.g. cpp/cs201/halting)");
       if (newname == null) return;
       request.newname = newname;
+    }    
+
+    if (action == 'chown') {
+      var newauthor = prompt(action+ " to what new author?");
+      if (newauthor == null) return;
+      request.newauthor = newauthor;
     }    
 
     disable_buttons();
@@ -308,10 +351,10 @@ $(function() {
                    remove_error();
                    alert('Failed: ' + data.message);
                  }
-                 if (data.success && (action=='delete' || action=='rename' || action=='copy')) {
+                 if (data.success && (action=='delete' || action=='rename' || action=='copy' || action=='chown')) {
                    alert(action + ' successful.');
                    nowarn = true;
-                   window.location.href='./editor.php' + (action!='delete'?'?edit='+newname:'');
+                   window.location.href='./editor.php' + (action!='delete'?'?edit='+(action=='chown'?websheets.GET['edit']:newname):'');
                  }
                  if (data.success && action=='save') {
                    $('.unsaved-changes').hide(400);
@@ -345,6 +388,11 @@ $(function() {
       return 'You have unsaved changes.';
     }
   });
+
+  if (websheets.authinfo.is_super)
+    $('#chown').show();
+  else
+    $('#chown').remove();
   
 });
 
