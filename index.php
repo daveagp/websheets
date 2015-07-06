@@ -49,7 +49,7 @@ if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
  <div id="page">
   <div class="menu-bar noprint">
     <a href="mailto:daveagp@gmail.com">Report feedback</a>. 
-    <a href="https://github.com/daveagp/websheets">Websheets is open-source</a>.    
+    <a href="./about.html">About</a>.    
    
     <div class='selectdiv'>
     <span class='selectspan'>
