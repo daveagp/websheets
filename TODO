@@ -1,3 +1,5 @@
+sql %s
+
 export button prefix with export source
 
 usability: pre-save check for invalid json or missing engine
