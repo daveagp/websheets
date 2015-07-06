@@ -23,10 +23,9 @@ if __name__ == "__main__":
     sys.exit(0)
 
   def owner(slug):
-    # really should be done with %s but ok since we sanitize
     cursor.execute(
       "select author, action from ws_sheets " +
-      "WHERE problem = '"+slug+"' AND action != 'preview' ORDER BY ID DESC LIMIT 1;")
+      "WHERE problem = %s AND action != 'preview' ORDER BY ID DESC LIMIT 1;", [slug])
     result = "false"
     for row in cursor:
       author = row[0]
@@ -38,7 +37,7 @@ if __name__ == "__main__":
   def definition(slug, username):
     for definition, sharing, author, action in config.get_rows(
       "select definition, sharing, author, action from ws_sheets " +
-      "WHERE problem = '"+slug+"' AND action != 'preview' ORDER BY ID DESC LIMIT 1;"):
+      "WHERE problem = %s AND action != 'preview' ORDER BY ID DESC LIMIT 1;", [slug]):
       if action == 'delete': continue
       if not sharing.startswith('open') and author != username: continue # closed-source
       if sharing=='open-nosol' and author != username:        
@@ -63,11 +62,9 @@ if __name__ == "__main__":
   def list_problems(username):
     result = []
 
-    condition = "action != 'preview'"
-
     for problem, action, sharing, author in config.get_rows(
       """SELECT o1.problem, o1.action, o1.sharing, o1.author FROM ws_sheets o1
-      INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE """+condition+""" GROUP BY problem) o2
+      INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE action != 'preview' GROUP BY problem) o2
       ON (o1.problem = o2.problem AND o1.id = o2.id);"""):
       if action == 'delete': continue
       if author != username:
@@ -95,7 +92,7 @@ if __name__ == "__main__":
     # ignoring previews, get the latest version
     cursor.execute(
       "select author, action, sharing from ws_sheets " +
-      "WHERE problem = '"+slug+"' AND action != 'preview' ORDER BY ID DESC LIMIT 1;")
+      "WHERE problem = %s AND action != 'preview' ORDER BY ID DESC LIMIT 1;", [slug])
     result = "false"
     for row in cursor:
       author = row[0]
@@ -107,11 +104,11 @@ if __name__ == "__main__":
   def get_setting(user, key):
     for (value,) in config.get_rows(
       "select value from ws_settings " +
-      "WHERE user = '"+user+"' AND keyname = '"+key+"';"):
+      "WHERE user = %s AND keyname = %s;", [user, key]):
       return value
 
   def set_setting(user, key, value):
-    cursor.execute("delete from ws_settings where user = '"+user+"' AND keyname = '"+key+"';")
+    cursor.execute("delete from ws_settings where user = %s AND keyname = %s;", [user, key])
     cursor.execute("insert into ws_settings (user, keyname, value)" +
                                         " VALUES (%s, %s, %s)",
                                         (user, key, value))
@@ -220,10 +217,10 @@ if __name__ == "__main__":
     result = {}
     for (student,) in config.get_rows(
       "select user from ws_settings " +
-      "WHERE value = '"+authinfo['username']+"' AND keyname = 'instructor';"):
+      "WHERE value = %s AND keyname = 'instructor';", [authinfo['username']]):
       stuinfo = {}
       for (passed, time, problem) in config.get_rows(
-        "SELECT passed, time, problem from ws_history where user = '"+student+"' order by id asc;"):
+        "SELECT passed, time, problem from ws_history where user = %s order by id asc;", [student]):
         if (problem not in stuinfo): prev = (False, 0)
         else: prev = stuinfo[problem]
         if not prev[0]: # if not yet passed

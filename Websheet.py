@@ -613,14 +613,14 @@ self.classname + " to = new " + self.classname + "();\n" +
         if not preview:
             for action, definition, sharing, id in config.get_rows(
                 "select action, definition, sharing, id from ws_sheets " +
-                "WHERE problem = '"+slug+"' AND action != 'preview' ORDER BY ID DESC LIMIT 1;"):
+                "WHERE problem = %s AND action != 'preview' ORDER BY ID DESC LIMIT 1;", [slug]):
                 if action == 'delete': return None
                 if sharing == 'draft': return None
                 mydef = definition
         else:            
             for definition, id in config.get_rows(
                 "select definition, id from ws_sheets " +
-                "WHERE problem = '"+slug+"' AND author = '"+author+"' AND action = 'preview' ORDER BY ID DESC LIMIT 1;"):
+                "WHERE problem = %s AND author = %s AND action = 'preview' ORDER BY ID DESC LIMIT 1;", [slug, author]):
                 mydef = definition
         if mydef != None:
             mymap = json.loads(definition)
@@ -650,12 +650,12 @@ self.classname + " to = new " + self.classname + "();\n" +
         result = []
         prefix = '' if directory=='' else directory+'/'
 
-        condition = "action != 'preview' AND problem LIKE '"+prefix+"%' AND problem NOT LIKE '"+prefix+"%/%'"
-
         for problem, action, sharing in config.get_rows(
             """SELECT o1.problem, o1.action, o1.sharing FROM ws_sheets o1
-            INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE """+condition+""" GROUP BY problem) o2
-            ON (o1.problem = o2.problem AND o1.id = o2.id);"""):
+            INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE 
+            action != 'preview' AND problem LIKE %s AND problem NOT LIKE %s
+            GROUP BY problem) o2
+            ON (o1.problem = o2.problem AND o1.id = o2.id);""", [prefix+'%', prefix+'%/%']):
             if action == 'delete': continue
             if sharing == 'draft' or sharing == 'hidden': continue
             result += [problem[len(prefix):]]
@@ -668,12 +668,13 @@ self.classname + " to = new " + self.classname + "();\n" +
         result = set()
         prefix = '' if directory=='' else directory+'/'
 
-        condition = "action != 'preview' AND problem LIKE '"+prefix+"%/%'"
         
         for problem, action, sharing in config.get_rows(
             """SELECT o1.problem, o1.action, o1.sharing FROM ws_sheets o1
-            INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE """+condition+""" GROUP BY problem) o2
-            ON (o1.problem = o2.problem AND o1.id = o2.id);"""):
+            INNER JOIN (SELECT problem, MAX(id) AS id FROM ws_sheets WHERE
+            action != 'preview' AND problem LIKE %s
+            GROUP BY problem) o2
+            ON (o1.problem = o2.problem AND o1.id = o2.id);""", [prefix+'%/%']):
             if action == 'delete': continue
             if sharing == 'draft' or sharing == 'hidden': continue
             result |= {prefix+problem[len(prefix):].split('/')[0]}

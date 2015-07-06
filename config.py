@@ -146,10 +146,10 @@ def num_submissions(student, problem):
         db.close()
         return result
 
-def get_row(query, multiple=False):
+def get_row(query, multiple=False, escapeme=[]):
     db = connect()
     cursor = db.cursor()
-    cursor.execute(query)
+    cursor.execute(query, escapeme)
     
     result = [] if multiple else None
     for row in cursor:
@@ -162,6 +162,6 @@ def get_row(query, multiple=False):
     db.close()
     return result
 
-def get_rows(query):
-    return get_row(query, multiple=True)
+def get_rows(query, escapeme=[]):
+    return get_row(query, True, escapeme)
 
