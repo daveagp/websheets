@@ -7,16 +7,11 @@ other licenses for subdirectories/subrepositories).
 GETTING STARTED
 
 See the list of the main components of the websheets system here:
+
 http://cscircles.cemc.uwaterloo.ca/websheets.html
 
-You can create problems and get your student grades without installation, 
-using one of these mirrors:
-
- http://cscircles.cemc.uwaterloo.ca/websheets/ (Java 8)
- http://bits.usc.edu/websheets/ (focuses on C++)
- http://www.cs.princeton.edu/~cos126/websheets/index.php (old, Java 7)
-
-However, you may wish to do extra customizations, requiring your own mirror.
+There are also other mirrors at USC and Princeton but they require that
+you have an account at one of those schools.
 
 INSTALLATION
 
