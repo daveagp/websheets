@@ -7,6 +7,9 @@ if __name__ == "__main__":
   ispreview = sys.argv[3]=='True'
   try:
     websheet = Websheet.from_name(sys.argv[1], ispreview, student)
+    if websheet == None:
+      print("Could not find " + sys.argv[1])
+      sys.exit(1)
     dbslug = websheet.dbslug
     
     import config, json
