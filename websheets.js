@@ -85,7 +85,7 @@ websheets.set_authinfo = function(info) {
         if (i != 0) msg += ' or ';
         msg += "<a href='javascript:websheets.popup_reauth(\""+info.providers[i]+"\")'>"+info.providers[i]+"</a>";
       }
-      $(".embed-authinfo").html(msg);
+      $(".embed-authinfo").html(msg +".");
     }
   }
   if (reload_sheets)
