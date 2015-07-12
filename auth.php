@@ -127,7 +127,8 @@ else {
   }
 
   if (array_key_exists("GitHub-id", $WS_CONFIG)
-      && array_key_exists("GitHub-secret", $WS_CONFIG))
+      && array_key_exists("GitHub-secret", $WS_CONFIG)
+      && file_exists("hybridauth/hybridauth/Hybrid/Providers/GitHub.php"))
     $ha_config["providers"]["GitHub"] = 
       array("enabled" => true, 
             "keys" => array("id" => $WS_CONFIG['GitHub-id'],
