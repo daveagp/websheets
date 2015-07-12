@@ -5,7 +5,8 @@
 </head>
 <body>
 <div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?> </div>
-<p><i>The grades interface is new and experimental. <a href='mailto:daveagp@gmail.com'>Please send us your feedback</a>. Students indicate their teacher on the <a href='settings.php'>settings page</a>.</i>
+<p><i>The grades interface is experimental. <a href='mailto:daveagp@gmail.com'>Please send us your feedback or UI suggestions</a>.
+Students indicate their teacher on the <a href='settings.php'>settings page</a>.</i>
 <p>
 <?php
 global $WS_AUTHINFO;
