@@ -249,9 +249,9 @@ using diagrams
 were created using <a href="http://ipe7.sourceforge.net/">IPE</a> (which uses PDFs as an editable format)
 and rasterized to PNG using  <a href="https://github.com/daveagp/websheets/blob/master/images/render.sh"><tt>render.sh</tt></a>.
 
-<h2>Java test suite</h2>
+<a name='javasuite'></a><h2>Java test suite</h2>
 
-The <tt>tests</tt> contains a snippet of Java code that makes calls to
+For Java, the <tt>tests</tt> contains a snippet of Java code that makes calls to
 our testing API. These API calls cause the automatic grader to dynamically
 execute both the reference code and student code in separate namespaces,
 capturing their outputs and return values, and comparing the results
@@ -309,7 +309,7 @@ exist if there are multiple arguments of which some are arrays, e.g. see
 </dl>
 
 <p><i style='color:red'>If you're reading the manual for the first time, now would be a good time for you to
-try creating some sample exercises; you've now read the documentation for all of the basics.</i>
+try creating some sample exercises; you've now read the documentation for the essential mechanics.</i>
 
 <h3>Basics: testing instance methods</h3>
 
@@ -626,7 +626,7 @@ both stdin and args. Many other C++ examples use just one of stdin or args but n
 <p>A test that runs with no inputs is an empty dict, so a test suite that just runs one 
 test with no inputs would have test suite <tt>[{}]</tt>. See 
 <span class='EG' data-slug='cpp/hello'></span>.
-<h3>C++ (call functions directly)</h3>
+<a name='cppfuncsuite'></a><h3>C++ (call functions directly)</h3>
 The other kind of C++ test engine supported is one that makes function calls directly.
 This allows more fine-grained testing of multiple functions.
 (Unlike Java, it doesn't allow stdin or calling OOP member functions.)
