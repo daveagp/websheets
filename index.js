@@ -27,7 +27,7 @@ $(function() {
       if (websheets.authinfo.providers.length==1) {
          snippet += '<a href="javascript:websheets.auth_reload(\'' +
             websheets.authinfo.providers[0] + '\')">' +
-            pretext + websheets.authinfo.providers[0] + '</a>.';
+            pretext + websheets.authinfo.providers[0] + '</a>';
       }
       else {
          snippet += pretext;
