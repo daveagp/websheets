@@ -126,6 +126,13 @@ else {
     }
   }
 
+  if (array_key_exists("GitHub-id", $WS_CONFIG)
+      && array_key_exists("GitHub-secret", $WS_CONFIG))
+    $ha_config["providers"]["GitHub"] = 
+      array("enabled" => true, 
+            "keys" => array("id" => $WS_CONFIG['GitHub-id'],
+                            "secret" => $WS_CONFIG['GitHub-secret']));
+
   //echo json_encode($ha_config);
   
   // now call the hybridauth library
