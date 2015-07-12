@@ -21,57 +21,74 @@ Install these on your server first:
 This requires root access. See the instructions therein for details. It is best to
 install these in locations that are not served to users by your web server.
 
+If you wish to run C++ problems through websheets, you need to do a 
+couple of small changes to java_jail:
+ - add a subdirectory "scratch" with apache write permission
+ - add libraries libstdc++.so.6 & libgcc_s.so.1 to the jail
+
 Next, in some folder accessible to your web server, run
 
 git clone --recursive https://github.com/daveagp/websheets
 
-You should be able to see the frontend, and an exercise, at 
- http://your.website/url/to/websheets/index.php
-although it will warn you of configuration problems.
-
 Next, copy ws-config.example.json to ws-config.json. 
-Reloading that page, it won't warn you, but submitting will
-cause errors.
-
-Set up the otions in ws-config.json.
+Set up the options in ws-config.json.
 
 Run the commands in "install.sql", e.g. with:
   mysql database_name -u user_name -p < install.sql
 
+Try visiting
+ http://your.website/url/to/websheets/index.php
+and everything should now work except authentication.
+
+LOGIN MECHANISMS
+
+Websheets doesn't currently let users create accounts or store
+passwords, and instead it relies on third-party authentication.
+
+It primarily uses an open-source module called "HybridAuth".
+"HybridAuth" supports tons of providers but Websheets is most easily
+prepared to utilize three: Facebook, Google and GitHub.
+   
+(a) To use one of these three open authenticators, you just have 
+    to register your "application" (your local Websheets mirror) with 
+    the corresponding provider and copy the id and secret into ws-config.json.
+
+    Use your google "Client ID for web applications" and "Client secret"
+    or facebook "App ID" and "App Secret".
+    The receiving URI should be like
+      http://your.website/url/to/websheets/hybridauth/hybridauth/index.php
+
+    Delete the options you don't want to use in ws-config.json.
+
+(b) If your school has Google Apps accounts for all students 
+    (e.g., USC does this), you can enforce that _only_ students
+    with accounts corresponding to your school may log in
+    (e.g. to avoid strangers from consuming CPU cycles).
+    Enter "google-apps-domain" and "required_username_suffix"
+    in ws-config.json if you want to do this (in addition to
+    your google app credentials).
+
+(c) If using GitHub, you have to copy a file in hybridauth:
+     cd hybridauth
+     cp additional-providers/hybridauth-github/Providers/GitHub.php hybridauth/Hybrid/Providers/
+
+Additional hybridauth providers can be added if you poke around
+auth.php a bit.
+
+Many schools (Waterloo, Princeton) also have PHP libraries 
+that perform authentication for students specifically from their 
+school. You can hook it up to Websheets by modifying auth.php
+accordingly. For an example, see the Princeton-related code in auth.php.
+
 ADDITIONAL SETUP
 
-There are some optional things you can do once the basics are working:
-
-0. To download updates, you need two commands to get the subrepos:
+To download updates, you need two commands to get the subrepos:
    git pull; git submodule update
 
-1. Setup or change login mechanisms if you want the websheets site to
-   remember each user's latest submission and what they've solved. 
-   If you want to use facebook and/or google, get API keys for them 
-   and change the listed options in ws-config.json. Delete the options
-   you don't want to use. 
-
-   For authentication we use "hybridauth" which we use as a unified wrapper 
-   for user email authentication (they are remembered by email address). 
-   With some work you can set up a custom authentication for your school
-   if they have a PHP authentication system; follow the Princeton example
-   in auth.php. You should also be able to use other hybridauth providers
-   with a little work.
-
-   You need a google "Client ID for web applications" and "Client secret"
-   or a facebook "App ID" and "App Secret" See the hybridauth documentation
-   for more details.
-
-2. The C++ backend can basically use the same 'java_jail' jail as long as
-    (a) you need to add a subdirectory "scratch" with apache write permission
-    (b) you need to add libraries libstdc++.so.6 & libgcc_s.so.1 to the jail
-
-3. See embed.html for an example of embedding Websheets in other pages,
-
-4. WARNING: If you use a database, you'll be putting a DB password in ws-config.json.
-   Please check that
+WARNING: You'll be putting a DB password in ws-config.json.
+Please check that
      http://your.website/url/to/websheets/ws-config.json
-   is inaccessible; .htaccess tries to do this, but you should confirm it works.
+is inaccessible; .htaccess tries to do this, but you should confirm it works.
 
 THANKS
 
