@@ -390,6 +390,12 @@ $(function() {
     $('#chown').show();
   else
     $('#chown').remove();
+
+  if (!websheets.authinfo.logged_in) {
+    $(".editor button").remove();
+    $("#reload").html("Open a different Websheet");
+  }
+
   
 });
 

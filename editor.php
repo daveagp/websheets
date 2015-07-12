@@ -45,9 +45,10 @@
   websheets.authinfo = <?php echo json_encode($GLOBALS['WS_AUTHINFO']); ?>;
 
 <?php 
-if (!$GLOBALS['WS_AUTHINFO']['logged_in'])
-  echo "websheets.initialize_error = 'You must log in to use the editor.';";
- else if (!array_key_exists('edit', $_REQUEST))
+  //if (!$GLOBALS['WS_AUTHINFO']['logged_in'])
+  //echo "websheets.initialize_error = 'You must log in to use the editor.';";
+  //else 
+if (!array_key_exists('edit', $_REQUEST))
   echo "websheets.initialize_error = 'Please use one of the buttons above to start editing.';";
  else {
   require_once('edit.php');
@@ -79,7 +80,7 @@ $attemptlink = "./?start=".$bits[count($bits)-1]."&folder=".implode('/', array_s
 </script>
 </head>
 <body>
-<div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?> <a href="https://github.com/daveagp/websheets">View Websheets source code repository.</a></div>
+<div id='info'><?php echo $GLOBALS['WS_AUTHINFO']['info_span']; ?> <a href="./about.html">About Websheets.</a></div>
 <p><button id='reload' class='pure'>Create blank Websheet or open existing Websheet</button> <a href='./list.php'>List of all available Websheets</a>
 <div id='error' style='display:none'>
 </div>
@@ -93,7 +94,7 @@ $attemptlink = "./?start=".$bits[count($bits)-1]."&folder=".implode('/', array_s
 <p class='hide-readonly'>Optional properties:<span id='optionals'></span>
 <p>
 Note: problems are open-source by default (see 'Public permissions'). 
-License will be assumed to be <a href='https://creativecommons.org/licenses/by-sa/4.0/'>Creative Commons 4.0 Attribution-ShareAlike</a> unless otherwise specified in 'Remarks'.
+Assumed license for open problems is <a href='https://creativecommons.org/licenses/by-sa/4.0/'>Creative Commons 4.0 Attribution-ShareAlike</a> unless specified in 'Remarks'.
 <hr>
 <div class='preview'></div>
 </div> <!-- editor -->

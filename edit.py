@@ -119,7 +119,7 @@ if __name__ == "__main__":
   authinfo = request['authinfo']
   problem = request['problem'] if 'problem' in request else None
   action = request['action']  
-  if not authinfo["logged_in"] and action != 'listmine':
+  if not authinfo["logged_in"] and action not in ['listmine', 'load']:
     internal_error("Only logged-in users can edit")
 
   if action not in ['listmine', 'settings', 'showgrades'] and not valid(problem):
