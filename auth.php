@@ -179,7 +179,13 @@ else {
           $adapter = $hybridauth->authenticate( $authdomain );  
           try {
              $user_profile = $adapter->getUserProfile(); 
-             $un = $user_profile->emailVerified;
+
+             // github seems to verify addresses even though the Hybrid_User_Profile
+             // doesn't acknowledge this.
+             if ($authdomain == 'GitHub')
+               $un = $user_profile->email;
+             else
+               $un = $user_profile->emailVerified;
 
              if (array_key_exists("required_username_suffix", $WS_CONFIG)) {
                $rus = $WS_CONFIG["required_username_suffix"];
