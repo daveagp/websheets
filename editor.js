@@ -393,6 +393,7 @@ $(function() {
 
   if (!websheets.authinfo.logged_in) {
     $(".editor button").remove();
+    $("#pokelogin").show();
     $("#reload").html("Open a different Websheet");
   }
 
