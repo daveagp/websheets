@@ -22,7 +22,7 @@ function run_edit_py() {
                           2 => array("pipe", "w"),  // stderr
                           );
   
-  $process = proc_open("./edit.py", $descriptorspec, $pipes);
+  $process = proc_open("python3 ./edit.py", $descriptorspec, $pipes);
   
   if (!is_resource($process))
     return json_encode("Internal error, could not run Websheet program");

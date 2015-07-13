@@ -41,8 +41,8 @@ if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
    websheets.require_login = false;
    websheets.current_folder = <?php echo json_encode($_GET['folder']); ?>;
    websheets.authinfo = <?php echo json_encode($GLOBALS['WS_AUTHINFO']); ?>;
-   websheets.sheets = <?php echo passthru("./Websheet.py list ".$_GET['folder']); ?>;
-   websheets.subfolders = <?php echo passthru("./Websheet.py list-folders ".$_GET['folder']); ?>;
+   websheets.sheets = <?php echo passthru("python3 ./Websheet.py list ".$_GET['folder']); ?>;
+   websheets.subfolders = <?php echo passthru("python3 ./Websheet.py list-folders ".$_GET['folder']); ?>;
    </script>
 </head>
 <body>

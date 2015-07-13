@@ -42,7 +42,7 @@ $stdin = json_encode(array("client_request" => $client_request,
                                                              "preview"=>$client_request['preview'],
                                                              "ip"=>$_SERVER['REMOTE_ADDR']))));
 
-$process = proc_open("./submit.py", $descriptorspec, $pipes);
+$process = proc_open("python3 ./submit.py", $descriptorspec, $pipes);
 
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";
