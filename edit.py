@@ -209,7 +209,10 @@ if __name__ == "__main__":
     myowner = owner(problem)
     # if it doesn't exist, everything is good
     if myowner == None:
-      done(success=True, message="Loaded " + problem, new=True, canedit=True, author=authinfo['username'])
+      if authinfo['logged_in']:
+        done(success=True, message="Loaded " + problem, new=True, canedit=True, author=authinfo['username'])
+      else:
+        done(success=False, message=problem + " does not exist. You need to log in to create new problems.")
     # it exists
     if not canread(problem):
       done(success=False, message="You do not have read permissions for: " + problem)
