@@ -40,7 +40,7 @@ if __name__ == "__main__":
       "WHERE problem = %s AND action != 'preview' ORDER BY ID DESC LIMIT 1;", [slug]):
       if action == 'delete': continue
       if not sharing.startswith('open') and author != username: continue # closed-source
-      if sharing=='open-nosol' and author != username:        
+      if sharing=='open-nosol' and author != username and not authinfo['is_super']:
         definition = json.loads(definition)
         if 'choices' in definition:
           definition['choices'] = json.dumps([[x[0], None] for x in json.loads(definition['choices'])])
