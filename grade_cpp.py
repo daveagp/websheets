@@ -26,7 +26,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
                         "-Wconversion",
                         "-Wno-sign-compare", "-Wno-write-strings"]
     if "clang" in cpp_compiler: # good options, but not in g++
-        default_cppflags += ["-Wvla", "-Wno-shorten-64-to-32", "-Wno-sign-conversion"]
+        default_cppflags += ["-Wvla", "-Wno-shorten-64-to-32", "-Wno-sign-conversion", "-fsanitize=undefined"]
     else:
       unusable_cppflags = ["-Wno-array-bounds","-Wno-return-stack-address","-Wunreachable-code"]
 
