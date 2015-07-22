@@ -220,6 +220,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
       cmd += ["--chroot_dir", cfg["java_jail-abspath"]]
       cmd += ["--exec_dir", "/" + refdir]
       cmd += ["--clock", "1"]
+      cmd += ["--mem", "40000"]
       cmd += ["--exec", exename]
       cmd += args
 
@@ -237,6 +238,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
       cmd += ["--chroot_dir", cfg["java_jail-abspath"]]
       cmd += ["--exec_dir", "/" + studir]
       cmd += ["--clock", "1"]
+      cmd += ["--mem", "40000"]
       cmd += ["--exec", exename]
       cmd += args
 
