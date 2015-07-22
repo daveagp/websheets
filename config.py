@@ -1,11 +1,12 @@
-import socket, os
+import socket, os, os.path
 from subprocess import Popen, PIPE
 import Websheet
 import json
 
 # we already checked for this error in php land
 try:
-    config_jo = json.loads(open('ws-config.json').read())
+    # a little convoluted to account for possibility this module's loaded from another place
+    config_jo = json.loads(open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'ws-config.json')).read())
     db_enabled = "db-enabled" in config_jo and config_jo["db-enabled"] == True
 except:
     config_jo = []

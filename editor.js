@@ -342,8 +342,11 @@ $(function() {
                enable_buttons();
                if (typeof data == "string") alert(data);
                else {
-                 if (data.success) 
+                  
+                 if (data.success)
                    display_error(data.message);
+                 else if (data.error_span)
+                   display_error(data.error_span);
                  else {
                    remove_error();
                    alert('Failed: ' + data.message);
