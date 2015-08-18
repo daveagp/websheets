@@ -29,7 +29,7 @@ websheets.refresh_page = function(query) {
    var url = '';
    for (var key in query) if (query.hasOwnProperty(key)) {
       var comp = query[key];
-      if (key!='group') comp=encodeURIComponent(comp); // avoid + changing to %2B
+     comp=encodeURIComponent(comp).replace(/%2F/g, '/');
       url += "&" + key + "=" + comp;
    }
    window.location.href = '?' + url.substring(1); // remove leading '&'

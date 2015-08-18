@@ -261,7 +261,7 @@ $(function() {
     var slug = window.prompt(msg + "Enter the full path of the websheet to create or edit. E.g., cpp/arrays/echo");
     if (slug != null) {
       nowarn = true;
-      window.location.href='?edit='+encodeURIComponent(slug); 
+      window.location.href='?edit='+encodeURIComponent(slug).replace(/%2F/g, '/'); 
     }
     
   });
