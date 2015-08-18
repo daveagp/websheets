@@ -86,9 +86,12 @@ div.CodeMirror-cursors {
 }
 
 .wscontainer div.epilogue {
+    padding: 5px;
+}
+
+.wscontainer div.epilogue div.header {
     text-align: center;
     font-style: italic;
-    padding: 5px 0px;
 }
 
 @media print {

@@ -502,8 +502,8 @@ websheets.Websheet.prototype.submit = function() {
 	 var results = data.results;
          if (data.epilogue) {
             $(this_ws.div).find(".after-results")
-               .html("<div id='epilogue'>Epilogue</div>" 
-                     + data.epilogue);
+               .html("<div class='epilogue'><div class='header'>Epilogue</div>" 
+                     + data.epilogue + '</div>');
             $(this_ws.div).find(".after-results").show();
          }
          $(this_ws.div).find(".results").html(results);

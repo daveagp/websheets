@@ -10,6 +10,7 @@ sometimes produces:
  - epilogue, commentary after a submission
 """
 import config, json, cgi, sys, Websheet, re, os
+from utils import *
 
 def submit_and_log(websheet_name, student, client_request, meta):
 
@@ -116,8 +117,8 @@ def submit_and_log(websheet_name, student, client_request, meta):
   if errmsg is not None:
     print_output['errmsg'] = errmsg
     save_this['errmsg'] = errmsg
-  if epilogue is not None: # no need to log this
-    print_output['epilogue'] = epilogue
+  if category=='Passed' and websheet.epilogue is not None: 
+    print_output['epilogue'] = websheet.epilogue
 
   passed = (category == "Passed")
 
