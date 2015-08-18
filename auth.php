@@ -181,23 +181,16 @@ else {
           try {
              $user_profile = $adapter->getUserProfile(); 
 
-             // github seems to verify addresses even though the Hybrid_User_Profile
-             // doesn't acknowledge this.
-             if ($authdomain == 'GitHub') {
-
-               /*
-               $handle = fopen("log.txt", "a");
-               fwrite($handle, json_encode($user_profile) . "\n");
-               fclose($handle);
-               */
-
+             $un = $user_profile->emailVerified;
+             // github seems to verify addresses, even though the 
+             // Hybrid_User_Profile doesn't acknowledge this.
+             if (!$un && $authdomain == 'GitHub')
                $un = $user_profile->email;
-               if (!$un)
-                 $un = $user_profile->emailVerified;
-               if (!$un) {
-                 $things = explode('/', $user_profile->profileURL);
-                 $un = $things[count($things)-1]."@users.noreply.github.com";
-               }
+
+             // the user might not have a public email at all
+             if (!$un && $authdomain == 'GitHub') {
+               $things = explode('/', $user_profile->profileURL);
+               $un = $things[count($things)-1]."@users.noreply.github.com";
              }
 
              if (array_key_exists("required_username_suffix", $WS_CONFIG)) {
