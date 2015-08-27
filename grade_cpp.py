@@ -48,10 +48,11 @@ def grade(reference_solution, student_solution, translate_line, websheet):
     compile_args += [websheet.slug + ".cpp", "-o", websheet.slug + suffix]
 
     # build reference
-    os.chdir(jail + refdir)
-    refcompile = execute(compile_list + compile_args, "")
-    if (refcompile.stderr != "" or refcompile.returncode != 0
-        or not os.path.isfile(jail + refdir + websheet.slug + suffix)):
+    if not websheet.example:
+      os.chdir(jail + refdir)
+      refcompile = execute(compile_list + compile_args, "")
+      if (refcompile.stderr != "" or refcompile.returncode != 0
+          or not os.path.isfile(jail + refdir + websheet.slug + suffix)):
         return ("Internal Error (Compiling Reference)",
                 "cmd:"+pre(" ".join(compile_list))+
                 "<br>stdout:"+pre(refcompile.stdout)+
@@ -146,21 +147,23 @@ def grade(reference_solution, student_solution, translate_line, websheet):
 
         compile_list += [newslug + ".cpp", "-o", newslug]
 
-        cpp = open(jail + refdir + newslug + ".cpp", "w")
-#        print(reftester)
-        cpp.write(reftester)
-        cpp.close()
-        os.chdir(jail + refdir)
-        refcompile = execute(compile_list, "")
+        if not websheet.example:
 
-        if (refcompile.stderr != "" or refcompile.returncode != 0
-            or not os.path.isfile(jail + refdir + newslug)):
-          return ("Internal Error: Reference Type Check Failed",
-                  "<!--" +
-                  "stdout:"+pre(refcompile.stdout)+
-                  "<br>stderr:"+pre(refcompile.stderr)+
-                  "<br>retval:"+pre(str(refcompile.returncode))
-                  +"-->"   )
+          cpp = open(jail + refdir + newslug + ".cpp", "w")
+#        print(reftester)
+          cpp.write(reftester)
+          cpp.close()
+          os.chdir(jail + refdir)
+          refcompile = execute(compile_list, "")
+
+          if (refcompile.stderr != "" or refcompile.returncode != 0
+              or not os.path.isfile(jail + refdir + newslug)):
+            return ("Internal Error: Reference Type Check Failed",
+                    "<!--" +
+                    "stdout:"+pre(refcompile.stdout)+
+                    "<br>stderr:"+pre(refcompile.stderr)+
+                    "<br>retval:"+pre(str(refcompile.returncode))
+                    +"-->"   )
 
         cpp = open(jail + studir + newslug + ".cpp", "w")
         cpp.write(stutester)
@@ -185,6 +188,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         exename = newslug
         stdin = ""
         args = []
+
       if websheet.lang=='C++': # normal test, calling main
         stdin = ""
         args = []
@@ -215,15 +219,16 @@ def grade(reference_solution, student_solution, translate_line, websheet):
       cmd += ["--exec", exename]
       cmd += args
 
-      runref = execute(cmd, stdin)
+      if not websheet.example:
+        runref = execute(cmd, stdin)
 
-      if runref.returncode != 0 or not runref.stderr.startswith("OK"):
-        result += "<div>Reference solution crashed!"
-        result += "<br>stdout:"+pre(runref.stdout)
-        result += "stderr:"+pre(runref.stderr)
-        result += "val:"+pre(str(runref.returncode))
-        result += "</div>"
-        return ("Internal Error", result)
+        if runref.returncode != 0 or not runref.stderr.startswith("OK"):
+          result += "<div>Reference solution crashed!"
+          result += "<br>stdout:"+pre(runref.stdout)
+          result += "stderr:"+pre(runref.stderr)
+          result += "val:"+pre(str(runref.returncode))
+          result += "</div>"
+          return ("Internal Error", result)
 
       cmd = [cfg["safeexec-executable-abspath"]]
       cmd += ["--chroot_dir", cfg["java_jail-abspath"]]
