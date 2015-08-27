@@ -10,6 +10,10 @@ def grade(reference_solution, student_solution, translate_line, websheet, studen
         "student." + websheet.classname : student_solution[1],
         "tester." + websheet.classname : websheet.make_tester()    
         }
+
+#    print(student_solution[1])
+#    print(reference_solution)
+#    print(websheet.make_tester())
     
     for clazz in ["Grader", "Options", "Utils"]:
       dump["websheets."+clazz] = "".join(open("grade_java_files/"+clazz+".java"))
@@ -45,20 +49,27 @@ def grade(reference_solution, student_solution, translate_line, websheet, studen
               cgi.escape(compileObj["errmsg"]) +
               "</pre>")
     elif compileObj['status'] == 'Compile-time Error':
-        result = "Syntax error (could not compile):"
-        result += "<br>"
         errorObj = compileObj['error']
-        result += '<tt>'+errorObj['filename'].split('.')[-2]+'.java</tt>, line '
-        result += str(translate_line(errorObj['row'])) + ':'
-        #result += str(errorObj['row']) + ':'
-        result += "<pre>\n"
-        #remove the safeexec bits
-        result += cgi.escape(errorObj["errmsg"]
-                             .replace("stdlibpack.", "")
-                             .replace("student.", "")
-                             )
-        result += "</pre>"
-        return ("Syntax Error", result)
+        if errorObj['filename'] == ("student." + websheet.classname + ".java"):
+            result = "Syntax error (could not compile):"
+            result += "<br>"
+            result += '<tt>'+errorObj['filename'].split('.')[-2]+'.java</tt>, line '
+            result += str(translate_line(errorObj['row'])) + ':'
+            #result += str(errorObj['row']) + ':'
+            result += "<pre>\n"
+            #remove the safeexec bits
+            result += cgi.escape(errorObj["errmsg"]
+                                 .replace("stdlibpack.", "")
+                                 .replace("student.", "")
+                                 )
+            result += "</pre>"
+            return ("Syntax Error", result)
+        else:
+            return("Internal Error (Compiling reference solution and testing suite)",
+                   '<b>File: </b><tt>'+errorObj['filename']+'</tt><br><b>Line number: '
+                   +str(errorObj['row'])+"</b><pre>"
+                   +errorObj['errmsg']+":\n"+dump[errorObj['filename'][:-5]].split("\n")[errorObj['row']-1]+"</pre>")
+                    
 
     #print(compileResult)
 
