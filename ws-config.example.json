@@ -19,6 +19,12 @@
  "//users with extra permissions (e.g. change websheet owner)":"",
  "super_users":[],
 
+ "//this can be useful if you have a localhost server or you are an administrator who cannot use the normal auth method":"",
+ "//add ?auth=<your backdoor-auth-id> to URLs to log in as your@email.com":"",
+ "//note that this is totally insecure! anyone who knows the id can log in":"",
+ "backdoor-auth-id": "",
+ "backdoor-auth-as": "your@email.com",
+
  "//you only need to keep the ones whose auth system you are using":"",
  "facebook-id": "your facebook api id",
  "facebook-secret": "your facebook api secret key",

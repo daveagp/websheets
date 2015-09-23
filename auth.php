@@ -153,18 +153,15 @@ else {
   // see if the cookie has saved a previous login
   if (array_key_exists('WS_AUTHINFO', $_SESSION)) {
      $cookiedomain = $_SESSION['WS_AUTHINFO']['domain'];
-     $requestdomain = '';
-     if (array_key_exists('auth', $_REQUEST))
-        $requestdomain = $_REQUEST['auth'];
-     if ($requestdomain == '' || $requestdomain == $cookiedomain) {
+     if ($_REQUEST['auth'] == '' || $_REQUEST['auth'] == $cookiedomain) {
         $cookied = true;
         $WS_AUTHINFO = $_SESSION['WS_AUTHINFO'];
      }
   }
 
   // else try logging in, also build a list of providers
-  if (!$cookied) 
-  foreach ($ha_config["providers"] as $authdomain => $domaininfo) {
+  if (!$cookied) {
+   foreach ($ha_config["providers"] as $authdomain => $domaininfo) {
     $WS_AUTHINFO['providers'][] = $authdomain;
 
     // tries to log in twice. the reason is that an exception can be thrown
@@ -220,10 +217,10 @@ and sign out.";
           }
        }
     }
-  }     
+   } // end foreach
   
-  // some schools will want to use their own authentication. example:
-  if (substr($_SERVER['SERVER_NAME'], -13)=='princeton.edu') {
+   // some schools will want to use their own authentication. example:
+   if (substr($_SERVER['SERVER_NAME'], -13)=='princeton.edu') {
     $WS_AUTHINFO['providers'][] = "Princeton";
     
     include_once('../CAS-1.3.2/CAS.php');
@@ -244,7 +241,18 @@ and sign out.";
       $WS_AUTHINFO['domain'] = 'Princeton'; 
       $WS_AUTHINFO['logged_in'] = true;
     }     
-  }
+   }
+
+   // if backdoor is enabled, check for it
+   if (array_key_exists("backdoor-auth-id", $WS_CONFIG) &&
+    $_REQUEST['auth'] == $WS_CONFIG["backdoor-auth-id"] &&
+    $_REQUEST['auth'] != '') {
+      $WS_AUTHINFO['logged_in'] = true;
+      $WS_AUTHINFO['username'] = $WS_CONFIG["backdoor-auth-as"];
+      $WS_AUTHINFO['domain'] = $WS_CONFIG["backdoor-auth-id"];
+      $WS_AUTHINFO['is_super'] = true;
+   }
+  } // if not cookied
 
 // pass the list of authentication services to the next php file
   if ($WS_AUTHINFO["providers"] == array()) {
@@ -262,6 +270,8 @@ if (!$WS_AUTHINFO["logged_in"]) {
    $params = session_get_cookie_params();
    setcookie(session_name(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
 }
+
+$_SESSION['WS_AUTHINFO'] = $WS_AUTHINFO;
 
 $WS_AUTHINFO['is_super'] = array_key_exists("super_users", $WS_CONFIG) && 
   in_array($WS_AUTHINFO["username"], $WS_CONFIG["super_users"]);
