@@ -2,6 +2,7 @@ import socket, os, os.path
 from subprocess import Popen, PIPE
 import Websheet
 import json
+import utils
 
 # we already checked for this error in php land
 try:
@@ -34,16 +35,19 @@ if socket.gethostname().endswith("princeton.edu"):
 # in either case "java_prefix" is like the 'java' binary,
 # ready to accept the class name and cmd line args
 
-def execute(command, the_stdin, input_encoding="UTF-8", output_encoding="UTF-8"):
+def execute(command, the_stdin, input_encoding="UTF-8", output_encoding="UTF-8", flag_badchars = False):
     proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
         
     result = proc.communicate(input = the_stdin.encode(input_encoding))
-    return Websheet.record(command = command,
-                           pwd = os.getcwd(),
-                           stdin = the_stdin,
-                           stdout = result[0].decode(output_encoding),
-                           stderr = result[1].decode(output_encoding),
-                           returncode = proc.returncode)
+    result = Websheet.record(command = command,
+                             pwd = os.getcwd(),
+                             stdin = the_stdin,
+                             stdout = result[0].decode(output_encoding),
+                             stderr = result[1].decode(output_encoding),
+                             returncode = proc.returncode)
+    if flag_badchars:
+        result.stdout = utils.expose_badchars(result.stdout)
+    return result
     
 def run_java(command, the_stdin = ""):
     return execute(java_prefix() + command, the_stdin)

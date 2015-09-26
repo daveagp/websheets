@@ -1,10 +1,8 @@
 import config, json, cgi, sys, Websheet, re, os
 from utils import *
+from config import execute
 
 void_functions = []
-
-def execute(command, stdin):
-  return config.execute(command, stdin, output_encoding='Latin-1')
 
 def grade(reference_solution, student_solution, translate_line, websheet):
     cpp_compiler = config.config_jo["cpp_compiler"]
@@ -29,11 +27,11 @@ def grade(reference_solution, student_solution, translate_line, websheet):
 
     # put slug.cpp
     jail = config.config_jo["java_jail-abspath"]
-    refcpp = open(jail + refdir + websheet.slug + ".cpp", "w")
+    refcpp = open(jail + refdir + websheet.slug + ".cpp", "w", encoding="utf-8")
     refcpp.write(reference_solution)
     refcpp.close()
     
-    stucpp = open(jail + studir + websheet.slug + ".cpp", "w")
+    stucpp = open(jail + studir + websheet.slug + ".cpp", "w", encoding="utf-8")
     stucpp.write(student_solution)
     stucpp.close()
     
@@ -238,7 +236,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
       cmd += ["--exec", exename]
       cmd += args
 
-      runstu = execute(cmd, stdin)
+      runstu = execute(cmd, stdin, flag_badchars = True)
       if runstu.returncode != 0 or not runstu.stderr.startswith("OK"):
         result += "<div>Crashed! "
         errmsg = runstu.stderr

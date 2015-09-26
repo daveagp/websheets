@@ -61,10 +61,10 @@ def submit_and_log(websheet_name, student, client_request, meta):
 
     ss = student_solution[1]
     for i in range(len(ss)):
-      if ord(ss[i]) >= 128:
+      if badchar(ss[i]):
         return("Pre-syntax Error",
                "<div class='pre-syntax-error'>Syntax error:" + 
-               " Your code contains a non-ASCII character:<br>" + 
+               " Your code contains character number " + str(ord(ss[i])) + ":<br>" + 
                "<pre>"
                +("&hellip;" if i>5 else "")
                +cgi.escape(ss[max(0,i-5):i])
