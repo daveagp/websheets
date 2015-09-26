@@ -237,6 +237,9 @@ def grade(reference_solution, student_solution, translate_line, websheet):
       cmd += args
 
       runstu = execute(cmd, stdin, flag_badchars = True)
+      if websheet.slug == "ascii_table":
+          # this is the unique exercise where a corrcet solution uses a badchar
+          runstu.stdout = runstu.stdout.replace("\\u007f", chr(127))
       if runstu.returncode != 0 or not runstu.stderr.startswith("OK"):
         result += "<div>Crashed! "
         errmsg = runstu.stderr
