@@ -244,13 +244,13 @@ and sign out.";
    }
 
    // if backdoor is enabled, check for it
-   if (array_key_exists("backdoor-auth-id", $WS_CONFIG) &&
-    $_REQUEST['auth'] == $WS_CONFIG["backdoor-auth-id"] &&
-    $_REQUEST['auth'] != '') {
-      $WS_AUTHINFO['logged_in'] = true;
-      $WS_AUTHINFO['username'] = $WS_CONFIG["backdoor-auth-as"];
-      $WS_AUTHINFO['domain'] = $WS_CONFIG["backdoor-auth-id"];
-      $WS_AUTHINFO['is_super'] = true;
+   if (array_key_exists("backdoor-auths", $WS_CONFIG)) {
+      if (array_key_exists($_REQUEST['auth'], $WS_CONFIG['backdoor-auths'])) {
+            $WS_AUTHINFO['logged_in'] = true;
+            $WS_AUTHINFO['username'] = $WS_CONFIG["backdoor-auths"][$_REQUEST['auth']];
+            $WS_AUTHINFO['domain'] = $_REQUEST['auth'];
+            $WS_AUTHINFO['is_super'] = true;
+      }
    }
   } // if not cookied
 
