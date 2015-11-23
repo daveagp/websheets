@@ -18,6 +18,8 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         default_cppflags += ["-Wvla", "-Wno-shorten-64-to-32", "-Wno-sign-conversion", "-fsanitize=undefined"]
     else:
       unusable_cppflags = ["-Wno-array-bounds","-Wno-return-stack-address","-Wunreachable-code"]
+      # didn't seem to help :(
+      # default_cppflags += ["-fextended-identifiers", "-finput-charset=UTF-8"]
 
     websheet.unusable_cppflags = unusable_cppflags
 
@@ -101,7 +103,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         tester += "\n" + "int main() {}\n"
 
         newslug = websheet.slug + "test"
-        cpp = open(jail + refdir + newslug + ".cpp", "w")
+        cpp = open(jail + refdir + newslug + ".cpp", "w", encoding="utf-8")
         cpp.write(tester)
         cpp.close()
 
@@ -147,7 +149,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
 
         if not websheet.example:
 
-          cpp = open(jail + refdir + newslug + ".cpp", "w")
+          cpp = open(jail + refdir + newslug + ".cpp", "w", encoding="utf-8")
 #        print(reftester)
           cpp.write(reftester)
           cpp.close()
@@ -163,7 +165,7 @@ def grade(reference_solution, student_solution, translate_line, websheet):
                     "<br>retval:"+pre(str(refcompile.returncode))
                     +"-->"   )
 
-        cpp = open(jail + studir + newslug + ".cpp", "w")
+        cpp = open(jail + studir + newslug + ".cpp", "w", encoding="utf-8")
         cpp.write(stutester)
         cpp.close()
         os.chdir(jail + studir)
