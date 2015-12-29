@@ -12,7 +12,7 @@ def tt(s):
 
 def badchar(ch):
   x = ord(ch)
-  return x<32 and x not in [10, 13] or x == 127 or x >= 0x2018 and x < 0x2020
+  return x<32 and x not in [9, 10, 13] or x == 127 or x >= 0x2018 and x < 0x2020
 
 def expose_badchars(str):
   for i in reversed(range(len(str))):
