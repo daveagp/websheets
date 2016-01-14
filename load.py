@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-if __name__ == "__main__":
+def load():
   import sys, json
   from Websheet import Websheet
   student = sys.argv[2]
@@ -14,6 +14,15 @@ if __name__ == "__main__":
     
     import config, json
     
+    authinfo = json.loads("".join(sys.stdin))
+    instructor = config.get_instructor(student)
+    if "username" in authinfo: # if not anonymous
+        # checks if you can see the solution -- are his instructor (or himself)
+        if not authinfo["username"] in [instructor, student]:  
+            print("You can't see the submission of " + student
+                 + ". You are not his instructor (nor himself).")
+            return
+          
     if not config.db_enabled: student="anonymous"
     #  websheet = Websheet.from_filesystem(classname)
     data = {"template_code":websheet.get_json_template(),
@@ -25,7 +34,7 @@ if __name__ == "__main__":
             "lang": websheet.lang,
             "sharing": websheet.sharing,
             "attempts_until_ref": websheet.attempts_until_ref,
-            "authinfo": json.loads("".join(sys.stdin))
+            "authinfo": authinfo
           }
     if websheet.nocode:
       data["nocode"] = websheet.get_nocode_question()
@@ -39,3 +48,6 @@ if __name__ == "__main__":
     print(json.dumps(data, indent=4, separators=(',', ': '))) # pretty!
   except FileNotFoundError:
     print("No exercise named " + sys.argv[1])
+
+if __name__ == "__main__":
+    load()
