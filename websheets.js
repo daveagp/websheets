@@ -388,6 +388,17 @@ websheets.Websheet.prototype.load_success = function(data) {
    }
 }
 
+function getQueryVariable(variable) // https://css-tricks.com/snippets/javascript/get-url-variables/
+{
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == variable){return pair[1];}
+       }
+       return("");
+}
+
 websheets.Websheet.prototype.load = function(newslug) {
    var this_ws = this; // to access in callbacks
 
@@ -401,7 +412,8 @@ websheets.Websheet.prototype.load = function(newslug) {
   var doauth = websheets.auth_by_embed && !websheets.authinfo;
   
   var request = {problem: this_ws.slug,
-                 preview: this_ws.preview};
+                 preview: this_ws.preview,
+                 student: getQueryVariable("student")};
 
   if (!doauth) request['ajax_uid_intended'] = websheets.authinfo.username;
 
