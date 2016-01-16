@@ -19,7 +19,7 @@ $preview = $_REQUEST["preview"]=='True' ? 'True' : 'False';
 
 $student = $WS_AUTHINFO['username']; 
 // for code review by instructor
-if (array_key_exists('student', $_REQUEST) && $_REQUEST["student"]!="undefined"){
+if (array_key_exists('student', $_REQUEST) && $_REQUEST["student"]!=""){
     $student = $_REQUEST["student"];
 }
 
