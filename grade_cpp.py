@@ -196,12 +196,19 @@ def grade(reference_solution, student_solution, translate_line, websheet):
           stdin = test['stdin']
         if 'args' in test:
           args = test['args']
+        title = test.get('title', "")       # optional title for test
+        hidden = test.get('hidden', False)  # test IO could be hidden -- to prevent cheating: "if In print Out" 
+
 
         cmd = websheet.slug
         if len(args) > 0: cmd += " " + " ".join(args)
+        if title: 
+            result += 'Title: "%s" '%title
         result += "<div>Running " + tt("./" + cmd)
-
-        if len(stdin) > 0: 
+        
+        if stdin and hidden:
+            result += " on hidden input "
+        elif stdin: 
           result += " on input " + pre(stdin)
         else:
           result += "&hellip;"
@@ -282,10 +289,13 @@ def grade(reference_solution, student_solution, translate_line, websheet):
         result += "which is almost correct but <i>you are missing a newline at the end</i>.</div>"
         return ("Failed Tests", result)
       else:
-        result += "<div>Failed! Printed this incorrect output:"
-        result += pre(runstu.stdout, True)
-        result += "Expected this correct output instead:"
-        result += pre(runref.stdout, True) + "</div>"
+        result += "<div>Failed!"
+        if not hidden: 
+            result += " Printed this incorrect output:"
+            result += pre(runstu.stdout, True)
+            result += "Expected this correct output instead:"
+            result += pre(runref.stdout, True) 
+        result += "</div>"
         return ("Failed Tests", result)
 
     if websheet.example:
