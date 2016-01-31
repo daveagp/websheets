@@ -623,6 +623,7 @@ dict with optional keys <tt>stdin</tt> (a string) and <tt>args</tt> (a list of s
 and the test suite is a list of tests.
 <p>Take a look at <span class='EG' data-slug='cpp/pointers/increase_by'></span> which uses
 both stdin and args. Many other C++ examples use just one of stdin or args but not both.
+<p>You can add <tt>"hidden":true</tt> to a test to make the input now be shown. You can add <tt>"title":"<i>your title here</i>"</tt> to label a test with a title. <a href='https://github.com/daveagp/websheets/pull/11'>Thanks to <tt>dz0</tt> for this feature!</a>
 <p>A test that runs with no inputs is an empty dict, so a test suite that just runs one 
 test with no inputs would have test suite <tt>[{}]</tt>. See 
 <span class='EG' data-slug='cpp/hello'></span>.

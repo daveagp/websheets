@@ -202,12 +202,13 @@ def grade(reference_solution, student_solution, translate_line, websheet):
 
         cmd = websheet.slug
         if len(args) > 0: cmd += " " + " ".join(args)
+        result += "<div>"
         if title: 
-            result += 'Title: "%s" '%title
-        result += "<div>Running " + tt("./" + cmd)
+            result += 'Test <i>%s</i>: ' % title
+        result += "Running " + tt("./" + cmd)
         
         if stdin and hidden:
-            result += " on hidden input "
+            result += " on hidden input&hellip;"
         elif stdin: 
           result += " on input " + pre(stdin)
         else:
