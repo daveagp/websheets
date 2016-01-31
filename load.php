@@ -17,6 +17,12 @@ if (//!array_key_exists('stdin', $_REQUEST) ||
 $problem = $_REQUEST["problem"];
 $preview = $_REQUEST["preview"]=='True' ? 'True' : 'False';
 
+$student = $WS_AUTHINFO['username']; 
+// for code review by instructor
+if (array_key_exists('student', $_REQUEST) && $_REQUEST["student"]!=""){
+    $student = $_REQUEST["student"];
+}
+
 // only accept characters that cannot cause problems
 $regex = "[_0-9a-zA-Z/-]+";
 if (!preg_match("@^$regex\$@", $problem)) {
@@ -30,7 +36,7 @@ $descriptorspec = array(
                         2 => array("pipe", "w"),  // stderr
                         );
 
-$process = proc_open("python3 ./load.py " . $problem . " " . $WS_AUTHINFO['username'] . " " . $preview, $descriptorspec, $pipes);
+$process = proc_open("python3 ./load.py " . $problem . " " . $student . " " . $preview, $descriptorspec, $pipes);
 
 if (!is_resource($process)) {
   echo "Internal error, could not run Websheet program";

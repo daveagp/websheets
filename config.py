@@ -170,3 +170,11 @@ def get_row(query, multiple=False, escapeme=[]):
 def get_rows(query, escapeme=[]):
     return get_row(query, True, escapeme)
 
+# get instructor (to check permisions of student code review) 
+def get_instructor(student):
+        result = get_row(
+            "select value from ws_settings " +
+            "WHERE user = %s AND keyname = 'instructor';", 
+            escapeme=(student, )
+        )
+        return result[0] if result else ""

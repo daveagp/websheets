@@ -35,7 +35,9 @@ if (!$WS_AUTHINFO['logged_in']) {
       foreach ($info as $problem => $results) {
         if ($count2 > 0) echo ",\n"; else echo "\n";
         $count2++;
-        echo "    ".str_replace("\\/", "/", json_encode($problem)).": ".json_encode($results);
+        $problem_url="index.php?start=$problem&student=$student";
+        $problem_link="<a href='$problem_url'>".str_replace("\\/", "/", json_encode($problem)).'</a>';
+        echo "    $problem_link: ".json_encode($results);
       }
       echo "\n  }";
     }
