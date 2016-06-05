@@ -69,7 +69,7 @@ if __name__ == "__main__":
       if action == 'delete': continue
       if author != username:
         if sharing == 'draft' or sharing == 'hidden': continue
-      result.append([problem, author != username, sharing])
+      result.append([problem, author != username, sharing, author])
     #saner sort, files before folders
     for x in result:
       tmp = x[0].split('/')

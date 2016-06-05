@@ -3,10 +3,13 @@
 <head>
 <title>Websheets Listing</title>
    <link rel="icon" type="image/png" href="favicon.png">
+   <script type="text/javascript" src="jquery.min.js"></script>
+   <script type="text/javascript" src="list.js"></script>
 <style>
 table#list tr td:first-child {text-align:right;}
 .hidemine .mine {display:none;}
 .hidenotmine .notmine {display:none;}
+.filteredout {display:none;}
 </style>
 </head>
 <body>
@@ -16,6 +19,7 @@ table#list tr td:first-child {text-align:right;}
 <a href='#' onclick='window.list.className="hidemine"'>Show only other authors' websheets</a>
 <a href='#' onclick='window.list.className=""'>Show all websheets</a>
 </div>
+<input type="text" id="searchField" placeholder="Enter search terms">
 <table id='list'>
 <?php 
   require_once('edit.php');
@@ -34,11 +38,12 @@ table#list tr td:first-child {text-align:right;}
       if ($i == -1) $folder = ""; else $folder = substr($name, 0, $i);
       $slug = substr($name, $i+1);
       $sharing = $probleminfo[2];
+      $author = $probleminfo[3];
       $action = $probleminfo[1]?'View Source':'Edit';
       $class = $probleminfo[1]?'notmine':'mine';
-      echo "<tr class='$class'><td>$name</td><td><a href='editor.php?edit=$name'>$action</a></td>";
+      echo "<tr class='problem $class'><td class='name'>$name</td><td><a href='editor.php?edit=$name'>$action</a></td><td class='author'>$author</td>";
       if ($sharing != 'draft') echo "<td><a href='./?folder=$folder&start=$slug'>Solve</a></td>";
-      echo '</tr>';
+      echo "</tr>\n";
     }
   }
 ?>
