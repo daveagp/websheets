@@ -1,4 +1,9 @@
-<?php require_once('auth.php'); ?>
+<?php require_once('auth.php');
+if (!preg_match("@^[0-9a-zA-Z_/-]*$@", $REQUEST['edit'])) {
+  echo "Invalid command to edit";
+  die;
+ }
+?>
 <html>
 <head>
    <link rel="icon" type="image/png" href="favicon.png">
