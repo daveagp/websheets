@@ -1,5 +1,5 @@
 <?php require_once('auth.php');
-if (!preg_match("@^[0-9a-zA-Z_/-]*$@", $REQUEST['edit'])) {
+if (!preg_match("@^[0-9a-zA-Z_/-]*$@", $_REQUEST['edit'])) {
   echo "Invalid command to edit";
   die;
  }
