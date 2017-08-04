@@ -26,7 +26,7 @@ if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
       MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]} });
    </script>
    <script type="text/javascript" 
-    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
    </script>
 
    <link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
@@ -34,7 +34,7 @@ if (1 != preg_match('~^(([\\w-]+/)*[\\w-]+)?$~', $_GET['folder']))
    <link rel="stylesheet" href="websheets.css">
    <link rel="stylesheet" href="index.css">
   
-   <link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:400,700'
+   <link href='https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700'
     rel='stylesheet' type='text/css'>
    <script type='text/javascript'> 
    websheets.urlbase = "./";

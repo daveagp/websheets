@@ -103,6 +103,7 @@ else {
                   "secret" => $WS_CONFIG["facebook-secret"]
                   ),
             "scope"   => "email",
+            "trustForwarded" => true
             );
   }    
 

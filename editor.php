@@ -12,7 +12,7 @@ if (!preg_match("@^[0-9a-zA-Z_/-]*$@", $_REQUEST['edit'])) {
     MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]} });
 </script>
 <script type="text/javascript" 
-    src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 <script type='text/javascript' src='jquery.min.js'></script>
 <script type='text/javascript' src='editor.js'></script>
