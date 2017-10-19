@@ -105,6 +105,23 @@ $attemptlink = "./?start=".$bits[count($bits)-1]."&folder=".implode('/', array_s
 Note: problems are open-source by default (see 'Public permissions'). 
 Assumed license for open problems is <a href='https://creativecommons.org/licenses/by-sa/4.0/'>Creative Commons 4.0 Attribution-ShareAlike</a> unless specified in 'Remarks'.
 <hr>
+
+<script>
+function update_src_CM(){
+    var code = $('textarea#smart-paste').val();
+    
+    // replace (delete) metacomments:     /**:    and       :**/
+    
+    code = code.replace( /\/\*\*\:/g, '');
+    code = code.replace( /\:\*\*\//g, '');
+    // alert(code);
+    codemirrors[""+9].setValue(code);
+    // codemirrors[""+9].refresh();
+    // $('tr#row-9 cm-maker');
+    // $('tr.row-source_code display: table-row');
+}
+</script>
+<div id="smart-paste-container"><textarea style="width: 100%" id="smart-paste" onchange="update_src_CM();"></textarea></div>
 <div class='preview'></div>
 </div> <!-- editor -->
 </body>
