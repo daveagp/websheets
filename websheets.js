@@ -945,5 +945,5 @@ function delete_metacomments(){
     // replace (delete) metacomments:     /**:    and       :**/    
     code = code.replace( /\/\*\*\:/g, '');
     code = code.replace( /\:\*\*\//g, '');
-    codemirrors["9"].setValue(code);
+    codemirrors["source_code"].setValue(code);
 }

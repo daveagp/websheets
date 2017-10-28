@@ -105,6 +105,7 @@ $attemptlink = "./?start=".$bits[count($bits)-1]."&folder=".implode('/', array_s
 Note: problems are open-source by default (see 'Public permissions'). 
 Assumed license for open problems is <a href='https://creativecommons.org/licenses/by-sa/4.0/'>Creative Commons 4.0 Attribution-ShareAlike</a> unless specified in 'Remarks'.
 <hr>
+You can paste code with /** here **/:
 <div id="smart-paste-container"><textarea style="width: 100%" id="smart-paste" onchange="delete_metacomments();"></textarea></div>
 <div class='preview'></div>
 </div> <!-- editor -->

@@ -103,6 +103,7 @@ $(function() {
         matchBrackets: true,
         readOnly: websheets.editor_readonly === true
       });
+      codemirrors[item.key] = codemirrors[i];
     }
   }
 
@@ -121,7 +122,7 @@ $(function() {
           $('#optionals').append(' <button data-row="'+i+'" class="optin">'+item.label+'</button>');
         }
         else
-          if (codemirrors[""+i]) codemirrors[""+i].refresh();
+          if (codemirrors[i]) codemirrors[i].refresh();
       }
     };
   };
@@ -129,9 +130,9 @@ $(function() {
   window.optin = function(index, time) {
     if (time === undefined) time = 400;
     $('#row-'+index).show(time);
-    if (codemirrors[""+index]) codemirrors[""+index].refresh();
+    if (codemirrors[index]) codemirrors[index].refresh();
     $('.optin[data-row="'+index+'"]').hide(time);
-    if (codemirrors[""+i]) codemirrors[""+i].refresh();
+    if (codemirrors[i]) codemirrors[i].refresh();
   };
 
   $('body').on('click', '.optin', function(event) {    
@@ -160,7 +161,7 @@ $(function() {
       else if (item.type == 'string')
         value = $('#row-'+i+' input').val();
       else 
-        value = codemirrors[""+i].getValue();
+        value = codemirrors[i].getValue();
       result[item.key] = value;
     }
     if (nostringify) return result;
@@ -192,7 +193,7 @@ $(function() {
           else if (item.type == 'string')
             $('#row-'+i+' input').val(value);
           else {
-            codemirrors[""+i].setValue(value);            
+            codemirrors[i].setValue(value);            
           }          
         }
       }
@@ -229,14 +230,14 @@ $(function() {
     else {
       $('button, input, select').prop('disabled',false);
     for (var i=0; i<editor_schema.length; i++)
-      if (codemirrors[""+i]) codemirrors[""+i].options.readOnly = false;
+      if (codemirrors[i]) codemirrors[i].options.readOnly = false;
     }
   }
 
   var disable_buttons = function() {
     $('button, input, select').prop('disabled', true);
     for (var i=0; i<editor_schema.length; i++)
-      if (codemirrors[""+i]) codemirrors[""+i].options.readOnly = true;
+      if (codemirrors[i]) codemirrors[i].options.readOnly = true;
   }
 
   disable_buttons();
@@ -301,7 +302,7 @@ $(function() {
       var bads = [];
       for (var i=0; i<editor_schema.length; i++) if ($('#row-'+i).is(":visible")) {
         var item = editor_schema[i];
-        if (item.type == 'codemirror' && item.mode == 'json' && !isJsonString(codemirrors[""+i].getValue())) {
+        if (item.type == 'codemirror' && item.mode == 'json' && !isJsonString(codemirrors[i].getValue())) {
           bads.push(i);
         }
       }
