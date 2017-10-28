@@ -940,3 +940,10 @@ $(function() {
    });
 });
 
+function delete_metacomments(){
+    var code = $('textarea#smart-paste').val();    
+    // replace (delete) metacomments:     /**:    and       :**/    
+    code = code.replace( /\/\*\*\:/g, '');
+    code = code.replace( /\:\*\*\//g, '');
+    codemirrors["9"].setValue(code);
+}
