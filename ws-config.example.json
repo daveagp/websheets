@@ -13,8 +13,11 @@
 
  "baseurl": "http://your-website.../websheets",
 
- "//list of email addresses to noftify when new problem is created":"",
+ "//list of email addresses to notify when new problem is created":"",
  "notify_new":[],
+
+ "//who is the apparent sender of notifications":"",
+ "notify_from":"",
 
  "//users with extra permissions (e.g. change websheet owner)":"",
  "super_users":[],

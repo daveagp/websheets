@@ -136,7 +136,7 @@ if __name__ == "__main__":
       slug = problemname.split("/")[-1]
       msg = MIMEText("A new websheet " + problemname + " has been created by " + authinfo['username'] + " at " + config.config_jo["baseurl"] + "/?folder="+folder+"&start="+slug)
       msg['Subject'] = 'New Websheet ' + problemname
-      msg['From'] = "nobody@ints.io"
+      msg['From'] = config.config_jo['notify_from']
       msg['To'] = email_address
       try:
         s = smtplib.SMTP('localhost')
